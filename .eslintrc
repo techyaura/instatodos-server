@@ -5,6 +5,8 @@
         "max-len": 0,
         "no-underscore-dangle": 0,
         "global-require": 0,
-        "indent": ["error", 2]
+        "indent": ["error", 2],
+        "comma-dangle": ["error", "never"],
+        "no-param-reassign": 0
     }
 }

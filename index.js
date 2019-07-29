@@ -1,14 +1,14 @@
 // Config env constibales on app bootsrap
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV}`,
+  path: `.env.${process.env.NODE_ENV}`
 });
 
 // Express config
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
-const { buildSchema } = require('graphql');
 const morgan = require('morgan');
+const schema = require('./src/graphql');
 
 const port = process.env.PORT;
 
@@ -18,30 +18,18 @@ require('./src/config/db');
 const winston = require('./src/config/winston');
 
 // Construct a schema, using GraphQL schema language
-const schema = buildSchema(`
-  
-type User {
-  name: String,
-  amount: Int
-}
-
-type Query {
-    hello: User
-}
-
-`);
 
 // The root provides a resolver function for each API endpoint
-const root = {
-  hello: () => ({ name: 'hwllo', amount: 300 }),
-};
+// const root = {
+//   hello: () => ({ name: 'hwllo', amount: 300 })
+// };
 
 const app = express();
 app.use(morgan('combined', { stream: winston.stream }));
 app.use('/graphql', graphqlHTTP({
   schema,
-  rootValue: root,
-  graphiql: true,
+  pretty: true,
+  graphiql: true
 }));
 
 app.use((err, req, res, next) => {
