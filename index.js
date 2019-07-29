@@ -10,7 +10,7 @@ const graphqlHTTP = require('express-graphql');
 const morgan = require('morgan');
 const schema = require('./src/graphql');
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8080;
 
 // connect to the database
 require('./src/config/db');
