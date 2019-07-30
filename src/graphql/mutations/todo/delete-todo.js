@@ -3,7 +3,7 @@ const {
   GraphQLID
 } = require('graphql');
 
-const TodoModel = require('../../../models/todo');
+const { TodoModel } = require('../../../models');
 const todoDeleteType = require('../../types/todo/delete');
 
 
