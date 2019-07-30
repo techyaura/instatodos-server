@@ -4,17 +4,25 @@ const {
 } = require('graphql');
 
 const { TodoModel } = require('../../../models');
-const todoDeleteType = require('../../types/todo/delete');
-
+const toDoSuccessType = require('../../types/todo/success');
 
 module.exports = {
-  type: todoDeleteType,
+  type: toDoSuccessType,
   args: {
     _id: { type: GraphQLNonNull(GraphQLID) }
   },
-  resolve: (root, args, context, info) => TodoModel.remove({
-    _id: args._id
-  })
-    .then(() => ({ ok: true }))
-    .catch(err => err)
+  resolve: (root, args, context, info) => {
+    if (typeof (context.user) === 'undefined') {
+      return {
+        message: 'Not Authorized',
+        ok: false
+      };
+    }
+
+    return TodoModel.remove({
+      _id: args._id
+    })
+      .then(() => ({ ok: true, message: 'Todo deleted successfully' }))
+      .catch(err => err);
+  }
 };

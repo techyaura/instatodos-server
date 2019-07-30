@@ -17,16 +17,11 @@ require('./src/config/db');
 
 const winston = require('./src/config/winston');
 
-// Construct a schema, using GraphQL schema language
-
-// The root provides a resolver function for each API endpoint
-// const root = {
-//   hello: () => ({ name: 'hwllo', amount: 300 })
-// };
+const { AuthMiddleware } = require('./src/middlewares');
 
 const app = express();
 app.use(morgan('combined', { stream: winston.stream }));
-app.use('/graphql', graphqlHTTP({
+app.use('/graphql', AuthMiddleware.jwt, graphqlHTTP({
   schema,
   pretty: true,
   graphiql: true

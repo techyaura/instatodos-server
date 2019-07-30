@@ -21,6 +21,7 @@ class AuthService {
     return this.UserModel.findOne(
       {
         isDeleted: false,
+        status: true,
         email: postBody.email
       }
     )

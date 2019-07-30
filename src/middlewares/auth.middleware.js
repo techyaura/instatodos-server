@@ -15,11 +15,9 @@ module.exports = {
         } else {
           return next('INVALID_GRANT');
         }
-      } else {
-        return next('INVALID_GRANT');
       }
     } else {
-      return next(401);
+      return next();
     }
 
     return JwtUtil.verify(token)
@@ -27,17 +25,15 @@ module.exports = {
         if (tokenPayload && tokenPayload.auth) {
           return UserModel.findOne(
             { _id: tokenPayload.auth },
-            { _id: 1, role: 1, username: 1 },
+            { _id: 1, email: 1 },
           ).lean();
         }
         return next(new Error('INVALID_GRANT'));
       })
       .then((user) => {
         req.user = user;
-        next();
+        return next();
       })
-      .catch((err) => {
-        next(err);
-      });
+      .catch(err => next(err));
   }
 };

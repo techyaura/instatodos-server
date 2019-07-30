@@ -5,15 +5,23 @@ const {
 
 const { TodoModel } = require('../../../models');
 
-const todoAddType = require('../../types/todo/add');
+const toDoSuccessType = require('../../types/todo/success');
 
 module.exports = {
-  type: todoAddType,
+  type: toDoSuccessType,
   args: {
     title: { type: GraphQLNonNull(GraphQLString) }
   },
   resolve: (root, args, context, info) => {
+    if (typeof (context.user) === 'undefined') {
+      return {
+        message: 'Not Authorized',
+        ok: false
+      };
+    }
     const todo = new TodoModel(args);
-    return todo.save();
+    return todo.save()
+      .then(() => ({ message: 'Todo has been succesfully added', ok: true }))
+      .catch(err => err);
   }
 };

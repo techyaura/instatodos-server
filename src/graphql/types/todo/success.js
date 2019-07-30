@@ -3,14 +3,18 @@
 const {
   GraphQLObjectType,
   GraphQLBoolean,
-  GraphQLNonNull
+  GraphQLNonNull,
+  GraphQLString
 } = require('graphql');
 
 module.exports = new GraphQLObjectType({
-  name: 'ok',
+  name: 'success',
   fields: {
     ok: {
       type: new GraphQLNonNull(GraphQLBoolean)
+    },
+    message: {
+      type: new GraphQLNonNull(GraphQLString)
     }
   }
 });
