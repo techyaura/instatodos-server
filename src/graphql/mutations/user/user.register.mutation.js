@@ -5,10 +5,10 @@ const {
 
 const { UserService } = require('../../../services');
 
-const userRegister = require('../../types/user/user.register.type');
+const { userRegisterType } = require('../../types');
 
 module.exports = {
-  type: userRegister,
+  type: userRegisterType,
   args: {
     email: { type: GraphQLNonNull(GraphQLString) },
     password: { type: GraphQLNonNull(GraphQLString) }

@@ -23,7 +23,7 @@ class TodoService {
   }
 
   deleteTodo(params) {
-    return this.TodoModel.remove({ isDeleted: false, status: true, _id: params._id });
+    return this.TodoModel.deleteOne({ isDeleted: false, status: true, _id: params._id });
   }
 }
 

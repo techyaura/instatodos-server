@@ -8,7 +8,7 @@ const {
 } = require('graphql');
 
 module.exports = new GraphQLObjectType({
-  name: 'TodoList',
+  name: 'TodoType',
   fields: {
     _id: {
       type: new GraphQLNonNull(GraphQLID)

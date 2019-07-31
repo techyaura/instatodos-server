@@ -5,7 +5,7 @@ const {
 
 const { TodoService } = require('../../../services');
 
-const toDoSuccessType = require('../../types/todo/success');
+const { toDoSuccessType } = require('../../types');
 
 module.exports = {
   type: toDoSuccessType,

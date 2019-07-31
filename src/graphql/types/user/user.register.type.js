@@ -6,7 +6,7 @@ const {
 } = require('graphql');
 
 module.exports = new GraphQLObjectType({
-  name: 'UserRegister',
+  name: 'UserRegisterType',
   fields: {
     message: {
       type: new GraphQLNonNull(GraphQLString)

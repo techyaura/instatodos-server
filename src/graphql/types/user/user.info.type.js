@@ -8,7 +8,7 @@ const {
 
 
 module.exports = new GraphQLObjectType({
-  name: 'UserInfo',
+  name: 'UserInfoType',
   fields: {
     email: {
       type: new GraphQLNonNull(GraphQLString)

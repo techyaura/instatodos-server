@@ -5,7 +5,7 @@ const {
 
 const { UserService } = require('../../../services');
 
-const userLoginType = require('../../types/user/user.login.type');
+const { userLoginType } = require('../../types');
 
 module.exports = {
   type: userLoginType,

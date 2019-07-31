@@ -8,7 +8,7 @@ const {
 } = require('graphql');
 
 module.exports = new GraphQLObjectType({
-  name: 'success',
+  name: 'TodoSuccessType',
   fields: {
     ok: {
       type: new GraphQLNonNull(GraphQLBoolean)
