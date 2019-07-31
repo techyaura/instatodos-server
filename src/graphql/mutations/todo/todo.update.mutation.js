@@ -4,7 +4,7 @@ const {
   GraphQLString
 } = require('graphql');
 
-const { TodoModel } = require('../../../models');
+const { TodoService } = require('../../../services');
 
 const toDoSuccessType = require('../../types/todo/success');
 
@@ -22,14 +22,8 @@ module.exports = {
       };
     }
 
-    return TodoModel.updateOne({
-      _id: args._id
-    }, {
-      $set: {
-        title: args.title
-      }
-    })
-      .then(() => ({ title: args.title, _id: args._id }))
+    return TodoService.updateTodo(args)
+      .then(() => ({ message: 'Todo has been succesfully updated', ok: true }))
       .catch(err => err);
   }
 };

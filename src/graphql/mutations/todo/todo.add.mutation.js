@@ -1,15 +1,16 @@
 const {
-  GraphQLNonNull,
-  GraphQLID
+  GraphQLString,
+  GraphQLNonNull
 } = require('graphql');
 
-const { TodoModel } = require('../../../models');
+const { TodoService } = require('../../../services');
+
 const toDoSuccessType = require('../../types/todo/success');
 
 module.exports = {
   type: toDoSuccessType,
   args: {
-    _id: { type: GraphQLNonNull(GraphQLID) }
+    title: { type: GraphQLNonNull(GraphQLString) }
   },
   resolve: (root, args, context, info) => {
     if (typeof (context.user) === 'undefined') {
@@ -18,11 +19,8 @@ module.exports = {
         ok: false
       };
     }
-
-    return TodoModel.remove({
-      _id: args._id
-    })
-      .then(() => ({ ok: true, message: 'Todo deleted successfully' }))
+    return TodoService.addTodo(args)
+      .then(() => ({ message: 'Todo has been succesfully added', ok: true }))
       .catch(err => err);
   }
 };

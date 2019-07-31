@@ -1,9 +1,9 @@
-const todoList = require('./todo/multiple-todo.js');
-const todo = require('./todo/single-todo');
+const todoList = require('./todo/todo.list.query');
+const todoView = require('./todo/todo.view.query');
 const login = require('./user/user.login.query');
 
 module.exports = {
   todoList,
-  todo,
+  todoView,
   login
 };

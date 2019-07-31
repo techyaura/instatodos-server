@@ -3,7 +3,7 @@ const {
   GraphQLID
 } = require('graphql');
 
-const { TodoModel } = require('../../../models');
+const { TodoService } = require('../../../services');
 
 const todoListType = require('../../types/todo/list');
 
@@ -12,7 +12,7 @@ module.exports = {
   args: {
     _id: { type: GraphQLNonNull(GraphQLID) }
   },
-  resolve(root, params, options) {
-    return TodoModel.findById(params._id).exec();
+  resolve(root, args, options) {
+    return TodoService.viewTodo(args);
   }
 };
