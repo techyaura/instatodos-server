@@ -8,6 +8,9 @@ const { TodoService } = require('../../../services');
 
 const { toDoSuccessType } = require('../../types');
 
+const { updateTodoValidator } = require('../../../validators');
+
+
 module.exports = {
   type: toDoSuccessType,
   args: {
@@ -22,8 +25,8 @@ module.exports = {
       };
     }
 
-    return TodoService.updateTodo(args)
-      .then(() => ({ message: 'Todo has been succesfully updated', ok: true }))
+    return updateTodoValidator(args).then(() => TodoService.updateTodo(args))
+      .then(() => ({ message: 'Todo has been succesfully added', ok: true }))
       .catch(err => err);
   }
 };

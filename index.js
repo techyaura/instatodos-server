@@ -19,6 +19,8 @@ const winston = require('./src/config/winston');
 
 const { AuthMiddleware } = require('./src/middlewares');
 
+const errorHandler = require('./src/errors/handler');
+
 const app = express();
 app.use(morgan('combined', { stream: winston.stream }));
 app.use('/graphql', AuthMiddleware.jwt, graphqlHTTP({
@@ -35,9 +37,7 @@ app.use((err, req, res, next) => {
   // add this line to include winston logging
   winston.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  return errorHandler(err, req, res, next);
 });
 
 

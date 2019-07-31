@@ -7,20 +7,24 @@ const { TodoService } = require('../../../services');
 
 const { toDoSuccessType } = require('../../types');
 
+const { addTodoValidator } = require('../../../validators');
+
 module.exports = {
   type: toDoSuccessType,
   args: {
     title: { type: GraphQLNonNull(GraphQLString) }
   },
-  resolve: (root, args, context, info) => {
-    if (typeof (context.user) === 'undefined') {
+  resolve: (root, args, context) => {
+    const { res, next, user } = context;
+    if (typeof (user) === 'undefined') {
       return {
         message: 'Not Authorized',
         ok: false
       };
     }
-    return TodoService.addTodo(args)
+
+    return addTodoValidator(args).then(() => TodoService.addTodo(args))
       .then(() => ({ message: 'Todo has been succesfully added', ok: true }))
-      .catch(err => err);
+      .catch(err => next(err));
   }
 };
