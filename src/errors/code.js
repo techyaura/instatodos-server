@@ -54,14 +54,5 @@ module.exports = {
   507: 'Insufficient storage',
   509: 'Bandwidth limit exceeded',
   510: 'Not extended',
-  511: 'Network authentication required',
-  INVALID_CREDENTIALS: 'Invalid Email or Password',
-  EMAIL_NOT_REGISTER:
-    'Entered email is not registered with us, Please try again.',
-  WRONG_OTP: 'You have entered wrong OTP.',
-  NO_USER: 'Authentication failed',
-  ACCOUNT_FAIL_WITH_NO_EMAIL: 'Temporary Issue with account confirmation.',
-  EMAIL_ALREADY_REGISTER:
-    'Email is not available, Please try different email address.',
-  CATEGORY_UNIQUE: 'Category name should be unique.',
+  511: 'Network authentication required'
 };
