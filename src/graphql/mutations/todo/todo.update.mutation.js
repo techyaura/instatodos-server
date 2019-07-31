@@ -18,7 +18,8 @@ module.exports = {
     title: { type: GraphQLNonNull(GraphQLString) }
   },
   resolve: (root, args, context, info) => {
-    if (typeof (context.user) === 'undefined') {
+    const { res, next, user } = context;
+    if (typeof (user) === 'undefined') {
       return {
         message: 'Not Authorized',
         ok: false
@@ -27,6 +28,6 @@ module.exports = {
 
     return updateTodoValidator(args).then(() => TodoService.updateTodo(args))
       .then(() => ({ message: 'Todo has been succesfully added', ok: true }))
-      .catch(err => err);
+      .catch(err => next(err));
   }
 };

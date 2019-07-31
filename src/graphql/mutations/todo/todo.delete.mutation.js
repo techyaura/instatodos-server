@@ -13,7 +13,8 @@ module.exports = {
     _id: { type: GraphQLNonNull(GraphQLID) }
   },
   resolve: (root, args, context, info) => {
-    if (typeof (context.user) === 'undefined') {
+    const { res, next, user } = context;
+    if (typeof (user) === 'undefined') {
       return {
         message: 'Not Authorized',
         ok: false
@@ -22,6 +23,6 @@ module.exports = {
 
     return TodoService.deleteTodo(args)
       .then(() => ({ ok: true, message: 'Todo deleted successfully' }))
-      .catch(err => err);
+      .catch(err => next(err));
   }
 };

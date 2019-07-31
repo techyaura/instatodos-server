@@ -19,6 +19,6 @@ module.exports = {
     const { res, next } = context;
     return registerValidator(args, res, next).then(() => UserService.register(args))
       .then(response => ({ message: response.message }))
-      .catch(err => err);
+      .catch(err => next(err));
   }
 };
