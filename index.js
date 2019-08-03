@@ -17,6 +17,8 @@ require('./src/config/db');
 
 const winston = require('./src/config/winston');
 
+const cors = require('cors');
+
 const { AuthMiddleware } = require('./src/middlewares');
 
 const errorHandler = require('./src/errors/handler');
@@ -24,15 +26,7 @@ const errorHandler = require('./src/errors/handler');
 const app = express();
 
 // Configuring CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'POST, GET, DELETE, PUT');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-  );
-  next();
-});
+app.use(cors());
 
 app.use(morgan('combined', { stream: winston.stream }));
 app.use('/graphql', AuthMiddleware.jwt, graphqlHTTP({
