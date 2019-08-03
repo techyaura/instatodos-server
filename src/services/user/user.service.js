@@ -12,7 +12,8 @@ class AuthService {
     return this.UserModel(postBody)
       .save()
       .then(() => ({
-        message: 'User succsessfully registered'
+        message: 'User succsessfully registered',
+        ...postBody
       }))
       .catch(err => err);
   }
