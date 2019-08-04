@@ -1,5 +1,6 @@
 const {
-  GraphQLNonNull
+  GraphQLNonNull,
+  GraphQLID
 } = require('graphql');
 
 const { TodoService } = require('../../../services');
@@ -12,6 +13,9 @@ const { updateTodoValidator } = require('../../../validators');
 module.exports = {
   type: successType,
   args: {
+    id: {
+      type: new GraphQLNonNull(GraphQLID)
+    },
     input: {
       type: new GraphQLNonNull(toDoInputType)
     }
@@ -25,8 +29,8 @@ module.exports = {
       };
     }
 
-    return updateTodoValidator(args).then(() => TodoService.updateTodo(args))
-      .then(() => ({ message: 'Todo has been succesfully added', ok: true }))
+    return updateTodoValidator({ ...args.input, _id: args.id }).then(() => TodoService.updateTodo(args.id, args.input))
+      .then(() => ({ message: 'Todo has been succesfully updated', ok: true }))
       .catch(err => next(err));
   }
 };

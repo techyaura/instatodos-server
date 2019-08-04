@@ -14,12 +14,12 @@ module.exports = {
   },
   resolve: (root, args, context, info) => {
     const { res, next, user } = context;
-    if (typeof (user) === 'undefined') {
-      return {
-        message: 'Not Authorized',
-        ok: false
-      };
-    }
+    // if (typeof (user) === 'undefined') {
+    //   return {
+    //     message: 'Not Authorized',
+    //     ok: false
+    //   };
+    // }
 
     return TodoService.deleteTodo(args)
       .then(() => ({ ok: true, message: 'Todo deleted successfully' }))

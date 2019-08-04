@@ -18,8 +18,8 @@ class TodoService {
     return this.TodoModel.find({ isDeleted: false, status: true });
   }
 
-  updateTodo(postBody) {
-    return this.TodoModel.updateOne({ isDeleted: false, status: true, _id: postBody._id }, { $set: { title: postBody.title } });
+  updateTodo(todoId, postBody) {
+    return this.TodoModel.updateOne({ isDeleted: false, status: true, _id: todoId }, { $set: postBody });
   }
 
   deleteTodo(params) {
