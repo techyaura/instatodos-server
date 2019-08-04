@@ -17,7 +17,7 @@ module.exports = {
   },
   resolve(root, args, context) {
     const { res, next } = context;
-    return loginValidator(args, res, next).then(() => UserService.login(args))
+    return loginValidator(args.input, res, next).then(() => UserService.login(args.input))
       .then(response => response)
       .catch(err => next(err));
   }

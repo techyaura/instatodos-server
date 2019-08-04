@@ -19,7 +19,7 @@ module.exports = {
   },
   resolve(root, args, context) {
     const { res, next } = context;
-    return registerValidator(args, res, next).then(() => UserService.register(args))
+    return registerValidator(args.input, res, next).then(() => UserService.register(args.input))
       .then(user => TemplateService.fetch('USER_REGISTER').then(templateObj => [user, templateObj]))
       .then((response) => {
         const [user, templateObject] = response;
@@ -30,7 +30,7 @@ module.exports = {
         };
         return EmailUtil.sendViaSendgrid(mailOptions);
       })
-      .then(() => ({ message: 'User Registered' }))
+      .then(() => ({ message: 'User Registered', ok: true }))
       .catch(err => next(err));
   }
 };

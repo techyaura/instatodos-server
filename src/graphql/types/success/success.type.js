@@ -14,7 +14,7 @@ module.exports = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLBoolean)
     },
     message: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     }
   }
 });
