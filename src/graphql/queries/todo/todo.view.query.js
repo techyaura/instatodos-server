@@ -12,7 +12,7 @@ module.exports = {
   args: {
     _id: { type: GraphQLNonNull(GraphQLID) }
   },
-  resolve(root, args, options) {
+  resolve(root, args) {
     return TodoService.viewTodo(args);
   }
 };

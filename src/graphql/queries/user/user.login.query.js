@@ -1,19 +1,19 @@
 const {
-  GraphQLString,
   GraphQLNonNull
 } = require('graphql');
 
 const { UserService } = require('../../../services');
 
-const { userLoginType } = require('../../types');
+const { userLoginSuccessType, userLoginInputType } = require('../../types');
 
 const { loginValidator } = require('../../../validators');
 
 module.exports = {
-  type: userLoginType,
+  type: userLoginSuccessType,
   args: {
-    email: { type: GraphQLNonNull(GraphQLString) },
-    password: { type: GraphQLNonNull(GraphQLString) }
+    input: {
+      type: new GraphQLNonNull(userLoginInputType)
+    }
   },
   resolve(root, args, context) {
     const { res, next } = context;

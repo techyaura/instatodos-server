@@ -1,13 +1,18 @@
-const toDoSuccessType = require('./todo/todo.success.type');
+const successType = require('./success/success.type');
 const toDoType = require('./todo/todo.type');
+const toDoInputType = require('./todo/todo.input.type');
 const userInfoType = require('./user/user.info.type');
-const userLoginType = require('./user/user.login.type');
-const userRegisterType = require('./user/user.register.type');
+const userLoginSuccessType = require('./user/user.login.success.type');
+const userLoginInputType = require('./user/user.login.input.type');
+const userRegisterInputType = require('./user/user.register.input.type');
+
 
 module.exports = {
-  toDoSuccessType,
+  successType,
   toDoType,
+  toDoInputType,
   userInfoType,
-  userLoginType,
-  userRegisterType
+  userLoginSuccessType,
+  userLoginInputType,
+  userRegisterInputType
 };

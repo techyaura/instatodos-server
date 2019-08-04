@@ -5,12 +5,12 @@ const {
 
 const { TodoService } = require('../../../services');
 
-const { toDoSuccessType } = require('../../types');
+const { successType } = require('../../types');
 
 const { addTodoValidator } = require('../../../validators');
 
 module.exports = {
-  type: toDoSuccessType,
+  type: successType,
   args: {
     title: { type: GraphQLNonNull(GraphQLString) }
   },

@@ -5,10 +5,10 @@ const {
 
 const { TodoService } = require('../../../services');
 
-const { toDoSuccessType } = require('../../types');
+const { successType } = require('../../types');
 
 module.exports = {
-  type: toDoSuccessType,
+  type: successType,
   args: {
     _id: { type: GraphQLNonNull(GraphQLID) }
   },

@@ -1,24 +1,23 @@
 const {
-  GraphQLNonNull,
-  GraphQLID,
-  GraphQLString
+  GraphQLNonNull
 } = require('graphql');
 
 const { TodoService } = require('../../../services');
 
-const { toDoSuccessType } = require('../../types');
+const { toDoInputType, successType } = require('../../types');
 
 const { updateTodoValidator } = require('../../../validators');
 
 
 module.exports = {
-  type: toDoSuccessType,
+  type: successType,
   args: {
-    _id: { type: GraphQLNonNull(GraphQLID) },
-    title: { type: GraphQLNonNull(GraphQLString) }
+    input: {
+      type: new GraphQLNonNull(toDoInputType)
+    }
   },
-  resolve: (root, args, context, info) => {
-    const { res, next, user } = context;
+  resolve: (root, args, context) => {
+    const { next, user } = context;
     if (typeof (user) === 'undefined') {
       return {
         message: 'Not Authorized',

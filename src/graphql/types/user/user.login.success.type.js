@@ -8,7 +8,7 @@ const {
 const userInfoType = require('./user.info.type');
 
 module.exports = new GraphQLObjectType({
-  name: 'UserLoginType',
+  name: 'UserLoginSuccessType',
   fields: {
     message: {
       type: new GraphQLNonNull(GraphQLString)
