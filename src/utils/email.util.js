@@ -8,9 +8,11 @@
       html: data,
     };
  */
+const SgMail = require('@sendgrid/mail');
+const Nodemailer = require('nodemailer');
+
 class EmailUtil {
   constructor() {
-    this.Nodemailer = require('nodemailer');
     this.fromEmail = process.env.SMTP_FROM_EMAIL || 'info@sumanix.com';
   }
 
@@ -26,16 +28,15 @@ class EmailUtil {
   }
 
   transporter() {
-    return this.Nodemailer.createTransport(
+    return Nodemailer.createTransport(
       this.constructor.smtpConfigOptions(),
     );
   }
 
   static smtpConfigOptionsSendgrid() {
     return new Promise((resolve) => {
-      const sgMail = require('@sendgrid/mail');
-      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-      return resolve(sgMail);
+      SgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      return resolve(SgMail);
     });
   }
 
