@@ -1,6 +1,7 @@
 const {
   registerValidator,
-  loginValidator
+  loginValidator,
+  registerVerificationValidator
 } = require('./auth.validator');
 
 const {
@@ -11,6 +12,7 @@ const {
 
 const validators = {
   registerValidator,
+  registerVerificationValidator,
   loginValidator,
   addTodoValidator,
   updateTodoValidator

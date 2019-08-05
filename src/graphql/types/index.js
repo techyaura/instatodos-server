@@ -5,7 +5,7 @@ const userInfoType = require('./user/user.info.type');
 const userLoginSuccessType = require('./user/user.login.success.type');
 const userLoginInputType = require('./user/user.login.input.type');
 const userRegisterInputType = require('./user/user.register.input.type');
-
+const userRegisterSuccessType = require('./user/user-register-success.type');
 
 module.exports = {
   successType,
@@ -14,5 +14,6 @@ module.exports = {
   userInfoType,
   userLoginSuccessType,
   userLoginInputType,
-  userRegisterInputType
+  userRegisterInputType,
+  userRegisterSuccessType
 };

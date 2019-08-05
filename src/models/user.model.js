@@ -11,12 +11,13 @@ const modelSchema = new Schema(
     firstname: { type: String },
     lastname: { type: String },
     username: { type: String },
-    otp: { type: String },
     password: String,
     email: {
       type: String,
       required: true
     },
+    otp: { type: String },
+    registerHash: { type: String },
     lastLogin: {
       type: Date,
       default: Date.now
@@ -24,7 +25,7 @@ const modelSchema = new Schema(
     status: {
       type: Boolean,
       enum: [true, false],
-      default: true
+      default: false
     },
     isDeleted: {
       type: Boolean,

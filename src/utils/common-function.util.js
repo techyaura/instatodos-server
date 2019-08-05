@@ -2,6 +2,7 @@
  * @name CommonFunctionUtil
  * @desc Common functions
  */
+const crypto = require('crypto');
 
 class CommonFunctionUtil {
   static generateOtp(sequenceLength = 6) {
@@ -21,6 +22,16 @@ class CommonFunctionUtil {
 
   static capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  static generateHash(email = '') {
+    const currentDate = new Date().valueOf().toString();
+    const random = Math.random().toString();
+    const hash = crypto
+      .createHash('sha1')
+      .update(currentDate + random + email)
+      .digest('hex');
+    return hash;
   }
 }
 

@@ -11,11 +11,35 @@ class AuthService {
   register(postBody) {
     return this.UserModel(postBody)
       .save()
-      .then(() => ({
-        message: 'User succsessfully registered',
-        ...postBody
-      }))
-      .catch(err => err);
+      .then(() => Promise.resolve({ message: 'User succsessfully registered', ...postBody }))
+      .catch(err => Promise.reject(err));
+  }
+
+  registerVerificationByOtp(postBody) {
+    return this.UserModel.findOneAndUpdate({
+      otp: postBody.otp,
+      registerHash: postBody.registerHash,
+      status: false
+    },
+    {
+      status: true,
+      registerHash: '',
+      otp: ''
+    },
+    {
+      upsert: false,
+      new: true
+    })
+      .then((response) => {
+        if (!response) {
+          return Promise.reject(new Error('No User Found'));
+        }
+        return Promise.resolve({
+          message: 'User succsessfully registered',
+          ...response
+        });
+      })
+      .catch(err => Promise.reject(err));
   }
 
   login(postBody) {
@@ -28,7 +52,7 @@ class AuthService {
     )
       .then((user) => {
         if (!user) {
-          return new Error('No_User_Found');
+          return Promise.reject(new Error('No_User_Found'));
         }
         return new Promise((resolve, reject) => new UserModel().comparePassword(postBody.password, user, (err, valid) => {
           if (err) {
@@ -50,7 +74,7 @@ class AuthService {
           });
         }));
       })
-      .catch(err => err);
+      .catch(err => Promise.reject(err));
   }
 }
 

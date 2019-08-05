@@ -4,14 +4,14 @@ const {
 
 const { UserService, TemplateService } = require('../../../services');
 
-const { userRegisterInputType, successType } = require('../../types');
+const { userRegisterInputType, userRegisterSuccessType } = require('../../types');
 
 const { registerValidator } = require('../../../validators');
 
 const { EmailUtil, CommonFunctionUtil } = require('../../../utils');
 
 module.exports = {
-  type: successType,
+  type: userRegisterSuccessType,
   args: {
     input: {
       type: new GraphQLNonNull(userRegisterInputType)
@@ -19,8 +19,9 @@ module.exports = {
   },
   resolve(root, args, context) {
     const otp = CommonFunctionUtil.generateOtp();
+    const registerHash = CommonFunctionUtil.generateHash(args.input.email ? args.input.email : '');
     const { res, next } = context;
-    return registerValidator(args.input, res, next).then(() => UserService.register({ ...args.input, otp }))
+    return registerValidator(args.input, res, next).then(() => UserService.register({ ...args.input, otp, registerHash }))
       .then(user => TemplateService.fetch('USER_REGISTER').then(templateObj => [user, templateObj]))
       .then((response) => {
         const [user, templateObject] = response;
@@ -36,9 +37,13 @@ module.exports = {
           subject: templateObject.subject,
           to: user.email
         };
-        return EmailUtil.sendViaSendgrid(mailOptions);
+        EmailUtil.sendViaSendgrid(mailOptions);
+        return {
+          message: 'An OTP has been send on your email.',
+          registerHash: user.registerHash
+        };
       })
-      .then(() => ({ message: 'User Registered', ok: true }))
+      .then(response => ({ ...response }))
       .catch(err => next(err));
   }
 };
