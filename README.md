@@ -21,6 +21,9 @@ This is an simple TODO crud API using Graphql + Node Js + Mongodb (Using mongoos
 ```sh
 PORT=<PORT-NUMBER>
 DB_URL=<MONGODB_URL>
+SENDGRID_API_KEY=<SENDGRID_API_KEY>
+JWT_SECRET=<JWT_SECRET>
+SMTP_FROM_EMAIL=<SMTP_FROM_EMAIL>
 ```
 GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 
