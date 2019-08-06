@@ -1,7 +1,9 @@
 const {
   registerValidator,
   loginValidator,
-  registerVerificationValidator
+  registerVerificationValidator,
+  emailValidator,
+  resetPasswordValidator
 } = require('./auth.validator');
 
 const {
@@ -13,9 +15,11 @@ const {
 const validators = {
   registerValidator,
   registerVerificationValidator,
+  emailValidator,
   loginValidator,
   addTodoValidator,
-  updateTodoValidator
+  updateTodoValidator,
+  resetPasswordValidator
 };
 
 module.exports = validators;

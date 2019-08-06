@@ -29,12 +29,10 @@ class AuthService {
   registerVerificationByOtp(postBody) {
     return this.UserModel.findOneAndUpdate({
       otp: postBody.otp,
-      hashToken: postBody.hashToken,
-      status: false
+      hashToken: postBody.hashToken
     },
     {
       status: true,
-      hashToken: '',
       otp: ''
     },
     {
@@ -46,8 +44,8 @@ class AuthService {
           return Promise.reject(new Error('No User Found'));
         }
         return Promise.resolve({
-          message: 'User succsessfully registered',
-          ...response
+          message: 'Email succsessfully verified',
+          ...postBody
         });
       })
       .catch(err => Promise.reject(err));
@@ -90,7 +88,7 @@ class AuthService {
 
   forgotPasswordByOtp(postBody) {
     const { email, hashToken, otp } = postBody;
-    this.UserModel.findOneAndUpdate(
+    return this.UserModel.findOneAndUpdate(
       { email, status: true, isDeleted: false },
       { hashToken, otp },
       { new: true, upsert: false },
@@ -119,18 +117,9 @@ class AuthService {
         if (!user) {
           return Promise.reject(new Error('No User Found'));
         }
-        return new Promise((resolve, reject) => new UserModel().comparePassword(password, user, (err, valid) => {
-          if (err) {
-            return reject(err);
-          }
-          if (!valid) {
-            return reject(new Error('INVALID_PASSWORD'));
-          }
-          return resolve({
-            message: 'Password Changed successfully',
-            ok: true
-          });
-        }));
+        user.password = password;
+        user.hashToken = '';
+        return user.save();
       })
       .catch(err => Promise.reject(err));
   }

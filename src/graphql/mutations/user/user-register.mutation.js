@@ -19,14 +19,14 @@ module.exports = {
   },
   resolve(root, args, context) {
     const otp = CommonFunctionUtil.generateOtp();
-    const registerHash = CommonFunctionUtil.generateHash(args.input.email ? args.input.email : '');
+    const hashToken = CommonFunctionUtil.generateHash(args.input.email ? args.input.email : '');
     const { res, next } = context;
     return registerValidator(args.input, res, next)
       .then(() => {
         const { email } = args.input;
         return UserService.checkUniqueEmail(email);
       })
-      .then(() => UserService.register({ ...args.input, otp, registerHash }))
+      .then(() => UserService.register({ ...args.input, otp, hashToken }))
       .then(user => TemplateService.fetch('USER_REGISTER').then(templateObj => [user, templateObj]))
       .then((response) => {
         const [user, templateObject] = response;
@@ -45,7 +45,7 @@ module.exports = {
         EmailUtil.sendViaSendgrid(mailOptions);
         return {
           message: 'An OTP has been sent on your email.',
-          registerHash: user.registerHash
+          hashToken: user.hashToken
         };
       })
       .then(response => ({ ...response }))

@@ -1,11 +1,11 @@
 const { UserService } = require('../../../services');
 
-const { successType, emailVerificationInputType } = require('../../types');
+const { emailRequestSuccessType, emailVerificationInputType } = require('../../types');
 
 const { registerVerificationValidator } = require('../../../validators');
 
 module.exports = {
-  type: successType,
+  type: emailRequestSuccessType,
   args: {
     input: {
       type: emailVerificationInputType

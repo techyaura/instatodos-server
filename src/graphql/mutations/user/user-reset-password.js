@@ -19,7 +19,7 @@ module.exports = {
     const { res, next } = context;
     return resetPasswordValidator(args.input, res, next)
       .then(() => UserService.resetPassword({ ...args.input }))
-      .then(response => ({ ...response }))
+      .then(() => ({ message: 'Password reset successfully', ok: true }))
       .catch(err => next(err));
   }
 };
