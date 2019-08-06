@@ -1,6 +1,6 @@
-const addTodo = require('./todo.add.mutation');
-const updateTodo = require('./todo.update.mutation');
-const deleteTodo = require('./todo.delete.mutation');
+const addTodo = require('./todo-add.mutation');
+const updateTodo = require('./todo-update.mutation');
+const deleteTodo = require('./todo-delete.mutation');
 
 module.exports = {
   addTodo,

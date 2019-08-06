@@ -1,4 +1,4 @@
-const register = require('./user.register.mutation');
+const register = require('./user-register.mutation');
 const registerVerificationByOtp = require('./user-register-verify.mutation');
 
 module.exports = {

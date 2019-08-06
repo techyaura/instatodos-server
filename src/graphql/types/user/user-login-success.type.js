@@ -5,7 +5,7 @@ const {
   GraphQLString
 } = require('graphql');
 
-const userInfoType = require('./user.info.type');
+const userInfoType = require('./user-info.type');
 
 module.exports = new GraphQLObjectType({
   name: 'UserLoginSuccessType',
