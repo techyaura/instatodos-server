@@ -18,13 +18,8 @@ This is an simple TODO crud API using Graphql + Node Js + Mongodb (Using mongoos
   
 
 - create the files `env.development` for local & `.env.production` for production
-
-- Set content as follows:
-
 ```sh
-
 PORT=<PORT-NUMBER>
-
 DB_URL=<MONGODB_URL>
 ```
 GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
@@ -33,19 +28,32 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 
 ```sh
     mutation {
-    	  register(email: "techyaura@yopmail.com", password: "Hello@123"){
+    	  register(input: { email: "techyaura@yopmail.com", password: "Hello@123" }){
+    	    registerHash
+			message
+    	  }
+    }
+```
+
+2. Register Verification(Verify User)
+
+```sh
+    mutation {
+    	  registerVerificationByOtp(input: { otp: "<OTP>", registerHash: "<registerHash>" }){
     	    message
     	  }
     }
 ```
 
-2. Login (with registered User)
+3. Login (with registered User)
 
 ```sh
     query {
 	  login(
-	  email: "techyaura@yopmail.com", 
-	  password: "Hello@123"){
+		  input: {
+			email: "techyaura@yopmail.com", 
+	  		password: "Hello@123"
+		  }){
 	    message
 	    token
 	    user {
@@ -56,40 +64,51 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 	}
 ```
 
-3. TODOS (create) - Authenticated Request(Must sent Authorization HEADER - format: `Authorization: Bearer <Token>`)
+4. TODOS (create) - Authenticated Request(Must sent Authorization HEADER - format: `Authorization: Bearer <Token>`)
 
 ```sh
     mutation {
-	  addTodo (title: "Hello World") {
+	  addTodo (input: { title: "Hello World" }) {
 	    message
     	ok
 	  }
 	}
 ```
 
-4. TODOS (read) - UnAuthenticated
+5. TODOS (read) - UnAuthenticated
 
 ```sh
     query {
 	  todoList {
-	    message
-    	ok
+	    title
 	  }
 	}
 ```
 
-5. TODOS (update) - Authenticated Request(Must sent Authorization HEADER - format: `Authorization: Bearer <Token>`)
+
+6. TODOS (View) - UnAuthenticated
+
+```sh
+    query {
+	  todoView(id: "<<TODO-ID>>") {
+	    title
+	  }
+	}
+```
+
+
+6. TODOS (update) - Authenticated Request(Must sent Authorization HEADER - format: `Authorization: Bearer <Token>`)
 
 ```sh
     mutation {
-	  updateTodo (_id: "<<TODO-ID>>", title: "Hello World - 2") {
+	  updateTodo (id: "<<TODO-ID>>", input: { title: "Hello World - 2" }) {
 	    message
     	ok
 	  }
 	}
 ```
 
-6. TODOS (delete)  - Authenticated Request(Must sent Authorization HEADER - format: `Authorization: Bearer <Token>`)
+7. TODOS (delete)  - Authenticated Request(Must sent Authorization HEADER - format: `Authorization: Bearer <Token>`)
 
 ```sh
     mutation {
