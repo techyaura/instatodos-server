@@ -8,6 +8,17 @@ class AuthService {
     this.UserModel = UserModel;
   }
 
+  checkUniqueEmail(email) {
+    return this.UserModel.findOne({ email })
+      .then((response) => {
+        if (response) {
+          return Promise.reject(new Error('Email address not available'));
+        }
+        return Promise.resolve(true);
+      })
+      .catch(err => Promise.reject(err));
+  }
+
   register(postBody) {
     return this.UserModel(postBody)
       .save()

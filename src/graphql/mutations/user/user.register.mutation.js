@@ -21,7 +21,12 @@ module.exports = {
     const otp = CommonFunctionUtil.generateOtp();
     const registerHash = CommonFunctionUtil.generateHash(args.input.email ? args.input.email : '');
     const { res, next } = context;
-    return registerValidator(args.input, res, next).then(() => UserService.register({ ...args.input, otp, registerHash }))
+    return registerValidator(args.input, res, next)
+      .then(() => {
+        const { email } = args.input;
+        return UserService.checkUniqueEmail(email);
+      })
+      .then(() => UserService.register({ ...args.input, otp, registerHash }))
       .then(user => TemplateService.fetch('USER_REGISTER').then(templateObj => [user, templateObj]))
       .then((response) => {
         const [user, templateObject] = response;
