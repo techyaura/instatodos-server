@@ -1,13 +1,10 @@
-const addTodo = require('./todo/todo.add.mutation');
-const updateTodo = require('./todo/todo.update.mutation');
-const deleteTodo = require('./todo/todo.delete.mutation');
-const register = require('./user/user.register.mutation');
-const registerVerificationByOtp = require('./user/user-register-verify.mutation');
+const todoMuatations = require('./todo');
+const userMuatations = require('./user');
 
 module.exports = {
-  addTodo,
-  updateTodo,
-  deleteTodo,
-  register,
-  registerVerificationByOtp
+  addTodo: todoMuatations.addTodo,
+  updateTodo: todoMuatations.updateTodo,
+  deleteTodo: todoMuatations.deleteTodo,
+  register: userMuatations.register,
+  registerVerificationByOtp: userMuatations.registerVerificationByOtp
 };

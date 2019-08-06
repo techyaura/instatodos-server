@@ -1,9 +1,8 @@
-const todoList = require('./todo/todo.list.query');
-const todoView = require('./todo/todo.view.query');
+const todoQueries = require('./todo');
 const login = require('./user/user.login.query');
 
 module.exports = {
-  todoList,
-  todoView,
+  todoList: todoQueries.todoList,
+  todoView: todoQueries.todoView,
   login
 };
