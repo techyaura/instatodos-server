@@ -17,7 +17,7 @@ const modelSchema = new Schema(
       required: true
     },
     otp: { type: String },
-    registerHash: { type: String },
+    hashToken: { type: String },
     lastLogin: {
       type: Date,
       default: Date.now

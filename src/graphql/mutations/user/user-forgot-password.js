@@ -1,37 +1,47 @@
 const {
-  GraphQLNonNull
+  GraphQLNonNull,
+  GraphQLString,
+  GraphQLInputObjectType
 } = require('graphql');
 
 const { UserService, TemplateService } = require('../../../services');
 
-const { userRegisterInputType, emailRequestSuccessType } = require('../../types');
+const { emailRequestSuccessType } = require('../../types');
 
-const { registerValidator } = require('../../../validators');
+const { emailValidator } = require('../../../validators');
 
 const { EmailUtil, CommonFunctionUtil } = require('../../../utils');
+
 
 module.exports = {
   type: emailRequestSuccessType,
   args: {
     input: {
-      type: new GraphQLNonNull(userRegisterInputType)
+      type: new GraphQLInputObjectType({
+        name: 'UserForgotPasswordInputType',
+        fields: {
+          email: {
+            type: new GraphQLNonNull(GraphQLString)
+          }
+        }
+      })
     }
   },
   resolve(root, args, context) {
-    const otp = CommonFunctionUtil.generateOtp();
-    const registerHash = CommonFunctionUtil.generateHash(args.input.email ? args.input.email : '');
     const { res, next } = context;
-    return registerValidator(args.input, res, next)
+    return emailValidator(args.input, res, next)
       .then(() => {
-        const { email } = args.input;
-        return UserService.checkUniqueEmail(email);
+        const otp = CommonFunctionUtil.generateOtp();
+        const hashToken = CommonFunctionUtil.generateHash(args.input.email ? args.input.email : '');
+        return UserService.forgotPasswordByOtp({ ...args.input, otp, hashToken });
       })
-      .then(() => UserService.register({ ...args.input, otp, registerHash }))
-      .then(user => TemplateService.fetch('USER_REGISTER').then(templateObj => [user, templateObj]))
+      .then(user => TemplateService.fetch('FORGOT_PASSWORD').then(templateObj => [user, templateObj]))
       .then((response) => {
         const [user, templateObject] = response;
+        const { otp, email } = user;
         const username = CommonFunctionUtil.generateUsernameFromEmail(user.email);
         let { template } = templateObject;
+        const { subject } = templateObject;
         template = template.replace('{{COMPANY_NAME}}', '');
         template = template.replace('{{COMPANY_URL}}', '');
         template = template.replace('{{OTP}}', otp);
@@ -39,13 +49,13 @@ module.exports = {
         template = template.replace('{{COMPANY_TAG_LINE}}', '');
         const mailOptions = {
           html: template,
-          subject: templateObject.subject,
-          to: user.email
+          subject,
+          to: email
         };
         EmailUtil.sendViaSendgrid(mailOptions);
         return {
           message: 'An OTP has been sent on your email.',
-          registerHash: user.registerHash
+          hashToken: user.hashToken
         };
       })
       .then(response => ({ ...response }))

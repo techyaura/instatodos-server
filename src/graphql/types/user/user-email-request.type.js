@@ -6,12 +6,12 @@ const {
 } = require('graphql');
 
 module.exports = new GraphQLObjectType({
-  name: 'UserRegisterSuccessType',
+  name: 'EmailRequestSuccessType',
   fields: {
     message: {
       type: new GraphQLNonNull(GraphQLString)
     },
-    registerHash: {
+    hashToken: {
       type: new GraphQLNonNull(GraphQLString)
     }
   }

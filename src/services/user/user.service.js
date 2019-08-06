@@ -29,12 +29,12 @@ class AuthService {
   registerVerificationByOtp(postBody) {
     return this.UserModel.findOneAndUpdate({
       otp: postBody.otp,
-      registerHash: postBody.registerHash,
+      hashToken: postBody.hashToken,
       status: false
     },
     {
       status: true,
-      registerHash: '',
+      hashToken: '',
       otp: ''
     },
     {
@@ -82,6 +82,53 @@ class AuthService {
               email: user.email,
               _id: user._id
             }
+          });
+        }));
+      })
+      .catch(err => Promise.reject(err));
+  }
+
+  forgotPasswordByOtp(postBody) {
+    const { email, hashToken, otp } = postBody;
+    this.UserModel.findOneAndUpdate(
+      { email, status: true, isDeleted: false },
+      { hashToken, otp },
+      { new: true, upsert: false },
+    )
+      .then((response) => {
+        if (!response) {
+          return Promise.reject(new Error(`No account exist with ${email}`));
+        }
+        return Promise.resolve({
+          email,
+          otp,
+          hashToken
+        });
+      })
+      .catch(err => Promise.reject(err));
+  }
+
+  resetPassword(postBody) {
+    const { hashToken, password, confirmPassword } = postBody;
+    if (password !== confirmPassword) {
+      return Promise.reject(new Error('PASSWORD NOT MATCHED'));
+    }
+    return this.UserModel
+      .findOne({ hashToken, status: true, isDeleted: false })
+      .then((user) => {
+        if (!user) {
+          return Promise.reject(new Error('No User Found'));
+        }
+        return new Promise((resolve, reject) => new UserModel().comparePassword(password, user, (err, valid) => {
+          if (err) {
+            return reject(err);
+          }
+          if (!valid) {
+            return reject(new Error('INVALID_PASSWORD'));
+          }
+          return resolve({
+            message: 'Password Changed successfully',
+            ok: true
           });
         }));
       })

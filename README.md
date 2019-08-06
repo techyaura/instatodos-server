@@ -32,7 +32,7 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 ```sh
     mutation {
     	  register(input: { email: "techyaura@yopmail.com", password: "Hello@123" }){
-    	    registerHash
+    	    hashToken
 			message
     	  }
     }
@@ -42,7 +42,7 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 
 ```sh
     mutation {
-    	  registerVerificationByOtp(input: { otp: "<OTP>", registerHash: "<registerHash>" }){
+    	  registerVerificationByOtp(input: { otp: "<OTP>", hashToken: "<hashToken>" }){
     	    message
     	  }
     }

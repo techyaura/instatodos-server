@@ -1,5 +1,11 @@
 const Joi = require('joi');
 
+const emailSchema = Joi.object().keys({
+  email: Joi.string()
+    .email()
+    .required()
+});
+
 const registerSchema = Joi.object().keys({
   email: Joi.string()
     .email()
@@ -10,7 +16,7 @@ const registerSchema = Joi.object().keys({
     .required()
 });
 const registerVerificationSchema = Joi.object().keys({
-  registerHash: Joi.string()
+  hashToken: Joi.string()
     .required(),
   otp: Joi.string()
     .min(6)
@@ -26,7 +32,29 @@ const loginSchema = Joi.object().keys({
     .max(30)
     .required()
 });
+const resetPasswordSchema = Joi.object().keys({
+  hashToken: Joi.string()
+    .required(),
+  password: Joi.string()
+    .min(6)
+    .max(30)
+    .required(),
+  confirmPassword: Joi.string()
+    .min(6)
+    .max(30)
+    .required()
+});
+
 module.exports = {
+  emailValidator(req) {
+    const reqBody = req.body || req;
+    return new Promise((resolve, reject) => Joi.validate(reqBody, emailSchema, (err) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve();
+    }));
+  },
   registerValidator(req) {
     const reqBody = req.body || req;
     return new Promise((resolve, reject) => Joi.validate(reqBody, registerSchema, (err) => {
@@ -48,6 +76,15 @@ module.exports = {
   registerVerificationValidator(req) {
     const reqBody = req.body || req;
     return new Promise((resolve, reject) => Joi.validate(reqBody, registerVerificationSchema, (err) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve();
+    }));
+  },
+  resetPasswordValidator(req) {
+    const reqBody = req.body || req;
+    return new Promise((resolve, reject) => Joi.validate(reqBody, resetPasswordSchema, (err) => {
       if (err) {
         return reject(err);
       }

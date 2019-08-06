@@ -1,12 +1,6 @@
-const {
-  GraphQLNonNull,
-  GraphQLString,
-  GraphQLInputObjectType
-} = require('graphql');
-
 const { UserService } = require('../../../services');
 
-const { successType } = require('../../types');
+const { successType, emailVerificationInputType } = require('../../types');
 
 const { registerVerificationValidator } = require('../../../validators');
 
@@ -14,17 +8,7 @@ module.exports = {
   type: successType,
   args: {
     input: {
-      type: new GraphQLInputObjectType({
-        name: 'UserRegisterVerificationType',
-        fields: {
-          otp: {
-            type: new GraphQLNonNull(GraphQLString)
-          },
-          registerHash: {
-            type: new GraphQLNonNull(GraphQLString)
-          }
-        }
-      })
+      type: emailVerificationInputType
     }
   },
   resolve(root, args, context) {

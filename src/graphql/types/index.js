@@ -10,5 +10,7 @@ module.exports = {
   userLoginSuccessType: userTypes.userLoginSuccessType,
   userLoginInputType: userTypes.userLoginInputType,
   userRegisterInputType: userTypes.userRegisterInputType,
-  userRegisterSuccessType: userTypes.userRegisterSuccessType
+  emailRequestSuccessType: userTypes.emailRequestSuccessType,
+  emailVerificationInputType: userTypes.emailVerificationInputType,
+  resetPasswordInputType: userTypes.resetPasswordInputType
 };

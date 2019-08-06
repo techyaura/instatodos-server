@@ -6,5 +6,7 @@ module.exports = {
   updateTodo: todoMuatations.updateTodo,
   deleteTodo: todoMuatations.deleteTodo,
   register: userMuatations.register,
-  registerVerificationByOtp: userMuatations.registerVerificationByOtp
+  emailVerificationByOtp: userMuatations.emailVerificationByOtp,
+  userForgotPassword: userMuatations.userForgotPassword,
+  userResetPassword: userMuatations.userResetPassword
 };
