@@ -10,10 +10,10 @@ const graphqlHTTP = require('express-graphql');
 const morgan = require('morgan');
 const cors = require('cors');
 
-// 1. Use of graphql-tools for writing GraphQL Schema (RECOMMENDED)
+// 1. Writing GraphQL Schema as Javascript
 // const schema1 = require('./src/graphql');
 
-// 2. buildSchema over GraphQLSchema
+// 2. Use of graphql-tools for writing GraphQL Schema  (RECOMMENDED)
 const schema2 = require('./src/gql');
 
 
