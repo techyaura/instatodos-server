@@ -8,7 +8,14 @@ require('dotenv').config({
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
 const morgan = require('morgan');
-const schema = require('./src/graphql');
+const cors = require('cors');
+
+// 1. Use of graphql-tools for writing GraphQL Schema (RECOMMENDED)
+// const schema1 = require('./src/graphql');
+
+// 2. buildSchema over GraphQLSchema
+const schema2 = require('./src/gql');
+
 
 const port = process.env.PORT || 8080;
 
@@ -17,7 +24,6 @@ require('./src/config/db');
 
 const winston = require('./src/config/winston');
 
-const cors = require('cors');
 
 const { AuthMiddleware } = require('./src/middlewares');
 
@@ -30,7 +36,7 @@ app.use(cors());
 
 app.use(morgan('combined', { stream: winston.stream }));
 app.use('/graphql', AuthMiddleware.jwt, graphqlHTTP({
-  schema,
+  schema: schema2,
   pretty: true,
   graphiql: true
 }));
