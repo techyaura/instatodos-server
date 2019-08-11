@@ -13,7 +13,7 @@ const cors = require('cors');
 // 1. Writing GraphQL Schema as Javascript
 // const schema1 = require('./src/graphql');
 
-// 2. Use of graphql-tools for writing GraphQL Schema  (RECOMMENDED)
+// 2. Use of graphql-tools for writing GraphQL Schema (RECOMMENDED)
 const schema2 = require('./src/gql');
 
 
