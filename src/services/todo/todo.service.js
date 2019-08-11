@@ -11,7 +11,7 @@ class TodoService {
   }
 
   viewTodo(params) {
-    return this.TodoModel.findOne({ _id: params._id });
+    return this.TodoModel.findOne({ _id: params.id });
   }
 
   listTodo() {
@@ -23,7 +23,7 @@ class TodoService {
   }
 
   deleteTodo(params) {
-    return this.TodoModel.deleteOne({ isDeleted: false, status: true, _id: params._id });
+    return this.TodoModel.deleteOne({ isDeleted: false, status: true, _id: params.id });
   }
 }
 
