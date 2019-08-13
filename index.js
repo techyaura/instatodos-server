@@ -10,12 +10,8 @@ const graphqlHTTP = require('express-graphql');
 const morgan = require('morgan');
 const cors = require('cors');
 
-// 1. Writing GraphQL Schema as Javascript
-// const schema1 = require('./src/graphql');
-
-// 2. Use of graphql-tools for writing GraphQL Schema (RECOMMENDED)
-const schema2 = require('./src/gql');
-
+// Use of graphql-tools for writing GraphQL Schema (RECOMMENDED)
+const schema = require('./src/gql');
 
 const port = process.env.PORT || 8080;
 
@@ -36,7 +32,7 @@ app.use(cors());
 
 app.use(morgan('combined', { stream: winston.stream }));
 app.use('/graphql', AuthMiddleware.jwt, graphqlHTTP({
-  schema: schema2,
+  schema,
   pretty: true,
   graphiql: true
 }));
