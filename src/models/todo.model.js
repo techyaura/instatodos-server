@@ -1,7 +1,13 @@
 const mongoose = require('mongoose');
 
+const { Schema } = mongoose;
+
+const { ObjectId } = Schema;
 
 const schema = new mongoose.Schema({
+  userId: {
+    type: ObjectId
+  },
   title: {
     type: String,
     required: true
@@ -9,6 +15,10 @@ const schema = new mongoose.Schema({
   status: {
     type: Boolean,
     default: true
+  },
+  isCompleted: {
+    type: Boolean,
+    default: false
   },
   isDeleted: {
     type: Boolean,
