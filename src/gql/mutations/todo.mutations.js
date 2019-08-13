@@ -10,7 +10,7 @@ module.exports = {
         ok: false
       };
     }
-    return addTodoValidator(args.input).then(() => TodoService.addTodo(args.input))
+    return addTodoValidator(args.input).then(() => TodoService.addTodo({ ...args.input, user: user._id }))
       .then(() => ({ message: 'Todo has been succesfully added', ok: true }))
       .catch(err => next(err));
   },
@@ -22,7 +22,7 @@ module.exports = {
         ok: false
       };
     }
-    return updateTodoValidator({ ...args.input, _id: args.id }).then(() => TodoService.updateTodo(args.id, args.input))
+    return updateTodoValidator({ ...args.input, _id: args.id }).then(() => TodoService.updateTodo(user, args.id, args.input))
       .then(() => ({ message: 'Todo has been succesfully updated', ok: true }))
       .catch(err => next(err));
   },
@@ -34,7 +34,7 @@ module.exports = {
         ok: false
       };
     }
-    return TodoService.deleteTodo(args)
+    return TodoService.deleteTodo(user, args)
       .then(() => ({ ok: true, message: 'Todo deleted successfully' }))
       .catch(err => next(err));
   }

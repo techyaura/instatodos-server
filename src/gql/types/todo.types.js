@@ -1,8 +1,13 @@
 const todoTypes = () => `
+  type User {
+    email: String!
+  }
+
   type TodoType {
       _id: String!
       title: String!
-      status: Boolean!
+      user: User!
+      isCompleted: Boolean!
       isDeleted: Boolean!
   }
 

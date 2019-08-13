@@ -5,8 +5,8 @@ const { Schema } = mongoose;
 const { ObjectId } = Schema;
 
 const schema = new mongoose.Schema({
-  userId: {
-    type: ObjectId
+  user: {
+    type: ObjectId, ref: 'User'
   },
   title: {
     type: String,

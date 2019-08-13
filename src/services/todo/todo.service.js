@@ -11,19 +11,23 @@ class TodoService {
   }
 
   viewTodo(params) {
-    return this.TodoModel.findOne({ _id: params.id });
+    return this.TodoModel.findOne({ _id: params.id }).populate({ path: 'user' });
   }
 
   listTodo() {
-    return this.TodoModel.find({ isDeleted: false, status: true });
+    return this.TodoModel.find({ isDeleted: false, status: true }).populate({ path: 'user' });
   }
 
-  updateTodo(todoId, postBody) {
-    return this.TodoModel.updateOne({ isDeleted: false, status: true, _id: todoId }, { $set: postBody });
+  updateTodo(user, todoId, postBody) {
+    return this.TodoModel.updateOne({
+      user: user._id, isDeleted: false, status: true, _id: todoId
+    }, { $set: postBody });
   }
 
-  deleteTodo(params) {
-    return this.TodoModel.deleteOne({ isDeleted: false, status: true, _id: params.id });
+  deleteTodo(user, params) {
+    return this.TodoModel.deleteOne({
+      user: user._id, isDeleted: false, status: true, _id: params.id
+    });
   }
 }
 
