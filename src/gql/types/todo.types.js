@@ -13,6 +13,7 @@ const todoTypes = () => `
 
   input TodoInputType {
     title: String!
+    isCompleted: Boolean
   }
 
   type SuccessType {

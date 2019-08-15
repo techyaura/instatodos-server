@@ -11,7 +11,8 @@ const updateTodoSchema = Joi.object().keys({
   title: Joi.string()
     .min(4)
     .max(30)
-    .required()
+    .required(),
+  isCompleted: Joi.boolean().optional()
 });
 module.exports = {
   addTodoValidator(req) {
