@@ -15,7 +15,7 @@ class TodoService {
   }
 
   listTodo() {
-    return this.TodoModel.find({ isDeleted: false, status: true }).populate({ path: 'user' });
+    return this.TodoModel.find({ isDeleted: false, status: true }).populate({ path: 'user' }).sort({ createdAt: -1 });
   }
 
   updateTodo(user, todoId, postBody) {
