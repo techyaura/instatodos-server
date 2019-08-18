@@ -65,7 +65,7 @@ class AuthService {
         }
         return new Promise((resolve, reject) => new UserModel().comparePassword(postBody.password, user, (err, valid) => {
           if (err) {
-            reject(err);
+            return reject(err);
           }
           if (!valid) {
             return reject(new Error('INVALID_CREDENTIALS'));
@@ -78,7 +78,7 @@ class AuthService {
             token,
             user: {
               email: user.email,
-              _id: user._id
+              id: user._id
             }
           });
         }));

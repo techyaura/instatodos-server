@@ -61,7 +61,7 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 	    token
 	    user {
 	      email
-	      _id
+	      id
 	    }
 	  }
 	}
@@ -115,7 +115,7 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 
 ```sh
     mutation {
-	  deleteTodo(_id: "<TODO-ID>") {
+	  deleteTodo(id: "<TODO-ID>") {
 	    message
     	ok
 	  }

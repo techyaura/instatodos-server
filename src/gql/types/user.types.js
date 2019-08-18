@@ -12,7 +12,7 @@ const userTypes = () => `
 
     type UserInfoType {
       email: String!
-      _id: ID!
+      id: ID!
     }
 
     type UserLoginSuccessType {
