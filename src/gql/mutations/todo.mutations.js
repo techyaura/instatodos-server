@@ -3,25 +3,34 @@ const { ContextMiddleware } = require('../../middlewares');
 const { addTodoValidator, updateTodoValidator } = require('../../validators');
 
 module.exports = {
-  addTodo: (root, args, context) => {
+  addTodo: async (root, args, context) => {
     const { user, next } = context;
-    return ContextMiddleware(context, addTodoValidator(args.input))
-      .then(() => TodoService.addTodo({ ...args.input, user: user._id }))
-      .then(() => ({ message: 'Todo has been succesfully added', ok: true }))
-      .catch(err => next(err));
+    try {
+      await ContextMiddleware(context, addTodoValidator(args.input));
+      await TodoService.addTodo({ ...args.input, user: user._id });
+      return { message: 'Todo has been succesfully added', ok: true };
+    } catch (err) {
+      return next(err);
+    }
   },
-  updateTodo: (root, args, context) => {
+  updateTodo: async (root, args, context) => {
     const { next, user } = context;
-    return ContextMiddleware(context, updateTodoValidator({ ...args.input, id: args.id }))
-      .then(() => TodoService.updateTodo(user, args.id, args.input))
-      .then(() => ({ message: 'Todo has been succesfully updated', ok: true }))
-      .catch(err => next(err));
+    try {
+      await ContextMiddleware(context, updateTodoValidator({ ...args.input, id: args.id }));
+      await TodoService.updateTodo(user, args.id, args.input);
+      return { message: 'Todo has been succesfully updated', ok: true };
+    } catch (err) {
+      return next(err);
+    }
   },
-  deleteTodo: (root, args, context) => {
+  deleteTodo: async (root, args, context) => {
     const { next, user } = context;
-    return ContextMiddleware(context)
-      .then(() => TodoService.deleteTodo(user, args))
-      .then(() => ({ ok: true, message: 'Todo deleted successfully' }))
-      .catch(err => next(err));
+    try {
+      await ContextMiddleware(context);
+      await TodoService.deleteTodo(user, args);
+      return { ok: true, message: 'Todo deleted successfully' };
+    } catch (err) {
+      return next(err);
+    }
   }
 };
