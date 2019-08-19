@@ -78,18 +78,25 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 	}
 ```
 
-5. TODOS (read) - UnAuthenticated
+5. TODOS (read) - Authenticated Request(Must sent Authorization HEADER - format: `Authorization: Bearer <Token>`)
 
 ```sh
-    query {
-	  todoList {
-	    title
-	  }
+   query {
+		todoList (first:5, offset: 1) {
+			totalCount,
+			data {
+				title
+				isCompleted
+				user {
+				email
+				}
+			}
+		}
 	}
 ```
 
 
-6. TODOS (View) - UnAuthenticated
+6. TODOS (View) - Authenticated Request(Must sent Authorization HEADER - format: `Authorization: Bearer <Token>`)
 
 ```sh
     query {
