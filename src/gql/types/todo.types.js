@@ -2,18 +2,22 @@ const todoTypes = () => `
   
   scalar Date
 
+  input TodoFilterType {
+    title_contains: String
+  }
+
   type User {
     email: String!
   }
 
-  enum sortType {
+  enum TodoSortEnumType {
     ASC
     DESC
   }
 
   input TodoSortType {
-    createdAt: sortType
-    updatedAt: sortType
+    createdAt: TodoSortEnumType
+    updatedAt: TodoSortEnumType
   }
 
   type TodoType {
@@ -42,7 +46,7 @@ const todoTypes = () => `
   }
 
   type Query {
-    todoList (first: Int, offset: Int, sort: TodoSortType ): TodoListType
+    todoList (filter: TodoFilterType, first: Int, offset: Int, sort: TodoSortType ): TodoListType
     todoView(id: ID!): TodoType
   }
 

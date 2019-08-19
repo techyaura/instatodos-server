@@ -82,7 +82,7 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 
 ```sh
    query {
-		todoList (first:5, offset: 1, sort: {createdAt: ASC }) {
+		todoList (first:5, offset: 1, sort: {createdAt: ASC }, filter: {title_contains: "techyaura"}) {
 			totalCount,
 			data {
 				createdAt

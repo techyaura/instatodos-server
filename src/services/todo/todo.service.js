@@ -15,7 +15,9 @@ class TodoService {
   }
 
   listTodo({ args: params }) {
-    const { first = 10, offset = 1, sort } = params;
+    const {
+      filter, first = 10, offset = 1, sort
+    } = params;
     let sortObject = { createdAt: -1 };
     if (typeof (sort) !== 'undefined') {
       sortObject = {};
@@ -28,9 +30,21 @@ class TodoService {
         }
       });
     }
+    const conditions = {
+      isDeleted: false
+    };
 
+    if (typeof (filter) !== 'undefined') {
+      conditions.$or = [];
+      if (filter.title_contains) {
+        conditions.$or.push({ title: { $regex: filter.title_contains, $options: 'gi' } });
+      }
+    }
     return this.TodoModel
       .aggregate([
+        {
+          $match: conditions
+        },
         {
           $lookup: {
             from: 'users',
