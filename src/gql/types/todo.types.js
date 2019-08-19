@@ -6,9 +6,14 @@ const todoTypes = () => `
   type TodoType {
       _id: String!
       title: String!
-      user: User!
+      user: User
       isCompleted: Boolean!
       isDeleted: Boolean!
+  }
+
+  type TodoListDataType {
+    totalCount: Int!
+    data: [TodoType]
   }
 
   input TodoInputType {
@@ -22,7 +27,7 @@ const todoTypes = () => `
   }
 
   type Query {
-    todoList: [TodoType]
+    todoList (first: Int, offset: Int ): TodoListDataType
     todoView(id: ID!): TodoType
   }
 

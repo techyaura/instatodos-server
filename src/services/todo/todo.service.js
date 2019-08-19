@@ -14,8 +14,65 @@ class TodoService {
     return this.TodoModel.findOne({ _id: params.id }).populate({ path: 'user' });
   }
 
-  listTodo() {
-    return this.TodoModel.find({ isDeleted: false, status: true }).populate({ path: 'user' }).sort({ createdAt: -1 });
+  listTodo({ args: params }) {
+    const { first = 10, offset = 1 } = params;
+
+    return this.TodoModel
+      .aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user',
+            foreignField: '_id',
+            as: 'user'
+          }
+        },
+        {
+          $facet: {
+            todos: [
+              {
+                $project: {
+                  title: '$title',
+                  isCompleted: '$isCompleted',
+                  user: '$user'
+                }
+              },
+              {
+                $sort: {
+                  createdAt: -1
+                }
+              },
+              { $skip: (offset - 1) * first },
+              { $limit: first }
+            ],
+            todosCount: [
+              {
+                $group: {
+                  _id: null,
+                  count: { $sum: 1 }
+                }
+              }
+            ]
+          }
+        }
+      ])
+      .then((response) => {
+        const { todos, todosCount } = response[0];
+        const mapTodos = todos.map((todo) => {
+          const { email } = todo.user[0];
+          return {
+            ...todo,
+            user: {
+              email
+            }
+          };
+        });
+        const { count } = todosCount[0];
+        return Promise.resolve({
+          totalCount: count,
+          data: mapTodos
+        });
+      });
   }
 
   updateTodo(user, todoId, postBody) {
