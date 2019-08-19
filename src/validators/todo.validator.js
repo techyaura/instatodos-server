@@ -7,7 +7,7 @@ const addTodoSchema = Joi.object().keys({
     .required()
 });
 const updateTodoSchema = Joi.object().keys({
-  _id: Joi.string().required(),
+  id: Joi.string().required(),
   title: Joi.string()
     .min(4)
     .max(30)
