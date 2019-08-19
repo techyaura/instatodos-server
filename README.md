@@ -82,9 +82,10 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 
 ```sh
    query {
-		todoList (first:5, offset: 1) {
+		todoList (first:5, offset: 1, sort: {createdAt: ASC }) {
 			totalCount,
 			data {
+				createdAt
 				title
 				isCompleted
 				user {

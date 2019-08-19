@@ -1,6 +1,19 @@
 const todoTypes = () => `
+  
+  scalar Date
+
   type User {
     email: String!
+  }
+
+  enum sortType {
+    ASC
+    DESC
+  }
+
+  input TodoSortType {
+    createdAt: sortType
+    updatedAt: sortType
   }
 
   type TodoType {
@@ -9,9 +22,11 @@ const todoTypes = () => `
       user: User
       isCompleted: Boolean!
       isDeleted: Boolean!
+      createdAt: Date!
+      updatedAt: Date!
   }
 
-  type TodoListDataType {
+  type TodoListType {
     totalCount: Int!
     data: [TodoType]
   }
@@ -27,7 +42,7 @@ const todoTypes = () => `
   }
 
   type Query {
-    todoList (first: Int, offset: Int ): TodoListDataType
+    todoList (first: Int, offset: Int, sort: TodoSortType ): TodoListType
     todoView(id: ID!): TodoType
   }
 

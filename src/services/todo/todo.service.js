@@ -15,7 +15,19 @@ class TodoService {
   }
 
   listTodo({ args: params }) {
-    const { first = 10, offset = 1 } = params;
+    const { first = 10, offset = 1, sort } = params;
+    let sortObject = { createdAt: -1 };
+    if (typeof (sort) !== 'undefined') {
+      sortObject = {};
+      Object.keys(sort).forEach((key) => {
+        if (sort[key] === 'DESC') {
+          sortObject[key] = -1;
+        }
+        if (sort[key] === 'ASC') {
+          sortObject[key] = 1;
+        }
+      });
+    }
 
     return this.TodoModel
       .aggregate([
@@ -34,13 +46,13 @@ class TodoService {
                 $project: {
                   title: '$title',
                   isCompleted: '$isCompleted',
+                  createdAt: '$createdAt',
+                  updatedAt: '$updatedAt',
                   user: '$user'
                 }
               },
               {
-                $sort: {
-                  createdAt: -1
-                }
+                $sort: sortObject
               },
               { $skip: (offset - 1) * first },
               { $limit: first }
@@ -72,7 +84,8 @@ class TodoService {
           totalCount: count,
           data: mapTodos
         });
-      });
+      })
+      .catch(err => Promise.reject(err));
   }
 
   updateTodo(user, todoId, postBody) {
