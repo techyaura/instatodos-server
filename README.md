@@ -10,7 +10,8 @@ This is an simple TODO crud API using Graphql + Node Js + Mongodb (Using mongoos
   
 
 ## Live URL
-[Production Link](https://gql-node.herokuapp.com/graphql)
+[TODO UI Link](https://techyaura-todo.netlify.com)
+[TODO API Link](https://gql-node.herokuapp.com/graphql)
   
 
 ## How to use!
