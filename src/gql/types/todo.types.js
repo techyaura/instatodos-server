@@ -31,7 +31,7 @@ const todoTypes = () => `
   }
 
   type TodoListType {
-    totalCount: Int!
+    totalCount: Int
     data: [TodoType]
   }
 

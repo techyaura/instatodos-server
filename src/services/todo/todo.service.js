@@ -14,7 +14,8 @@ class TodoService {
     return this.TodoModel.findOne({ _id: params.id }).populate({ path: 'user' });
   }
 
-  listTodo({ args: params }) {
+  listTodo({ context, args: params }) {
+    const { user } = context;
     const {
       filter, first = 10, offset = 1, sort
     } = params;
@@ -31,7 +32,8 @@ class TodoService {
       });
     }
     const conditions = {
-      isDeleted: false
+      isDeleted: false,
+      user: user._id
     };
 
     if (typeof (filter) !== 'undefined') {
@@ -93,7 +95,7 @@ class TodoService {
             }
           };
         });
-        const { count } = todosCount[0];
+        const { count } = todosCount[0] || 0;
         return Promise.resolve({
           totalCount: count,
           data: mapTodos
