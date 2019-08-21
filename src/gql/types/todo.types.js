@@ -2,10 +2,6 @@ const todoTypes = () => `
   
   scalar Date
 
-  input TodoFilterType {
-    title_contains: String
-  }
-
   type User {
     email: String!
   }
@@ -15,9 +11,27 @@ const todoTypes = () => `
     DESC
   }
 
-  input TodoSortType {
+  input TodoCommentInputType {
+    description: String!
+  }
+
+  input TodoInputType {
+    title: String!
+    isCompleted: Boolean
+  }
+
+  input TodoSortInputType {
     createdAt: TodoSortEnumType
     updatedAt: TodoSortEnumType
+  }
+
+  input TodoFilterInputType {
+    title_contains: String
+  }
+
+  type TodoCommentType {
+    description: String
+    _id: String
   }
 
   type TodoType {
@@ -28,16 +42,12 @@ const todoTypes = () => `
       isDeleted: Boolean!
       createdAt: Date!
       updatedAt: Date!
+      comments: [TodoCommentType]
   }
 
   type TodoListType {
     totalCount: Int
     data: [TodoType]
-  }
-
-  input TodoInputType {
-    title: String!
-    isCompleted: Boolean
   }
 
   type SuccessType {
@@ -46,7 +56,7 @@ const todoTypes = () => `
   }
 
   type Query {
-    todoList (filter: TodoFilterType, first: Int, offset: Int, sort: TodoSortType ): TodoListType
+    todoList (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ): TodoListType
     todoView(id: ID!): TodoType
   }
 
@@ -54,6 +64,8 @@ const todoTypes = () => `
     addTodo(input: TodoInputType!): SuccessType!
     updateTodo(id: ID!, input: TodoInputType!): SuccessType!
     deleteTodo(id: ID!): SuccessType!
+    addTodoComment(todoId: ID!, input: TodoCommentInputType!): SuccessType!
+    updateTodoComment(id: ID!, todoId: ID!, input: TodoCommentInputType!): SuccessType!
   }
 `;
 

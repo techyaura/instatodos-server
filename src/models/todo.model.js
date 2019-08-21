@@ -1,8 +1,17 @@
 const mongoose = require('mongoose');
 
+
 const { Schema } = mongoose;
 
 const { ObjectId } = Schema;
+
+const commentSchema = new Schema({
+  description: {
+    type: String
+  }
+}, {
+  timestamps: {}
+});
 
 const schema = new mongoose.Schema({
   user: {
@@ -23,7 +32,8 @@ const schema = new mongoose.Schema({
   isDeleted: {
     type: Boolean,
     default: false
-  }
+  },
+  comments: [commentSchema]
 },
 {
   timestamps: {}

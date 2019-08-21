@@ -64,7 +64,8 @@ class TodoService {
                   isCompleted: '$isCompleted',
                   createdAt: '$createdAt',
                   updatedAt: '$updatedAt',
-                  user: '$user'
+                  user: '$user',
+                  comments: '$comments'
                 }
               },
               {
@@ -126,6 +127,40 @@ class TodoService {
           return Promise.resolve(response);
         }
         return Promise.reject(new Error('You are not authorized to delete'));
+      })
+      .catch(err => Promise.reject(err));
+  }
+
+  addTodoComment(context, params, body) {
+    const { user } = context;
+    const { _id: userId } = user;
+    const { todoId } = params;
+    const { description } = body;
+    return this.TodoModel.updateOne({
+      user: userId, isDeleted: false, _id: todoId
+    }, { $push: { comments: { description } } })
+      .then((response) => {
+        if (response && response.n !== 0) {
+          return Promise.resolve(response);
+        }
+        return Promise.reject(new Error('You are not authorized to comment'));
+      })
+      .catch(err => Promise.reject(err));
+  }
+
+  updateTodoComment(context, params, body) {
+    const { user } = context;
+    const { _id: userId } = user;
+    const { todoId, commentId } = params;
+    const { description } = body;
+    return this.TodoModel.updateOne({
+      user: userId, isDeleted: false, _id: todoId, 'comments._id': commentId
+    }, { $set: { 'comments.$.description': description } })
+      .then((response) => {
+        if (response && response.n !== 0) {
+          return Promise.resolve(response);
+        }
+        return Promise.reject(new Error('You are not authorized to update comment'));
       })
       .catch(err => Promise.reject(err));
   }

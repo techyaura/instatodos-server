@@ -1,25 +1,10 @@
-const {
-  registerValidator,
-  loginValidator,
-  registerVerificationValidator,
-  emailValidator,
-  resetPasswordValidator
-} = require('./auth.validator');
+const authValidator = require('./auth.validator');
 
-const {
-  addTodoValidator,
-  updateTodoValidator
-} = require('./todo.validator');
-
+const todoValidator = require('./todo.validator');
 
 const validators = {
-  registerValidator,
-  registerVerificationValidator,
-  emailValidator,
-  loginValidator,
-  addTodoValidator,
-  updateTodoValidator,
-  resetPasswordValidator
+  ...authValidator,
+  ...todoValidator
 };
 
 module.exports = validators;

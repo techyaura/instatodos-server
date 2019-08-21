@@ -1,6 +1,8 @@
 const { TodoService } = require('../../services');
 const { ContextMiddleware } = require('../../middlewares');
-const { addTodoValidator, updateTodoValidator } = require('../../validators');
+const {
+  addTodoValidator, updateTodoValidator, addTodoCommentValidator, updateTodoCommentValidator
+} = require('../../validators');
 
 module.exports = {
   addTodo: async (root, args, context) => {
@@ -29,6 +31,26 @@ module.exports = {
       await ContextMiddleware(context);
       await TodoService.deleteTodo(user, args);
       return { ok: true, message: 'Todo deleted successfully' };
+    } catch (err) {
+      return next(err);
+    }
+  },
+  addTodoComment: async (root, args, context) => {
+    const { next } = context;
+    try {
+      await ContextMiddleware(context, addTodoCommentValidator({ ...args.input, todoId: args.todoId }));
+      await TodoService.addTodoComment(context, { todoId: args.todoId }, args.input);
+      return { message: 'Todo has been succesfully commented', ok: true };
+    } catch (err) {
+      return next(err);
+    }
+  },
+  updateTodoComment: async (root, args, context) => {
+    const { next } = context;
+    try {
+      await ContextMiddleware(context, updateTodoCommentValidator({ ...args.input, todoId: args.todoId, id: args.id }));
+      await TodoService.updateTodoComment(context, { todoId: args.todoId, commentId: args.id }, args.input);
+      return { message: 'Todo has been succesfully commented', ok: true };
     } catch (err) {
       return next(err);
     }
