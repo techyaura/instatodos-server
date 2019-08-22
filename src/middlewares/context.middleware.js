@@ -1,7 +1,7 @@
 module.exports = function (context, ...arguments) {
     const { next, user } = context;
     if (typeof (user) === 'undefined') {
-        return next(new Error('Not_Authorized'));
+        return next(new Error('UNAUTHORIZED'));
     }
     if (typeof (arguments) === 'undefined') {
         return Promise.resolve(true);

@@ -32,6 +32,10 @@ class Boot {
         this.useErrors(),
         this.useListen()
       ]).then(() => {
+        if (process.env.NODE_ENV === 'development') {
+          /** Clear console for every server restart while development */
+          console.clear(); // eslint-disable-line no-console
+        }
         console.log(`Running a GraphQL API server at localhost:${this.port}/graphql`); // eslint-disable-line no-console
         return this.app;
       });
@@ -89,7 +93,9 @@ class Boot {
       // add this line to include winston logging
       this.winston.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
       const errorHandler = require('./src/errors/handler');
-      return errorHandler(err, req, res, next);
+      return errorHandler({
+        err, req, res, next
+      });
     });
   }
 

@@ -113,7 +113,7 @@ class TodoService {
         if (response && response.n !== 0) {
           return Promise.resolve(response);
         }
-        return Promise.reject(new Error('You are not authorized to update'));
+        return Promise.reject(new Error('RESOURCE_FORBIDDEN'));
       })
       .catch(err => Promise.reject(err));
   }
@@ -126,7 +126,7 @@ class TodoService {
         if (response && response.n !== 0) {
           return Promise.resolve(response);
         }
-        return Promise.reject(new Error('You are not authorized to delete'));
+        return Promise.reject(new Error('RESOURCE_FORBIDDEN'));
       })
       .catch(err => Promise.reject(err));
   }
@@ -143,7 +143,7 @@ class TodoService {
         if (response && response.n !== 0) {
           return Promise.resolve(response);
         }
-        return Promise.reject(new Error('You are not authorized to comment'));
+        return Promise.reject(new Error('RESOURCE_FORBIDDEN'));
       })
       .catch(err => Promise.reject(err));
   }
@@ -160,7 +160,7 @@ class TodoService {
         if (response && response.n !== 0) {
           return Promise.resolve(response);
         }
-        return Promise.reject(new Error('You are not authorized to update comment'));
+        return Promise.reject(new Error('RESOURCE_FORBIDDEN'));
       })
       .catch(err => Promise.reject(err));
   }

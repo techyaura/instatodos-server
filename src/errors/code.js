@@ -54,5 +54,15 @@ module.exports = {
   507: 'Insufficient storage',
   509: 'Bandwidth limit exceeded',
   510: 'Not extended',
-  511: 'Network authentication required'
+  511: 'Network authentication required',
+  RESOURCE_FORBIDDEN: {
+    status: 403,
+    message: 'Forbidden Error',
+    code: 'RESOURCE_FORBIDDEN'
+  },
+  UNAUTHORIZED: {
+    status: 403,
+    message: 'UNAUTHORIZED Error',
+    code: 'UNAUTHORIZED'
+  }
 };
