@@ -61,7 +61,7 @@ module.exports = {
     code: 'RESOURCE_FORBIDDEN'
   },
   UNAUTHORIZED: {
-    status: 403,
+    status: 401,
     message: 'UNAUTHORIZED Error',
     code: 'UNAUTHORIZED'
   }
