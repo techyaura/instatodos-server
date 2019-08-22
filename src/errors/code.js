@@ -18,9 +18,17 @@ module.exports = {
   305: 'Use proxy',
   307: 'Temporary redirect',
   400: 'Bad request',
-  401: 'Unauthorized',
+  401: {
+    status: 401,
+    message: 'UNAUTHORIZED Error',
+    code: 'UNAUTHORIZED'
+  },
   402: 'Payment required',
-  403: 'Forbidden',
+  403: {
+    status: 403,
+    message: 'Forbidden Error',
+    code: 'RESOURCE_FORBIDDEN'
+  },
   404: 'Not found',
   405: 'Method not allowed',
   406: 'Not acceptable',
@@ -54,15 +62,5 @@ module.exports = {
   507: 'Insufficient storage',
   509: 'Bandwidth limit exceeded',
   510: 'Not extended',
-  511: 'Network authentication required',
-  RESOURCE_FORBIDDEN: {
-    status: 403,
-    message: 'Forbidden Error',
-    code: 'RESOURCE_FORBIDDEN'
-  },
-  UNAUTHORIZED: {
-    status: 401,
-    message: 'UNAUTHORIZED Error',
-    code: 'UNAUTHORIZED'
-  }
+  511: 'Network authentication required'
 };
