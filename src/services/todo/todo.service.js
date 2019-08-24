@@ -1,4 +1,5 @@
 const { TodoModel } = require('../../models');
+const { CommonFunctionUtil } = require('../../utils');
 
 class TodoService {
   constructor() {
@@ -17,7 +18,7 @@ class TodoService {
   listTodo({ context, args: params }) {
     const { user } = context;
     const {
-      filter, first = 10, offset = 1, sort
+      filter, first = 50, offset = 1, sort
     } = params;
     let sortObject = { createdAt: -1 };
     if (typeof (sort) !== 'undefined') {
@@ -46,6 +47,27 @@ class TodoService {
       .aggregate([
         {
           $match: conditions
+        },
+        {
+          $project: {
+            name: 1,
+            title: '$title',
+            isCompleted: '$isCompleted',
+            createdAt: '$createdAt',
+            updatedAt: '$updatedAt',
+            user: '$user',
+            comments: '$comments',
+            month: { $month: '$createdAt' },
+            day: { $dayOfMonth: '$createdAt' },
+            year: { $year: '$createdAt' }
+          }
+        },
+        {
+          $match: {
+            month: CommonFunctionUtil.getDateInfo('m'),
+            day: CommonFunctionUtil.getDateInfo('d'),
+            year: CommonFunctionUtil.getDateInfo('y')
+          }
         },
         {
           $lookup: {

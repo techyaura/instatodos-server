@@ -33,6 +33,19 @@ class CommonFunctionUtil {
       .digest('hex');
     return hash;
   }
+
+  static getDateInfo(dateParam, dateObj = new Date()) {
+    if (dateParam === 'm') {
+      return dateObj.getMonth() + 1;
+    }
+    if (dateParam === 'd') {
+      return dateObj.getDate();
+    }
+    if (dateParam === 'y') {
+      return dateObj.getFullYear();
+    }
+    throw new Error('Provide date Param');
+  }
 }
 
 module.exports = CommonFunctionUtil;
