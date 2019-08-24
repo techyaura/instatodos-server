@@ -128,6 +128,12 @@ class TodoService {
   }
 
   updateTodo(user, todoId, postBody) {
+    postBody = {
+      ...postBody,
+      $currentDate: {
+        updatedAt: true
+      }
+    };
     return this.TodoModel.updateOne({
       user: user._id, isDeleted: false, status: true, _id: todoId
     }, { $set: postBody })

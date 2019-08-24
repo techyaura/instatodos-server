@@ -3,14 +3,14 @@ const Joi = require('joi');
 const addTodoSchema = Joi.object().keys({
   title: Joi.string()
     .min(4)
-    .max(30)
+    .max(60)
     .required()
 });
 const updateTodoSchema = Joi.object().keys({
   id: Joi.string().required(),
   title: Joi.string()
     .min(4)
-    .max(30)
+    .max(60)
     .required(),
   isCompleted: Joi.boolean().optional()
 });
