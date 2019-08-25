@@ -53,6 +53,7 @@ class TodoService {
             name: 1,
             title: '$title',
             isCompleted: '$isCompleted',
+            isInProgress: '$isInProgress',
             createdAt: '$createdAt',
             updatedAt: '$updatedAt',
             user: '$user',
@@ -84,6 +85,7 @@ class TodoService {
                 $project: {
                   title: '$title',
                   isCompleted: '$isCompleted',
+                  isInProgress: '$isInProgress',
                   createdAt: '$createdAt',
                   updatedAt: '$updatedAt',
                   user: '$user',
@@ -134,6 +136,11 @@ class TodoService {
         updatedAt: true
       }
     };
+    if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
+      postBody = {
+        ...postBody, isInProgress: false
+      };
+    }
     return this.TodoModel.updateOne({
       user: user._id, isDeleted: false, status: true, _id: todoId
     }, { $set: postBody })

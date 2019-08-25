@@ -29,6 +29,10 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isInProgress: {
+    type: Boolean,
+    default: false
+  },
   isDeleted: {
     type: Boolean,
     default: false

@@ -18,6 +18,7 @@ const todoTypes = () => `
   input TodoInputType {
     title: String!
     isCompleted: Boolean
+    isInProgress: Boolean
   }
 
   input TodoSortInputType {
@@ -38,10 +39,10 @@ const todoTypes = () => `
       _id: String!
       title: String!
       user: User
-      isCompleted: Boolean!
-      isDeleted: Boolean!
+      isCompleted: Boolean
+      isInProgress: Boolean
       createdAt: Date!
-      updatedAt: Date!
+      updatedAt: Date
       comments: [TodoCommentType]
   }
 
