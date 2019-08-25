@@ -13,7 +13,8 @@ const updateTodoSchema = Joi.object().keys({
     .max(60)
     .required(),
   isCompleted: Joi.boolean().optional(),
-  isInProgress: Joi.boolean().optional()
+  isInProgress: Joi.boolean().optional(),
+  priority: Joi.string().optional()
 });
 const addTodoCommentSchema = Joi.object().keys({
   todoId: Joi.string().required(),

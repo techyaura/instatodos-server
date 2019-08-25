@@ -11,6 +11,13 @@ const todoTypes = () => `
     DESC
   }
 
+  enum TodoPriorityEnumType {
+    p1
+    p2
+    p3
+    p4
+  }
+
   input TodoCommentInputType {
     description: String!
   }
@@ -19,6 +26,7 @@ const todoTypes = () => `
     title: String!
     isCompleted: Boolean
     isInProgress: Boolean
+    priority: TodoPriorityEnumType
   }
 
   input TodoSortInputType {
@@ -39,6 +47,7 @@ const todoTypes = () => `
       _id: String!
       title: String!
       user: User
+      priority: TodoPriorityEnumType
       isCompleted: Boolean
       isInProgress: Boolean
       createdAt: Date!

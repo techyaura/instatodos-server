@@ -56,6 +56,7 @@ class TodoService {
             isInProgress: '$isInProgress',
             createdAt: '$createdAt',
             updatedAt: '$updatedAt',
+            priority: '$priority',
             user: '$user',
             comments: '$comments',
             month: { $month: '$createdAt' },
@@ -89,7 +90,8 @@ class TodoService {
                   createdAt: '$createdAt',
                   updatedAt: '$updatedAt',
                   user: '$user',
-                  comments: '$comments'
+                  comments: '$comments',
+                  priority: '$priority'
                 }
               },
               {

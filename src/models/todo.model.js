@@ -25,6 +25,11 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  priority: {
+    type: String,
+    enum: ['p1', 'p2', 'p3', 'p4'],
+    default: 'p4'
+  },
   isCompleted: {
     type: Boolean,
     default: false
