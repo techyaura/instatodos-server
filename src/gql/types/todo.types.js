@@ -18,6 +18,15 @@ const todoTypes = () => `
     p4
   }
 
+  input TodoLabelInputType {
+    name: String!
+  }
+
+  type TodoLabelListType {
+    name: String
+    _id: String
+  }
+
   input TodoCommentInputType {
     description: String!
   }
@@ -27,6 +36,7 @@ const todoTypes = () => `
     isCompleted: Boolean
     isInProgress: Boolean
     priority: TodoPriorityEnumType
+    label: ID
   }
 
   input TodoSortInputType {
@@ -36,6 +46,7 @@ const todoTypes = () => `
 
   input TodoFilterInputType {
     title_contains: String
+    label: ID
   }
 
   type TodoCommentType {
@@ -53,6 +64,7 @@ const todoTypes = () => `
       createdAt: Date!
       updatedAt: Date
       comments: [TodoCommentType]
+      label: TodoLabelListType
   }
 
   type TodoListType {
@@ -68,6 +80,7 @@ const todoTypes = () => `
   type Query {
     todoList (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ): TodoListType
     todoView(id: ID!): TodoType
+    todoLabelList: [TodoLabelListType]
   }
 
   type Mutation {
@@ -76,6 +89,9 @@ const todoTypes = () => `
     deleteTodo(id: ID!): SuccessType!
     addTodoComment(todoId: ID!, input: TodoCommentInputType!): SuccessType!
     updateTodoComment(id: ID!, todoId: ID!, input: TodoCommentInputType!): SuccessType!
+    addTodoLabel(input: TodoLabelInputType): SuccessType!
+    updateTodoLabel(id: ID!, input: TodoLabelInputType): SuccessType!
+    deleteTodoLabel(id: ID!): SuccessType!
   }
 `;
 

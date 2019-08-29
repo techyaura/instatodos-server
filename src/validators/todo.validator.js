@@ -8,6 +8,7 @@ const addTodoSchema = Joi.object().keys({
 });
 const updateTodoSchema = Joi.object().keys({
   id: Joi.string().required(),
+  label: Joi.string().optional(),
   title: Joi.string()
     .min(4)
     .max(60)

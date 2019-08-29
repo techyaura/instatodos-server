@@ -1,9 +1,11 @@
 const { TodoModel } = require('../../models');
+const { TodoLabelModel } = require('../../models');
 const { CommonFunctionUtil } = require('../../utils');
 
 class TodoService {
   constructor() {
     this.TodoModel = TodoModel;
+    this.TodoLabelModel = TodoLabelModel;
   }
 
   addTodo(postBody) {
@@ -32,15 +34,20 @@ class TodoService {
         }
       });
     }
-    const conditions = {
+    let conditions = {
       isDeleted: false,
       user: user._id
     };
 
     if (typeof (filter) !== 'undefined') {
-      conditions.$or = [];
       if (filter.title_contains) {
+        conditions.$or = [];
         conditions.$or.push({ title: { $regex: filter.title_contains, $options: 'gi' } });
+      }
+      if (filter.label) {
+        const mongoose = require('mongoose');
+        const customObjectId = mongoose.Types.ObjectId(filter.label);
+        conditions = { ...conditions, label: customObjectId };
       }
     }
     return this.TodoModel
@@ -52,6 +59,7 @@ class TodoService {
           $project: {
             name: 1,
             title: '$title',
+            label: '$label',
             isCompleted: '$isCompleted',
             isInProgress: '$isInProgress',
             createdAt: '$createdAt',
@@ -80,11 +88,20 @@ class TodoService {
           }
         },
         {
+          $lookup: {
+            from: 'todolabels',
+            localField: 'label',
+            foreignField: '_id',
+            as: 'label'
+          }
+        },
+        {
           $facet: {
             todos: [
               {
                 $project: {
                   title: '$title',
+                  label: '$label',
                   isCompleted: '$isCompleted',
                   isInProgress: '$isInProgress',
                   createdAt: '$createdAt',
@@ -115,10 +132,18 @@ class TodoService {
         const { todos, todosCount } = response[0];
         const mapTodos = todos.map((todo) => {
           const { email } = todo.user[0];
+          let title = null;
+          if (todo.label && todo.label.length) {
+            const { name } = todo.label[0];
+            title = name;
+          }
           return {
             ...todo,
             user: {
               email
+            },
+            label: {
+              name: title
             }
           };
         });
@@ -199,6 +224,24 @@ class TodoService {
         }
         return Promise.reject(new Error(403));
       })
+      .catch(err => Promise.reject(err));
+  }
+
+  todoLabelList(context) {
+    const { user } = context;
+    const { _id: userId } = user;
+    return this.TodoLabelModel.find({ user: userId })
+      .then(response => Promise.resolve(response))
+      .catch(err => Promise.reject(err));
+  }
+
+  addTodoLabel(context, body) {
+    const { user } = context;
+    const { _id: userId } = user;
+    return this.TodoLabelModel({ ...body, user: userId }).save()
+      .then(() => Promise.resolve({
+        message: 'Saved'
+      }))
       .catch(err => Promise.reject(err));
   }
 }
