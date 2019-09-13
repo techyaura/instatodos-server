@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "watch": "nodemon index.js",
     "start": "node index.js",
     "lint": "eslint ./src --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,6 +16,7 @@
     "@sendgrid/mail": "^6.4.0",
     "app-root-path": "^2.2.1",
     "bcrypt-nodejs": "0.0.3",
+    "chalk": "^2.4.2",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^8.0.0",
