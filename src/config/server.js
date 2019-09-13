@@ -1,15 +1,11 @@
-// Config env constibales on app bootsrap
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV}`
-});
 
+require('./env');
 const express = require('express');
-
-const app = express();
 const graphqlHTTP = require('express-graphql');
 const morgan = require('morgan');
 const cors = require('cors');
+
+const app = express();
 const { success, error, warning } = require('../utils/console-log');
 const schema = require('../gql');
 const winston = require('./winston');
