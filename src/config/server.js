@@ -6,14 +6,14 @@ const morgan = require('morgan');
 const cors = require('cors');
 
 const app = express();
+const dbConnection = require('./db');
 const { success, error, warning } = require('../utils/console-log');
 const schema = require('../gql');
 const winston = require('./winston');
 const { AuthMiddleware } = require('../middlewares');
 
 class Boot {
-  constructor(db) {
-    this.dbConnection = db;
+  constructor() {
     this.app = app;
     this.port = process.env.PORT || 8080;
     this.environment = process.env.environment || 'local';
@@ -26,7 +26,7 @@ class Boot {
    */
   async boostrapExpress() {
     try {
-      await this.dbConnection();
+      await dbConnection();
       return Promise.all([
         this.useCors(),
         this.useMorgan(),
