@@ -12,7 +12,7 @@ module.exports = () => {
     // When successfully connected
     mongoose.connection.on('connected', () => {
     /* eslint no-console: 0 */
-      console.log(success(`Mongoose default connection open to ${process.env.DB_URL}`));
+      console.log(success('=> DB Connected'));
       return resolve();
     });
 
