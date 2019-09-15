@@ -11,6 +11,7 @@ const { success, error, warning } = require('../utils/console-log');
 const schema = require('../gql');
 const winston = require('./winston');
 const { AuthMiddleware } = require('../middlewares');
+const errorHandler = require('../errors/handler');
 
 class Boot {
   constructor() {
@@ -31,7 +32,7 @@ class Boot {
         this.useCors(),
         this.useMorgan(),
         this.useGraphQl(),
-        this.useErrors(),
+        this.useLogger(),
         this.useListen()
       ]).then(() => {
         if (process.env.NODE_ENV === 'development') {
@@ -70,11 +71,14 @@ class Boot {
    * @description Graphql config
    */
   static graphQlHttpConfig() {
-    return graphqlHTTP({
+    return graphqlHTTP((request, response) => ({
       schema,
       pretty: true,
-      graphiql: true
-    });
+      graphiql: true,
+      context: { ...request, startTime: Date.now() },
+      customFormatErrorFn: (err => errorHandler(err, request, response)),
+      extensions: this.useExtensions()
+    }));
   }
 
   /**
@@ -89,17 +93,11 @@ class Boot {
    * @name useErrors
    * @description Express Global Error Handler
    */
-  useErrors() {
+  useLogger() {
     return this.app.use((err, req, res, next) => {
-      // set locals, only providing error in development
-      res.locals.message = err.message;
-      res.locals.error = req.app.get('env') === 'development' ? err : {};
-      // add this line to include winston logging
-      this.winston.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-      const errorHandler = require('../errors/handler');
-      return errorHandler({
-        err, req, res, next
-      });
+      winston.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+      // return Promise.reject(err);
+      // throw err;
     });
   }
 
@@ -109,6 +107,18 @@ class Boot {
    */
   useListen() {
     return this.app.listen(this.port);
+  }
+
+  static useExtensions() {
+    return ({
+      document,
+      variables,
+      operationName,
+      result,
+      context
+    }) => ({
+      runTime: Date.now() - context.startTime
+    });
   }
 }
 

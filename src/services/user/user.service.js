@@ -43,10 +43,11 @@ class AuthService {
         if (!response) {
           return Promise.reject(new Error('No User Found'));
         }
-        return Promise.resolve({
+        return {
           message: 'Email succsessfully verified',
-          ...postBody
-        });
+          ...postBody,
+          ok: true
+        };
       })
       .catch(err => Promise.reject(err));
   }
@@ -61,7 +62,7 @@ class AuthService {
     )
       .then((user) => {
         if (!user) {
-          return Promise.reject(new Error('No_User_Found'));
+          throw new Error('No_User_Found');
         }
         return new Promise((resolve, reject) => new UserModel().comparePassword(postBody.password, user, (err, valid) => {
           if (err) {
@@ -83,7 +84,9 @@ class AuthService {
           });
         }));
       })
-      .catch(err => Promise.reject(err));
+      .catch((err) => {
+        throw err;
+      });
   }
 
   forgotPasswordByOtp(postBody) {
@@ -97,11 +100,11 @@ class AuthService {
         if (!response) {
           return Promise.reject(new Error(`No account exist with ${email}`));
         }
-        return Promise.resolve({
+        return {
           email,
           otp,
           hashToken
-        });
+        };
       })
       .catch(err => Promise.reject(err));
   }

@@ -9,9 +9,7 @@ module.exports = {
   emailVerificationByOtp: (root, args, context) => {
     const { res, next } = context;
     return registerVerificationValidator(args.input, res, next)
-      .then(() => UserService.registerVerificationByOtp({ ...args.input }))
-      .then(response => ({ ...response, ok: true }))
-      .catch(err => next(err));
+      .then(() => UserService.registerVerificationByOtp({ ...args.input }));
   },
   userForgotpassword: (root, args, context) => {
     const { res, next } = context;
@@ -44,8 +42,7 @@ module.exports = {
           hashToken: user.hashToken
         };
       })
-      .then(response => ({ ...response }))
-      .catch(err => next(err));
+      .then(response => ({ ...response }));
   },
   register: (root, args, context) => {
     const otp = CommonFunctionUtil.generateOtp();
@@ -78,14 +75,12 @@ module.exports = {
           hashToken: user.hashToken
         };
       })
-      .then(response => ({ ...response }))
-      .catch(err => next(err));
+      .then(response => ({ ...response }));
   },
   userResetPassword: (root, args, context) => {
     const { res, next } = context;
     return resetPasswordValidator(args.input, res, next)
       .then(() => UserService.resetPassword({ ...args.input }))
-      .then(() => ({ message: 'Password reset successfully', ok: true }))
-      .catch(err => next(err));
+      .then(() => ({ message: 'Password reset successfully', ok: true }));
   }
 };

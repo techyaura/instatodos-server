@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { TodoModel } = require('../../models');
 const { TodoLabelModel } = require('../../models');
 const { CommonFunctionUtil } = require('../../utils');
@@ -10,7 +11,11 @@ class TodoService {
 
   addTodo(postBody) {
     const todo = this.TodoModel(postBody);
-    return todo.save();
+    return todo.save()
+      .then(() => ({ message: 'Todo has been succesfully added', ok: true }))
+      .catch((err) => {
+        throw err;
+      });
   }
 
   viewTodo(params) {
@@ -36,7 +41,7 @@ class TodoService {
     }
     let conditions = {
       isDeleted: false,
-      user: user._id
+      user: mongoose.Types.ObjectId(user._id)
     };
 
     if (typeof (filter) !== 'undefined') {
@@ -45,7 +50,6 @@ class TodoService {
         conditions.$or.push({ title: { $regex: filter.title_contains, $options: 'gi' } });
       }
       if (filter.label) {
-        const mongoose = require('mongoose');
         const customObjectId = mongoose.Types.ObjectId(filter.label);
         conditions = { ...conditions, label: customObjectId };
       }
@@ -72,13 +76,13 @@ class TodoService {
             year: { $year: '$createdAt' }
           }
         },
-        {
-          $match: {
-            month: CommonFunctionUtil.getDateInfo('m'),
-            day: CommonFunctionUtil.getDateInfo('d'),
-            year: CommonFunctionUtil.getDateInfo('y')
-          }
-        },
+        // {
+        //   $match: {
+        //     month: CommonFunctionUtil.getDateInfo('m'),
+        //     day: CommonFunctionUtil.getDateInfo('d'),
+        //     year: CommonFunctionUtil.getDateInfo('y')
+        //   }
+        // },
         {
           $lookup: {
             from: 'users',
@@ -173,7 +177,7 @@ class TodoService {
     }, { $set: postBody })
       .then((response) => {
         if (response && response.n !== 0) {
-          return Promise.resolve(response);
+          return { message: 'Todo has been succesfully updated', ok: true };
         }
         return Promise.reject(new Error(403));
       })
@@ -186,7 +190,7 @@ class TodoService {
     })
       .then((response) => {
         if (response && response.n !== 0) {
-          return Promise.resolve(response);
+          return { ok: true, message: 'Todo deleted successfully' };
         }
         return Promise.reject(new Error(403));
       })
@@ -203,7 +207,7 @@ class TodoService {
     }, { $push: { comments: { description } } })
       .then((response) => {
         if (response && response.n !== 0) {
-          return Promise.resolve(response);
+          return { message: 'Todo has been succesfully commented', ok: true };
         }
         return Promise.reject(new Error(403));
       })
@@ -220,7 +224,7 @@ class TodoService {
     }, { $set: { 'comments.$.description': description } })
       .then((response) => {
         if (response && response.n !== 0) {
-          return Promise.resolve(response);
+          return { message: 'Todo has been succesfully updated', ok: true };
         }
         return Promise.reject(new Error(403));
       })
@@ -239,9 +243,7 @@ class TodoService {
     const { user } = context;
     const { _id: userId } = user;
     return this.TodoLabelModel({ ...body, user: userId }).save()
-      .then(() => Promise.resolve({
-        message: 'Saved'
-      }))
+      .then(() => ({ message: 'Todo label has been succesfully added', ok: true }))
       .catch(err => Promise.reject(err));
   }
 }

@@ -33,40 +33,20 @@ const updateTodoCommentSchema = Joi.object().keys({
     .required()
 });
 module.exports = {
-  addTodoValidator(req) {
+  async addTodoValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, addTodoSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, addTodoSchema);
   },
-  updateTodoValidator(req) {
+  async updateTodoValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, updateTodoSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, updateTodoSchema);
   },
-  addTodoCommentValidator(req) {
+  async addTodoCommentValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, addTodoCommentSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, addTodoCommentSchema);
   },
-  updateTodoCommentValidator(req) {
+  async updateTodoCommentValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, updateTodoCommentSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, updateTodoCommentSchema);
   }
 };

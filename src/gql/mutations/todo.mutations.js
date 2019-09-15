@@ -6,53 +6,26 @@ const {
 
 module.exports = {
   addTodo: async (root, args, context) => {
-    const { user, next } = context;
-    try {
-      await ContextMiddleware(context, addTodoValidator(args.input));
-      await TodoService.addTodo({ ...args.input, user: user._id });
-      return { message: 'Todo has been succesfully added', ok: true };
-    } catch (err) {
-      return next(err);
-    }
+    const { user } = context;
+    await ContextMiddleware(context, addTodoValidator(args.input));
+    return TodoService.addTodo({ ...args.input, user: user._id });
   },
   updateTodo: async (root, args, context) => {
-    const { next, user } = context;
-    try {
-      await ContextMiddleware(context, updateTodoValidator({ ...args.input, id: args.id }));
-      await TodoService.updateTodo(user, args.id, args.input);
-      return { message: 'Todo has been succesfully updated', ok: true };
-    } catch (err) {
-      return next(err);
-    }
+    const { user } = context;
+    await ContextMiddleware(context, updateTodoValidator({ ...args.input, id: args.id }));
+    return TodoService.updateTodo(user, args.id, args.input);
   },
   deleteTodo: async (root, args, context) => {
-    const { next, user } = context;
-    try {
-      await ContextMiddleware(context);
-      await TodoService.deleteTodo(user, args);
-      return { ok: true, message: 'Todo deleted successfully' };
-    } catch (err) {
-      return next(err);
-    }
+    const { user } = context;
+    await ContextMiddleware(context);
+    return TodoService.deleteTodo(user, args);
   },
   addTodoComment: async (root, args, context) => {
-    const { next } = context;
-    try {
-      await ContextMiddleware(context, addTodoCommentValidator({ ...args.input, todoId: args.todoId }));
-      await TodoService.addTodoComment(context, { todoId: args.todoId }, args.input);
-      return { message: 'Todo has been succesfully commented', ok: true };
-    } catch (err) {
-      return next(err);
-    }
+    await ContextMiddleware(context, addTodoCommentValidator({ ...args.input, todoId: args.todoId }));
+    return TodoService.addTodoComment(context, { todoId: args.todoId }, args.input);
   },
   updateTodoComment: async (root, args, context) => {
-    const { next } = context;
-    try {
-      await ContextMiddleware(context, updateTodoCommentValidator({ ...args.input, todoId: args.todoId, id: args.id }));
-      await TodoService.updateTodoComment(context, { todoId: args.todoId, commentId: args.id }, args.input);
-      return { message: 'Todo has been succesfully commented', ok: true };
-    } catch (err) {
-      return next(err);
-    }
+    await ContextMiddleware(context, updateTodoCommentValidator({ ...args.input, todoId: args.todoId, id: args.id }));
+    return TodoService.updateTodoComment(context, { todoId: args.todoId, commentId: args.id }, args.input);
   }
 };
