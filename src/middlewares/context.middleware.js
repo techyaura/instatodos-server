@@ -1,5 +1,5 @@
 module.exports = function (context, ...arguments) {
-    const { next, user } = context;
+    const { user } = context;
     if (typeof (user) === 'undefined') {
         return Promise.reject(new Error(401));
     }

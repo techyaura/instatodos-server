@@ -94,10 +94,8 @@ class Boot {
    * @description Express Global Error Handler
    */
   useLogger() {
-    return this.app.use((err, req, res, next) => {
+    return this.app.use((err, req) => {
       winston.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-      // return Promise.reject(err);
-      // throw err;
     });
   }
 
@@ -111,10 +109,10 @@ class Boot {
 
   static useExtensions() {
     return ({
-      document,
-      variables,
-      operationName,
-      result,
+      document, // eslint-disable-line no-unused-vars
+      variables, // eslint-disable-line no-unused-vars
+      operationName, // eslint-disable-line no-unused-vars
+      result, // eslint-disable-line no-unused-vars
       context
     }) => ({
       runTime: Date.now() - context.startTime
