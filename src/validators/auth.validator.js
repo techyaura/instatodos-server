@@ -46,49 +46,24 @@ const resetPasswordSchema = Joi.object().keys({
 });
 
 module.exports = {
-  emailValidator(req) {
+  async emailValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, emailSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, emailSchema);
   },
-  registerValidator(req) {
+  async registerValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, registerSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, registerSchema);
   },
-  loginValidator(req) {
+  async loginValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, loginSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, loginSchema);
   },
-  registerVerificationValidator(req) {
+  async registerVerificationValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, registerVerificationSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, registerVerificationSchema);
   },
-  resetPasswordValidator(req) {
+  async resetPasswordValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, resetPasswordSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, resetPasswordSchema);
   }
 };

@@ -16,22 +16,12 @@ const updateTodoLabelSchema = Joi.object().keys({
     .required()
 });
 module.exports = {
-  addTodoLabelValidator(req) {
+  async addTodoLabelValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, addTodoLabelSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, addTodoLabelSchema);
   },
-  updateTodoLabelValidator(req) {
+  async updateTodoLabelValidator(req) {
     const reqBody = req.body || req;
-    return new Promise((resolve, reject) => Joi.validate(reqBody, updateTodoLabelSchema, (err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    }));
+    await Joi.validate(reqBody, updateTodoLabelSchema);
   }
 };
