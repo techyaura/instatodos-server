@@ -76,13 +76,13 @@ class TodoService {
             year: { $year: '$createdAt' }
           }
         },
-        // {
-        //   $match: {
-        //     month: CommonFunctionUtil.getDateInfo('m'),
-        //     day: CommonFunctionUtil.getDateInfo('d'),
-        //     year: CommonFunctionUtil.getDateInfo('y')
-        //   }
-        // },
+        {
+          $match: {
+            month: CommonFunctionUtil.getDateInfo('m'),
+            day: CommonFunctionUtil.getDateInfo('d'),
+            year: CommonFunctionUtil.getDateInfo('y')
+          }
+        },
         {
           $lookup: {
             from: 'users',

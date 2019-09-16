@@ -1,3 +1,5 @@
+const { CommonFunctionUtil } = require('../utils');
+
 module.exports = function (context, ...arguments) {
     const { user } = context;
     if (typeof (user) === 'undefined') {

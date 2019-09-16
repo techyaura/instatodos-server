@@ -1,5 +1,5 @@
 const { TodoService } = require('../../services');
-const { ContextMiddleware } = require('../../middlewares');
+const { ContextMiddleware, TodoMiddlewares } = require('../../middlewares');
 const {
   addTodoValidator, updateTodoValidator, addTodoCommentValidator, updateTodoCommentValidator
 } = require('../../validators');
@@ -12,7 +12,7 @@ module.exports = {
   },
   updateTodo: async (root, args, context) => {
     const { user } = context;
-    await ContextMiddleware(context, updateTodoValidator({ ...args.input, id: args.id }));
+    await ContextMiddleware(context, updateTodoValidator({ ...args.input, id: args.id }), TodoMiddlewares.checkLabel(context, args.input));
     return TodoService.updateTodo(user, args.id, args.input);
   },
   deleteTodo: async (root, args, context) => {
