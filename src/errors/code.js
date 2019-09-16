@@ -26,7 +26,7 @@ module.exports = {
   402: 'Payment required',
   403: {
     status: 403,
-    message: 'Forbidden Error',
+    message: 'You are not allowed to perform the action',
     code: 'RESOURCE_FORBIDDEN'
   },
   404: 'Not found',

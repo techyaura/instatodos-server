@@ -12,14 +12,16 @@ module.exports = (err, req, res) => {
         path
       };
     }
-    res.statusCode = 400;
+    res.statusCode = 500;
     return {
+      status: 500,
       locations,
       path
     };
   } catch (appErr) {
     res.statusCode = 500;
     return {
+      status: 500,
       message: 'unknown',
       code: 'UNKNOWN',
       locations,
