@@ -62,5 +62,15 @@ module.exports = {
   507: 'Insufficient storage',
   509: 'Bandwidth limit exceeded',
   510: 'Not extended',
-  511: 'Network authentication required'
+  511: 'Network authentication required',
+  No_User_Found: {
+    status: 400,
+    code: 'No_User_Found',
+    message: 'This email address not exist'
+  },
+  INVALID_CREDENTIALS: {
+    status: 401,
+    code: 'INVALID_CREDENTIALS',
+    message: 'You are not Authorized'
+  }
 };
