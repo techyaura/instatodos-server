@@ -246,6 +246,35 @@ class TodoService {
       .then(() => ({ message: 'Todo label has been succesfully added', ok: true }))
       .catch(err => Promise.reject(err));
   }
+
+
+  updateTodoLabel({ user }, { todoLabelId }, body) {
+    const { _id: userId } = user;
+    const { name } = body;
+    return this.TodoLabelModel.updateOne({
+      user: userId, _id: todoLabelId
+    }, { $set: { name } })
+      .then((response) => {
+        if (response && response.n !== 0) {
+          return { message: 'TodoLabel has been succesfully updated', ok: true };
+        }
+        return Promise.reject(new Error(403));
+      })
+      .catch(err => Promise.reject(err));
+  }
+
+  deleteTodoLabel({ user }, { todoLabelId }) {
+    return this.TodoLabelModel.deleteOne({
+      user: user._id, _id: todoLabelId
+    })
+      .then((response) => {
+        if (response && response.n !== 0) {
+          return { ok: true, message: 'TodoLabel deleted successfully' };
+        }
+        return Promise.reject(new Error(403));
+      })
+      .catch(err => Promise.reject(err));
+  }
 }
 
 module.exports = new TodoService();
