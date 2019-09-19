@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { TodoModel } = require('../../models');
 const { TodoLabelModel } = require('../../models');
-const { CommonFunctionUtil } = require('../../utils');
 
 class TodoService {
   constructor() {
@@ -25,7 +24,7 @@ class TodoService {
   listTodo({ context, args: params }) {
     const { user } = context;
     const {
-      filter, first = 50, offset = 1, sort
+      filter, first = 100, offset = 1, sort
     } = params;
     let sortObject = { createdAt: -1 };
     if (typeof (sort) !== 'undefined') {
@@ -41,13 +40,24 @@ class TodoService {
     }
     let conditions = {
       isDeleted: false,
-      user: mongoose.Types.ObjectId(user._id)
+      user: mongoose.Types.ObjectId(user._id),
+      $or: [
+        {
+          isCompleted: false,
+          createdAt: {
+            $lt: new Date()
+          }
+        },
+        {
+          createdAt: new Date()
+        }
+      ]
     };
 
-    if (typeof (filter) !== 'undefined') {
+    if (filter && typeof (filter) !== 'undefined') {
       if (filter.title_contains) {
-        conditions.$or = [];
-        conditions.$or.push({ title: { $regex: filter.title_contains, $options: 'gi' } });
+        conditions.$and = conditions.$and || [];
+        conditions.$and.push({ title: { $regex: filter.title_contains, $options: 'gi' } });
       }
       if (filter.label) {
         const customObjectId = mongoose.Types.ObjectId(filter.label);
@@ -74,13 +84,6 @@ class TodoService {
             month: { $month: '$createdAt' },
             day: { $dayOfMonth: '$createdAt' },
             year: { $year: '$createdAt' }
-          }
-        },
-        {
-          $match: {
-            month: CommonFunctionUtil.getDateInfo('m'),
-            day: CommonFunctionUtil.getDateInfo('d'),
-            year: CommonFunctionUtil.getDateInfo('y')
           }
         },
         {
