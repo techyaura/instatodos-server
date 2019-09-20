@@ -1,11 +1,6 @@
+
 const todoTypes = () => `
   
-  scalar Date
-
-  type User {
-    email: String!
-  }
-
   enum TodoSortEnumType {
     ASC
     DESC
@@ -70,11 +65,6 @@ const todoTypes = () => `
   type TodoListType {
     totalCount: Int
     data: [TodoType]
-  }
-
-  type SuccessType {
-    ok: Boolean!,
-    message: String!
   }
 
   type Query {

@@ -1,7 +1,6 @@
 const { CommonFunctionUtil } = require('../utils');
 
-module.exports = function (context, ...arguments) {
-    const { user } = context;
+module.exports = function ({user}, ...arguments) {
     if (typeof (user) === 'undefined') {
         return Promise.reject(new Error(401));
     }

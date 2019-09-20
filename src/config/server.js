@@ -37,7 +37,7 @@ class Boot {
       ]).then(() => {
         if (process.env.NODE_ENV === 'development') {
           /** Clear console for every server restart while development */
-          console.clear(); // eslint-disable-line no-console
+          // console.clear(); // eslint-disable-line no-console
         }
         console.log(success(`Running a GraphQL API server on PORT: ${this.port} in ${this.environment} mode`)); // eslint-disable-line no-console
         return this.app;
