@@ -39,9 +39,11 @@ class TodoService {
       });
     }
     let conditions = {
-      isDeleted: false,
-      user: mongoose.Types.ObjectId(user._id),
-      $or: [
+      user: mongoose.Types.ObjectId(user._id)
+    };
+
+    if (!filter || (filter && !('isCompleted' in filter))) {
+      conditions.$or = [
         {
           isCompleted: false,
           createdAt: {
@@ -49,10 +51,12 @@ class TodoService {
           }
         },
         {
-          createdAt: new Date()
+          createdAt: {
+            $gte: new Date()
+          }
         }
-      ]
-    };
+      ];
+    }
 
     if (filter && typeof (filter) !== 'undefined') {
       if (filter.title_contains) {
@@ -63,7 +67,11 @@ class TodoService {
         const customObjectId = mongoose.Types.ObjectId(filter.label);
         conditions = { ...conditions, label: customObjectId };
       }
+      if ('isCompleted' in filter) {
+        conditions = { ...conditions, isCompleted: filter.isCompleted };
+      }
     }
+    console.log(conditions);
     return this.TodoModel
       .aggregate([
         {

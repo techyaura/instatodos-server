@@ -40,6 +40,7 @@ const todoTypes = () => `
   }
 
   input TodoFilterInputType {
+    isCompleted: Boolean
     title_contains: String
     label: ID
   }

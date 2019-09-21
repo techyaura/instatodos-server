@@ -4,6 +4,7 @@ const thoughtTypes = () => `
     title: String
     description: String
     _id: String
+    createdAt: Date
   }
 
   input ThoughtInputType {
