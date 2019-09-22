@@ -7,7 +7,7 @@ const addThoughtSchema = Joi.object().keys({
     .required(),
   description: Joi.string()
     .min(10)
-    .max(200)
+    .max(1000)
     .optional()
 });
 const updateThoughtSchema = Joi.object().keys({
@@ -18,7 +18,7 @@ const updateThoughtSchema = Joi.object().keys({
     .required(),
   description: Joi.string()
     .min(10)
-    .max(200)
+    .max(1000)
     .optional()
 });
 module.exports = {

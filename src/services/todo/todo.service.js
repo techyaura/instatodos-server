@@ -71,7 +71,6 @@ class TodoService {
         conditions = { ...conditions, isCompleted: filter.isCompleted };
       }
     }
-    console.log(conditions);
     return this.TodoModel
       .aggregate([
         {
