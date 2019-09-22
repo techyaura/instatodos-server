@@ -1,19 +1,12 @@
 
-# Graphql + Node Js + Mongodb CRUD API
-
+# Instant-TODOS
+[TODO UI Link](https://instant-todos.netlify.com)
   
 
 ## Intro
 
-This is an simple TODO crud API using Graphql + Node Js + Mongodb (Using mongoose as ORM)
+This is a TODO-API implementation using Graphql + Node Js + Mongodb (Using mongoose as ORM)
 
-  
-
-## Live URL
-[TODO UI Link](https://techyaura-todo.netlify.com)
-
-[TODO API Link](https://gql-node.herokuapp.com/graphql)
-  
 
 ## How to use!
 
