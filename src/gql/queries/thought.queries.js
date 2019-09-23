@@ -4,6 +4,7 @@ const { ContextMiddleware } = require('../../middlewares');
 module.exports = {
   listThought: async (root, args, context) => {
     await ContextMiddleware(context);
-    return ThoughtService.listThought(context);
+    console.log(args);
+    return ThoughtService.listThought(context, args);
   }
 };

@@ -15,7 +15,20 @@ const schema = new mongoose.Schema({
   },
   description: {
     type: String,
-    default: true
+    default: true,
+    required: true
+  },
+  accomplishTenure: {
+    type: Date,
+    default: null
+  },
+  isPinned: {
+    type: Boolean,
+    default: false
+  },
+  isAchieved: {
+    type: Boolean,
+    default: false
   },
   isDeleted: {
     type: Boolean,

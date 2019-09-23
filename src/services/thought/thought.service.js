@@ -6,13 +6,53 @@ class ThoughtService {
     this.ThoughtModel = ThoughtModel;
   }
 
-  async listThought({ user }, params = { first: 100, offset: 1 }) {
-    const { first, offset } = params;
-    const sortObject = { createdAt: -1 };
-    const conditions = {
+  async listThought({ user }, params = {
+    limit: 100, offset: 1, filter: {}, sort: {}
+  }) {
+    const {
+      limit = 100, offset = 1, filter, sort
+    } = params;
+
+    let sortObject = { isPinned: -1, createdAt: -1 };
+    if (sort && Object.keys(sort).length) {
+      sortObject = {};
+      Object.keys(sort).forEach((key) => {
+        if (sort[key] === 'DESC') {
+          sortObject[key] = -1;
+        }
+        if (sort[key] === 'ASC') {
+          sortObject[key] = 1;
+        }
+      });
+    }
+
+    let conditions = {
       isDeleted: false,
       user: mongoose.Types.ObjectId(user._id)
     };
+
+    if (filter && Object.keys(filter).length) {
+      if ('q' in filter) {
+        conditions.$or = conditions.$or || [];
+        conditions.$or.push({ title: { $regex: filter.q, $options: 'gi' } }, { description: { $regex: filter.q, $options: 'gi' } });
+      }
+      if ('isPinned' in filter) {
+        conditions = { ...conditions, isPinned: filter.isPinned };
+      }
+      if ('isAchieved' in filter) {
+        if (filter.isAchieved === true) {
+          conditions = { ...conditions, isAchieved: true };
+        } else {
+          conditions.$or = conditions.$or || [];
+          conditions.$or.push({
+            isAchieved: false
+          });
+          conditions.$or.push({
+            isAchieved: null
+          });
+        }
+      }
+    }
 
     try {
       const response = await this.ThoughtModel
@@ -26,8 +66,8 @@ class ThoughtService {
                 {
                   $sort: sortObject
                 },
-                { $skip: (offset - 1) * first },
-                { $limit: first }
+                { $skip: (offset - 1) * limit },
+                { $limit: limit }
               ],
               count: [
                 {

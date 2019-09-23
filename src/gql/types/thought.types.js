@@ -1,15 +1,35 @@
 const thoughtTypes = () => `
      
+  input ThoughtFilterInputType {
+    isPinned: Boolean
+    isAchieved: Boolean
+    q: String
+  }
+
+  input ThoughtSortInputType {
+    createdAt: SortEnumType
+    updatedAt: SortEnumType
+    isPinned: SortEnumType
+    isAchieved: SortEnumType
+    accomplishTenure: SortEnumType
+  }
+
   type ThoughtType {
+    _id: String
     title: String
     description: String
-    _id: String
+    accomplishTenure: Date
+    isPinned: Boolean
+    isAchieved: Boolean
     createdAt: Date
   }
 
   input ThoughtInputType {
     title: String!
-    description: String
+    description: String!
+    accomplishTenure: Date
+    isPinned: Boolean
+    isAchieved: Boolean
   }
 
   type ThoughtListType {
@@ -18,7 +38,7 @@ const thoughtTypes = () => `
   }
 
   extend type Query {
-    listThought (first: Int, offset: Int ): ThoughtListType
+    listThought (filter: ThoughtFilterInputType, sort: ThoughtSortInputType, limit: Int, offset: Int ): ThoughtListType
     thought(id: ID!): ThoughtType
   }
 

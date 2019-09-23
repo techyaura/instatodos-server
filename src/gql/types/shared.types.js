@@ -10,6 +10,12 @@ const sharedTypes = () => `
     ok: Boolean!,
     message: String!
   }
+
+  enum SortEnumType {
+    ASC
+    DESC
+  }
+
 `;
 
 module.exports = {

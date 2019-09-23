@@ -1,11 +1,6 @@
 
 const todoTypes = () => `
   
-  enum TodoSortEnumType {
-    ASC
-    DESC
-  }
-
   enum TodoPriorityEnumType {
     p1
     p2
@@ -35,8 +30,8 @@ const todoTypes = () => `
   }
 
   input TodoSortInputType {
-    createdAt: TodoSortEnumType
-    updatedAt: TodoSortEnumType
+    createdAt: SortEnumType
+    updatedAt: SortEnumType
   }
 
   input TodoFilterInputType {
