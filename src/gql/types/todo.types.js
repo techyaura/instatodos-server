@@ -58,12 +58,24 @@ const todoTypes = () => `
       label: TodoLabelListType
   }
 
+  type TodoCompletedType {
+    _id: String!
+    list: [TodoType]
+    count: Int
+}
+
   type TodoListType {
     totalCount: Int
     data: [TodoType]
   }
 
+  type TodoListCompletedType {
+    totalCount: Int
+    data: [TodoCompletedType]
+  }
+
   type Query {
+    todoCompleted: TodoListCompletedType
     todoList (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ): TodoListType
     todoView(id: ID!): TodoType
     todoLabelList: [TodoLabelListType]

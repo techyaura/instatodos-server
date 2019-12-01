@@ -21,6 +21,116 @@ class TodoService {
     return this.TodoModel.findOne({ _id: params.id }).populate({ path: 'user' });
   }
 
+  completedTodo({ context, args: params }) {
+    const { user } = context;
+    let conditions = {
+      user: mongoose.Types.ObjectId(user._id),
+      isCompleted: true
+    };
+    return this.TodoModel
+      .aggregate([
+        {
+          $match: conditions
+        },
+        {
+          $project: {
+            name: 1,
+            title: '$title',
+            label: '$label',
+            isCompleted: '$isCompleted',
+            isInProgress: '$isInProgress',
+            createdAt: '$createdAt',
+            updatedAt: '$updatedAt',
+            priority: '$priority',
+            user: '$user',
+            comments: '$comments',
+            month: { $month: '$createdAt' },
+            day: { $dayOfMonth: '$createdAt' },
+            year: { $year: '$createdAt' }
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user',
+            foreignField: '_id',
+            as: 'user'
+          }
+        },
+        {
+          $lookup: {
+            from: 'todolabels',
+            localField: 'label',
+            foreignField: '_id',
+            as: 'label'
+          }
+        },
+        {
+          $facet: {
+            todos: [
+              {
+                $project: {
+                  title: '$title',
+                  label: '$label',
+                  isCompleted: '$isCompleted',
+                  isInProgress: '$isInProgress',
+                  createdAt: '$createdAt',
+                  updatedAt: '$updatedAt',
+                  user: '$user',
+                  comments: '$comments',
+                  priority: '$priority'
+                }
+              },
+              {
+                $group: {
+                  _id: { $dateToString: { format: "%Y-%m-%d", date: "$updatedAt" } },
+                  list: { $push: "$$ROOT" },
+                  count: { $sum: 1 }
+                }
+              },
+              {
+                $sort: { _id: -1 }
+              },
+            ],
+            todosCount: [
+              {
+                $group: {
+                  _id: null,
+                  count: { $sum: 1 }
+                }
+              }
+            ]
+          }
+        }
+      ])
+      .then((response) => {
+        const { todos, todosCount } = response[0];
+        // const mapTodos = (todos.list).map((todo) => {
+        //   const { email } = todo.user[0];
+        //   let title = null;
+        //   if (todo.label && todo.label.length) {
+        //     const { name } = todo.label[0];
+        //     title = name;
+        //   }
+        //   return {
+        //     ...todo,
+        //     user: {
+        //       email
+        //     },
+        //     label: {
+        //       name: title
+        //     }
+        //   };
+        // });
+        const { count } = todosCount[0] || 0;
+        return Promise.resolve({
+          totalCount: count,
+          data: todos
+        });
+      })
+      .catch(err => Promise.reject(err));
+  }
+
   listTodo({ context, args: params }) {
     const { user } = context;
     const {
