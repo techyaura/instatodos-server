@@ -23,7 +23,7 @@ class TodoService {
 
   completedTodo({ context, args: params }) {
     const { user } = context;
-    let conditions = {
+    const conditions = {
       user: mongoose.Types.ObjectId(user._id),
       isCompleted: true
     };
@@ -83,14 +83,14 @@ class TodoService {
               },
               {
                 $group: {
-                  _id: { $dateToString: { format: "%Y-%m-%d", date: "$updatedAt" } },
-                  list: { $push: "$$ROOT" },
+                  _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: 'Asia/Kolkata' } },
+                  list: { $push: '$$ROOT' },
                   count: { $sum: 1 }
                 }
               },
               {
                 $sort: { _id: -1 }
-              },
+              }
             ],
             todosCount: [
               {
@@ -228,7 +228,8 @@ class TodoService {
                   label: '$label',
                   isCompleted: '$isCompleted',
                   isInProgress: '$isInProgress',
-                  createdAt: '$createdAt',
+                  // createdAt: '$createdAt',
+                  createdAt: { $dateToString: { format: '%Y-%m-%d %H:%M:%S:%L%z', date: '$createdAt', timezone: 'Asia/Kolkata' } },
                   updatedAt: '$updatedAt',
                   user: '$user',
                   comments: '$comments',
