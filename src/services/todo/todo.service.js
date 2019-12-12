@@ -229,7 +229,7 @@ class TodoService {
                   isCompleted: '$isCompleted',
                   isInProgress: '$isInProgress',
                   // createdAt: '$createdAt',
-                  createdAt: { $dateToString: { format: '%Y-%m-%d %H:%M:%S:%L%z', date: '$createdAt', timezone: 'Asia/Kolkata' } },
+                  createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: 'Asia/Kolkata' } },
                   updatedAt: '$updatedAt',
                   user: '$user',
                   comments: '$comments',
