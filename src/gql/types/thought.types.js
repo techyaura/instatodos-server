@@ -22,6 +22,7 @@ const thoughtTypes = () => `
     isPinned: Boolean
     isAchieved: Boolean
     createdAt: Date
+    updatedAt: Date
   }
 
   input ThoughtInputType {
