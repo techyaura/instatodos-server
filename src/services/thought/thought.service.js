@@ -64,8 +64,17 @@ class ThoughtService {
             $facet: {
               dataList: [
                 {
-                  $sort: sortObject
+                  $project: {
+                    accomplishTenure: { $dateToString: { format: '%Y-%m-%d', date: '$accomplishTenure', timezone: 'Asia/Kolkata' } },
+                    title: 1,
+                    description: 1,
+                    isAchieved: 1,
+                    isPinned: 1,
+                    createdAt: 1,
+                    updatedAt: 1
+                  }
                 },
+                { $sort: sortObject },
                 { $skip: (offset - 1) * limit },
                 { $limit: limit }
               ],
