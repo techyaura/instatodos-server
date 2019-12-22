@@ -6,7 +6,7 @@ module.exports = () => {
   mongoose.Promise = global.Promise;
 
   return new Promise((resolve, reject) => {
-    mongoose.connect(process.env.DB_URL, { useNewUrlParser: true });
+    mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
     // CONNECTION EVENTS
 
     // When successfully connected
