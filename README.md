@@ -1,16 +1,9 @@
-
-# Instant-TODOS
-[TODO UI Link](https://instant-todos.netlify.com)
+# https://gql-node.herokuapp.com/graphql
   
-
-## Intro
-
-This is a TODO-API implementation using Graphql + Node Js + Mongodb (Using mongoose as ORM)
+This is the backend for [instant-todos](https://instant-todos.netlify.com) which powers the instant-todos
 
 
-## How to use!
-
-  
+## How to configure for use! 
 
 - create the files `env.development` for local & `.env.production` for production
 ```sh
