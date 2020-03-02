@@ -72,7 +72,7 @@ class AuthService {
             return reject(new Error('INVALID_CREDENTIALS'));
           }
           const token = this.JwtService.issueToken(
-            user._id /* eslint no-underscore-dangle: 0 */,
+            user._id /* eslint no-underscore-dangle: 0 */
           );
           return resolve({
             message: 'User successfully logged in',
@@ -94,7 +94,7 @@ class AuthService {
     return this.UserModel.findOneAndUpdate(
       { email, status: true, isDeleted: false },
       { hashToken, otp },
-      { new: true, upsert: false },
+      { new: true, upsert: false }
     )
       .then((response) => {
         if (!response) {
@@ -125,6 +125,14 @@ class AuthService {
         return user.save();
       })
       .catch(err => Promise.reject(err));
+  }
+
+  async profile({ user }) {
+    try {
+      return await this.UserModel.findById(user._id);
+    } catch (err) {
+      throw err;
+    }
   }
 }
 

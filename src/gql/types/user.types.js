@@ -13,6 +13,8 @@ const userTypes = () => `
     type UserInfoType {
       email: String!
       id: ID!
+      firstname: String
+      lastname: String
     }
 
     type UserLoginSuccessType {
@@ -49,6 +51,7 @@ const userTypes = () => `
 
     extend type Query {
       login(input: UserLoginInputType!): UserLoginSuccessType!
+      profile: UserInfoType!
     }
 
     extend type Mutation {

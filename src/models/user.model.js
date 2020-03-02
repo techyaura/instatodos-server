@@ -33,7 +33,7 @@ const modelSchema = new Schema(
       default: false
     }
   },
-  { timestamps: {} },
+  { timestamps: {} }
 );
 
 /* eslint func-names: 0 */
