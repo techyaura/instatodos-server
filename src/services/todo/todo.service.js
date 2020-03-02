@@ -131,11 +131,11 @@ class TodoService {
       .catch(err => Promise.reject(err));
   }
 
-  listTodo({ context, args: params }) {
-    const { user } = context;
+  listTodo({ user }, params) {
     const {
       filter, first = 100, offset = 1, sort
     } = params;
+    // sort object
     let sortObject = { createdAt: -1 };
     if (typeof (sort) !== 'undefined') {
       sortObject = {};
@@ -148,10 +148,12 @@ class TodoService {
         }
       });
     }
+    // define conditions
     let conditions = {
       user: mongoose.Types.ObjectId(user._id)
     };
 
+    // check isCompleted
     if (!filter || (filter && !('isCompleted' in filter))) {
       conditions.$or = [
         {
@@ -168,13 +170,14 @@ class TodoService {
       ];
     }
 
+    // Check & define filter conditions
     if (filter && typeof (filter) !== 'undefined') {
       if (filter.title_contains) {
         conditions.$and = conditions.$and || [];
         conditions.$and.push({ title: { $regex: filter.title_contains, $options: 'gi' } });
       }
-      if (filter.label) {
-        const customObjectId = mongoose.Types.ObjectId(filter.label);
+      if (filter.labelId) {
+        const customObjectId = mongoose.Types.ObjectId(filter.labelId);
         conditions = { ...conditions, label: customObjectId };
       }
       if ('isCompleted' in filter) {
@@ -354,12 +357,15 @@ class TodoService {
       .catch(err => Promise.reject(err));
   }
 
-  todoLabelList(context) {
-    const { user } = context;
+  todoLabelList({ user }) {
     const { _id: userId } = user;
-    return this.TodoLabelModel.find({ user: userId })
-      .then(response => Promise.resolve(response))
-      .catch(err => Promise.reject(err));
+    const query = { user: userId };
+    try {
+      const response = this.TodoLabelModel.find(query);
+      return response;
+    } catch (err) {
+      throw err;
+    }
   }
 
   addTodoLabel(context, body) {
