@@ -13,6 +13,6 @@ module.exports = {
   },
   deleteTodoLabel: async (root, args, context) => {
     await ContextMiddleware(context);
-    return TodoService.deleteTodoLabel(context, { todoLabelId: args.id });
+    return TodoService.deleteTodoLabel(context, args);
   }
 };
