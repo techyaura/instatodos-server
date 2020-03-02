@@ -12,6 +12,6 @@ module.exports = {
   },
   todoCompleted: async (root, args, context) => {
     await ContextMiddleware(context);
-    return TodoService.completedTodo({ context, args });
+    return TodoService.completedTodo(context);
   }
 };

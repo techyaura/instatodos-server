@@ -9,7 +9,7 @@ module.exports = {
   },
   updateTodoLabel: async (root, args, context) => {
     await ContextMiddleware(context, updateTodoLabelValidator({ ...args.input, id: args.id }));
-    return TodoService.updateTodoLabel(context, { todoLabelId: args.id }, args.input);
+    return TodoService.updateTodoLabel(context, args, args.input);
   },
   deleteTodoLabel: async (root, args, context) => {
     await ContextMiddleware(context);
