@@ -4,7 +4,8 @@ const addTodoSchema = Joi.object().keys({
   title: Joi.string()
     .min(4)
     .max(60)
-    .required()
+    .required(),
+  scheduledDate: Joi.date().allow(null)
 });
 const updateTodoSchema = Joi.object().keys({
   id: Joi.string().required(),
@@ -15,7 +16,8 @@ const updateTodoSchema = Joi.object().keys({
     .required(),
   isCompleted: Joi.boolean().optional(),
   isInProgress: Joi.boolean().optional(),
-  priority: Joi.string().optional()
+  priority: Joi.string().optional(),
+  scheduledDate: Joi.date().allow(null)
 });
 const addTodoCommentSchema = Joi.object().keys({
   todoId: Joi.string().required(),

@@ -23,6 +23,7 @@ const todoTypes = () => `
 
   input TodoInputType {
     title: String!
+    scheduledDate: Date
     isCompleted: Boolean
     isInProgress: Boolean
     priority: TodoPriorityEnumType
@@ -32,6 +33,7 @@ const todoTypes = () => `
   input TodoSortInputType {
     createdAt: SortEnumType
     updatedAt: SortEnumType
+    scheduledDate: SortEnumType
   }
 
   input TodoFilterInputType {
@@ -54,6 +56,7 @@ const todoTypes = () => `
       isInProgress: Boolean
       createdAt: Date!
       updatedAt: Date
+      scheduledDate: Date
       comments: [TodoCommentType]
       label: TodoLabelListType
   }

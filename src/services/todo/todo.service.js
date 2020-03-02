@@ -195,6 +195,7 @@ class TodoService {
             isInProgress: '$isInProgress',
             createdAt: '$createdAt',
             updatedAt: '$updatedAt',
+            scheduledDate: '$scheduledDate',
             priority: '$priority',
             user: '$user',
             comments: '$comments',
@@ -231,6 +232,7 @@ class TodoService {
                   // createdAt: '$createdAt',
                   createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: 'Asia/Kolkata' } },
                   updatedAt: '$updatedAt',
+                  scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate', timezone: 'Asia/Kolkata' } },
                   user: '$user',
                   comments: '$comments',
                   priority: '$priority'
@@ -367,7 +369,6 @@ class TodoService {
       .then(() => ({ message: 'Todo label has been succesfully added', ok: true }))
       .catch(err => Promise.reject(err));
   }
-
 
   updateTodoLabel({ user }, { todoLabelId }, body) {
     const { _id: userId } = user;
