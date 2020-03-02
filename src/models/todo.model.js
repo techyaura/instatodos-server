@@ -43,6 +43,10 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  scheduledDate: {
+    type: Date,
+    default: new Date()
+  },
   isDeleted: {
     type: Boolean,
     default: false
