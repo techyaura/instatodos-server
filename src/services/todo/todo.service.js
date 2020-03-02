@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const { TodoModel } = require('../../models');
-const { TodoLabelModel } = require('../../models');
+const { TodoModel, TodoLabelModel } = require('../../models');
 
 class TodoService {
   constructor() {
