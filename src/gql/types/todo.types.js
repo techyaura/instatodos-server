@@ -22,7 +22,7 @@ const todoTypes = () => `
   }
 
   input TodoInputType {
-    title: String!
+    title: String
     scheduledDate: Date
     isCompleted: Boolean
     isInProgress: Boolean
