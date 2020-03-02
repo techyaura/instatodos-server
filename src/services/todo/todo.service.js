@@ -388,7 +388,7 @@ class TodoService {
 
   async deleteTodoLabel({ user }, params) {
     try {
-      const { todoLabelId } = params;
+      const { id: todoLabelId } = params;
       const response = await this.TodoLabelModel.deleteOne({
         user: user._id, _id: todoLabelId
       });
