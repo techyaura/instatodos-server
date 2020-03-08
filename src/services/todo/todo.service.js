@@ -249,10 +249,12 @@ class TodoService {
       const { todos, todosCount } = response[0];
       const mapTodos = todos.map((todo) => {
         const { email } = todo.user[0];
-        let title = null;
+        let label = null;
         if (todo.label && todo.label.length) {
-          const { name } = todo.label[0];
-          title = name;
+          // eslint-disable-next-line prefer-destructuring
+          label = todo.label[0];
+          // title = name;
+          // id = _id;
         }
         return {
           ...todo,
@@ -260,7 +262,7 @@ class TodoService {
             email
           },
           label: {
-            name: title
+            ...label
           }
         };
       });
