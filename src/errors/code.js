@@ -63,6 +63,16 @@ module.exports = {
   509: 'Bandwidth limit exceeded',
   510: 'Not extended',
   511: 'Network authentication required',
+  TokenExpiredError: {
+    status: 401,
+    code: 'TOKEN_EXPIRED',
+    message: 'Token Expired'
+  },
+  INVALID_GRANT: {
+    status: 401,
+    code: 'INVALID_TOKEN',
+    message: 'Token Invalid'
+  },
   No_User_Found: {
     status: 400,
     code: 'No_User_Found',

@@ -94,9 +94,7 @@ class Boot {
    * @description Express Global Error Handler
    */
   useLogger() {
-    return this.app.use((err, req) => {
-      winston.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-    });
+    this.app.use((err, req, res, next) => errorHandler(err, req, res, next, true));
   }
 
   /**
