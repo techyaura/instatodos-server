@@ -28,7 +28,7 @@ module.exports = (err, req, res, next, isExpressSpecificError) => {
     } else {
       response = { ...response };
     }
-    winston.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+    winston.error(`${response.status || 500} - ${response.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     return res.json(response);
   }
   // Error specific to Graphql
@@ -40,5 +40,6 @@ module.exports = (err, req, res, next, isExpressSpecificError) => {
     };
   }
   response = { ...response, locations, path };
+  winston.error(`${response.status || 500} - ${response.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
   return response;
 };
