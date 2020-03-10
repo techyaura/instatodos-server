@@ -77,7 +77,7 @@ class Boot {
       graphiql: process.env.NODE_ENV === 'development',
       context: { ...request, startTime: Date.now() },
       customFormatErrorFn: (err => errorHandler(err, request, response)),
-      extensions: this.useExtensions()
+      extensions: process.env.NODE_ENV === 'development' ? this.useExtensions() : ''
     }));
   }
 
