@@ -74,7 +74,7 @@ class Boot {
     return graphqlHTTP((request, response) => ({
       schema,
       pretty: true,
-      graphiql: true,
+      graphiql: process.env.NODE_ENV === 'development',
       context: { ...request, startTime: Date.now() },
       customFormatErrorFn: (err => errorHandler(err, request, response)),
       extensions: this.useExtensions()
