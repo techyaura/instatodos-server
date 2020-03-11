@@ -71,12 +71,12 @@ class Boot {
    * @description Graphql config
    */
   static graphQlHttpConfig() {
-    return graphqlHTTP((request, response) => ({
+    return graphqlHTTP((request, response, next) => ({
       schema,
       pretty: true,
       graphiql: process.env.NODE_ENV === 'development',
       context: { ...request, startTime: Date.now() },
-      customFormatErrorFn: (err => errorHandler(err, request, response)),
+      customFormatErrorFn: (err => errorHandler(err, request, response, next)),
       extensions: process.env.NODE_ENV === 'development' ? this.useExtensions() : ''
     }));
   }

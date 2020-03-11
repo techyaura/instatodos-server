@@ -1,7 +1,7 @@
 const createError = require('./create');
 const winston = require('../config/winston');
 
-module.exports = (err, req, res, next, isExpressSpecificError) => {
+module.exports = (err, req, res, next, isExpressSpecificError = false) => {
   const {
     name, message, locations, path
   } = err;
