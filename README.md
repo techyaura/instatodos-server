@@ -26,18 +26,21 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
 
 ```sh
     mutation {
-    	  register(input: { email: "techyaura@yopmail.com", password: "Hello@123" }){
-    	    hashToken
-			message
-    	  }
-    }
+		register (input: {
+			email: "info@techyaura.com",
+			password: "techyaura"
+		}) {
+			hashToken
+			ok
+		}
+	}
 ```
 
 2. Register Verification(Verify User)
 
 ```sh
     mutation {
-    	  registerVerificationByOtp(input: { otp: "<OTP>", hashToken: "<hashToken>" }){
+    	  emailVerificationByOtp(input: { otp: "<OTP>", hashToken: "<hashToken>" }){
     	    message
     	  }
     }
@@ -49,8 +52,8 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
     query {
 	  login(
 		  input: {
-			email: "techyaura@yopmail.com", 
-	  		password: "Hello@123"
+			email: "info@techyaura.com", 
+	  		password: "techyaura"
 		  }){
 	    message
 	    token
