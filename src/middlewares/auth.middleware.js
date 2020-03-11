@@ -25,7 +25,7 @@ module.exports = {
         if (tokenPayload && tokenPayload.auth) {
           return UserModel.findOne(
             { _id: tokenPayload.auth },
-            { _id: 1, email: 1 },
+            { _id: 1, email: 1 }
           ).lean();
         }
         return next(new Error('INVALID_GRANT'));

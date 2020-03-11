@@ -13,24 +13,27 @@ SENDGRID_API_KEY=<SENDGRID_API_KEY>
 JWT_SECRET=<JWT_SECRET>
 SMTP_FROM_EMAIL=<SMTP_FROM_EMAIL>
 ```
-GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
+GRAPHQl API's - ([live-url-on-heroku](https://instatodo.herokuapp.com/graphql))
 
 1. Register (Create User)
 
 ```sh
     mutation {
-    	  register(input: { email: "techyaura@yopmail.com", password: "Hello@123" }){
-    	    hashToken
-			message
-    	  }
-    }
+		register (input: {
+			email: "info@techyaura.com",
+			password: "techyaura"
+		}) {
+			hashToken
+			ok
+		}
+	}
 ```
 
 2. Register Verification(Verify User)
 
 ```sh
     mutation {
-    	  registerVerificationByOtp(input: { otp: "<OTP>", hashToken: "<hashToken>" }){
+    	  emailVerificationByOtp(input: { otp: "<OTP>", hashToken: "<hashToken>" }){
     	    message
     	  }
     }
@@ -42,8 +45,8 @@ GRAPHQl API's - ([live-url](https://gql-node.herokuapp.com/graphql))
     query {
 	  login(
 		  input: {
-			email: "techyaura@yopmail.com", 
-	  		password: "Hello@123"
+			email: "info@techyaura.com", 
+	  		password: "techyaura"
 		  }){
 	    message
 	    token

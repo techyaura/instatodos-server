@@ -2,5 +2,8 @@ const { TodoService } = require('../../services');
 const { ContextMiddleware } = require('../../middlewares');
 
 module.exports = {
-  todoLabelList: (root, args, context) => ContextMiddleware(context).then(() => TodoService.todoLabelList(context))
+  todoLabelList: async (root, args, context) => {
+    await ContextMiddleware(context);
+    return TodoService.todoLabelList(context);
+  }
 };

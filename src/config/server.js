@@ -71,13 +71,13 @@ class Boot {
    * @description Graphql config
    */
   static graphQlHttpConfig() {
-    return graphqlHTTP((request, response) => ({
+    return graphqlHTTP((request, response, next) => ({
       schema,
       pretty: true,
-      graphiql: true,
+      graphiql: process.env.NODE_ENV === 'development',
       context: { ...request, startTime: Date.now() },
-      customFormatErrorFn: (err => errorHandler(err, request, response)),
-      extensions: this.useExtensions()
+      customFormatErrorFn: (err => errorHandler(err, request, response, next)),
+      extensions: process.env.NODE_ENV === 'development' ? this.useExtensions() : ''
     }));
   }
 
@@ -94,9 +94,7 @@ class Boot {
    * @description Express Global Error Handler
    */
   useLogger() {
-    return this.app.use((err, req) => {
-      winston.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-    });
+    this.app.use((err, req, res, next) => errorHandler(err, req, res, next, true));
   }
 
   /**

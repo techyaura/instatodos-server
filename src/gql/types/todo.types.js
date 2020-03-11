@@ -22,7 +22,7 @@ const todoTypes = () => `
   }
 
   input TodoInputType {
-    title: String!
+    title: String
     scheduledDate: Date
     isCompleted: Boolean
     isInProgress: Boolean
@@ -39,7 +39,7 @@ const todoTypes = () => `
   input TodoFilterInputType {
     isCompleted: Boolean
     title_contains: String
-    label: ID
+    labelId: ID
   }
 
   type TodoCommentType {

@@ -3,7 +3,7 @@ const Joi = require('joi');
 const addTodoLabelSchema = Joi.object().keys({
   name: Joi.string()
     .regex(/^\S+$/)
-    .min(4)
+    .min(2)
     .max(60)
     .required()
 });
@@ -11,7 +11,7 @@ const updateTodoLabelSchema = Joi.object().keys({
   id: Joi.string().required(),
   name: Joi.string()
     .regex(/^\S+$/)
-    .min(4)
+    .min(2)
     .max(30)
     .required()
 });
