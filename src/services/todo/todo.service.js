@@ -276,30 +276,28 @@ class TodoService {
     }
   }
 
-  async updateTodo({ user }, params, postBody) {
-    try {
-      const todoId = params.id;
+  async updateTodo({ user }, { id }, postBody) {
+    postBody = {
+      ...postBody,
+      $currentDate: {
+        updatedAt: true
+      }
+    };
+    if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
       postBody = {
-        ...postBody,
-        $currentDate: {
-          updatedAt: true
-        }
+        ...postBody, isInProgress: false
       };
-      if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
-        postBody = {
-          ...postBody, isInProgress: false
-        };
-      }
-      const response = await this.TodoModel.updateOne({
-        user: user._id, isDeleted: false, status: true, _id: todoId
-      }, { $set: postBody });
-      if (response && response.n !== 0) {
-        return { message: 'Todo has been succesfully updated', ok: true };
-      }
-      return Promise.reject(new Error(403));
-    } catch (err) {
-      throw err;
     }
+    return this.TodoModel.updateOne({
+      user: user._id, isDeleted: false, status: true, _id: id
+    }, { $set: postBody })
+      .then((response) => {
+        if (response && response.n !== 0) {
+          return { message: 'Todo has been succesfully updated', ok: true };
+        }
+        return Promise.reject(new Error(403));
+      })
+      .catch(err => Promise.reject(err));
   }
 
   async deleteTodo({ user }, params) {
