@@ -40,6 +40,8 @@ const todoTypes = () => `
     isCompleted: Boolean
     title_contains: String
     labelId: ID
+    startAt: Date
+    endAt: Date
   }
 
   type TodoCommentType {

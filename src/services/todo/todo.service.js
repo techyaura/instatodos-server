@@ -123,9 +123,15 @@ class TodoService {
       const {
         filter, first = 100, offset = 1, sort
       } = params;
-      // sort object
+
+      // define conditions
+      let conditions = {
+        user: mongoose.Types.ObjectId(user._id)
+      };
+
+      // sort object condition
       let sortObject = { createdAt: -1 };
-      if (typeof (sort) !== 'undefined') {
+      if (typeof (sort) === 'object' && !!sort) {
         sortObject = {};
         Object.keys(sort).forEach((key) => {
           if (sort[key] === 'DESC') {
@@ -136,41 +142,87 @@ class TodoService {
           }
         });
       }
-      // define conditions
-      let conditions = {
-        user: mongoose.Types.ObjectId(user._id)
-      };
-
-      // check isCompleted
-      if (!filter || (filter && !('isCompleted' in filter))) {
-        conditions.$or = [
-          {
-            isCompleted: false,
-            createdAt: {
-              $lt: new Date()
-            }
-          },
-          {
-            createdAt: {
-              $gte: new Date()
-            }
-          }
-        ];
-      }
 
       // Check & define filter conditions
-      if (filter && typeof (filter) !== 'undefined') {
-        if (filter.title_contains) {
+      if (typeof (filter) === 'object' && !!filter) {
+        // filter for title name
+        if ('title_contains' in filter && filter.title_contains) {
           conditions.$and = conditions.$and || [];
           conditions.$and.push({ title: { $regex: filter.title_contains, $options: 'gi' } });
         }
-        if (filter.labelId) {
+        // filter for label
+        if ('labelId' in filter && filter.labelId) {
           const customObjectId = mongoose.Types.ObjectId(filter.labelId);
           conditions = { ...conditions, label: customObjectId };
         }
-        if ('isCompleted' in filter) {
+        // filter for isCompleted flag
+        if ('isCompleted' in filter && 'isCompleted' in filter) {
           conditions = { ...conditions, isCompleted: filter.isCompleted };
         }
+        // filter for [startAt, EndAt]
+        if ('startAt' in filter && 'endAt' in filter && filter.startAt && filter.endAt) {
+          conditions.$and = conditions.$and || [];
+          // legacy check for existing records when scheduled field not present
+          // Not required for new Data
+          if ('isCompleted' in filter && !filter.isCompleted) {
+            conditions.$and.push({
+              $or: [
+                { scheduledDate: { $gte: new Date(filter.startAt), $lte: new Date(filter.endAt) } },
+                { scheduledDate: { $exists: false } }
+              ]
+            });
+          } else {
+            conditions.$and.push({ scheduledDate: { $gte: new Date(filter.startAt), $lte: new Date(filter.endAt) } });
+          }
+        } else if ('startAt' in filter && filter.startAt) { // filter in range [startAt]
+          conditions.$and = conditions.$and || [];
+          // legacy check for existing records when scheduled field not present
+          // Not required for new Data
+          if ('isCompleted' in filter && !filter.isCompleted) {
+            conditions.$and.push({
+              $or: [
+                { scheduledDate: { $gte: new Date(filter.startAt) } },
+                { scheduledDate: { $exists: false } }
+              ]
+            });
+          } else {
+            conditions.$and.push({ scheduledDate: { $gte: new Date(filter.startAt) } });
+          }
+        } else if ('endAt' in filter && filter.endAt) { // filter in range [endAt]
+          conditions.$and = conditions.$and || [];
+          // legacy check for existing records when scheduled field not present
+          // Not required for new Data
+          if ('isCompleted' in filter && !filter.isCompleted) {
+            conditions.$and.push({
+              $or: [
+                { scheduledDate: { $lte: new Date(filter.endAt) } },
+                { scheduledDate: { $exists: false } }
+              ]
+            });
+          } else {
+            conditions.$and.push({ scheduledDate: { $lte: new Date(filter.endAt) } });
+          }
+        }
+      } else {
+        conditions.$and = [
+          {
+            isCompleted: false
+          },
+          {
+            $or: [
+              {
+                createdAt: {
+                  $lt: new Date()
+                }
+              },
+              {
+                createdAt: {
+                  $gte: new Date()
+                }
+              }
+            ]
+          }
+        ];
       }
       const response = await this.TodoModel
         .aggregate([

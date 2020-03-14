@@ -17,7 +17,7 @@ class Boot {
   constructor() {
     this.app = app;
     this.port = process.env.PORT || 8080;
-    this.environment = process.env.environment || 'local';
+    this.environment = process.env.environment;
     this.boostrapExpress();
   }
 
@@ -39,7 +39,7 @@ class Boot {
           /** Clear console for every server restart while development */
           // console.clear(); // eslint-disable-line no-console
         }
-        console.log(success(`Running a GraphQL API server on PORT: ${this.port} in ${this.environment} mode`)); // eslint-disable-line no-console
+        console.log(success(`Running a GraphQL API server on PORT: ${this.port} in ${process.env.NODE_ENV} mode`)); // eslint-disable-line no-console
         return this.app;
       });
     } catch (err) {
