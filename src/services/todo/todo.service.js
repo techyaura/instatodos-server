@@ -131,7 +131,7 @@ class TodoService {
 
       // sort object condition
       let sortObject = { createdAt: -1 };
-      if (sort instanceof Object && sort.constructor === Object) {
+      if (typeof (sort) === 'object' && !!sort) {
         sortObject = {};
         Object.keys(sort).forEach((key) => {
           if (sort[key] === 'DESC') {
