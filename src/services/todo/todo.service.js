@@ -156,53 +156,85 @@ class TodoService {
           conditions = { ...conditions, label: customObjectId };
         }
         // filter for isCompleted flag
-        if ('isCompleted' in filter && 'isCompleted' in filter) {
+        if ('isCompleted' in filter) {
           conditions = { ...conditions, isCompleted: filter.isCompleted };
         }
-        // filter for [startAt, EndAt]
-        if ('startAt' in filter && 'endAt' in filter && filter.startAt && filter.endAt) {
-          conditions.$and = conditions.$and || [];
-          // legacy check for existing records when scheduled field not present
-          // Not required for new Data
-          if ('isCompleted' in filter && !filter.isCompleted) {
-            conditions.$and.push({
-              $or: [
-                { scheduledDate: { $gte: new Date(filter.startAt), $lte: new Date(filter.endAt) } },
-                { scheduledDate: { $exists: false } }
-              ]
-            });
-          } else {
-            conditions.$and.push({ scheduledDate: { $gte: new Date(filter.startAt), $lte: new Date(filter.endAt) } });
-          }
-        } else if ('startAt' in filter && filter.startAt) { // filter in range [startAt]
-          conditions.$and = conditions.$and || [];
-          // legacy check for existing records when scheduled field not present
-          // Not required for new Data
-          if ('isCompleted' in filter && !filter.isCompleted) {
-            conditions.$and.push({
-              $or: [
-                { scheduledDate: { $gte: new Date(filter.startAt) } },
-                { scheduledDate: { $exists: false } }
-              ]
-            });
-          } else {
-            conditions.$and.push({ scheduledDate: { $gte: new Date(filter.startAt) } });
-          }
-        } else if ('endAt' in filter && filter.endAt) { // filter in range [endAt]
-          conditions.$and = conditions.$and || [];
-          // legacy check for existing records when scheduled field not present
-          // Not required for new Data
-          if ('isCompleted' in filter && !filter.isCompleted) {
-            conditions.$and.push({
-              $or: [
-                { scheduledDate: { $lte: new Date(filter.endAt) } },
-                { scheduledDate: { $exists: false } }
-              ]
-            });
-          } else {
-            conditions.$and.push({ scheduledDate: { $lte: new Date(filter.endAt) } });
-          }
+        // check tasks for today
+        if ('type' in filter && filter.type === 'today') {
+          conditions = {
+            ...conditions,
+            scheduledDate: {
+              $gte: new Date(new Date().setHours('00', '00', '00'))
+            }
+          };
         }
+        // check backlogs tasks
+        if ('type' in filter && filter.type === 'backlog') {
+          conditions = { ...conditions, isCompleted: false, scheduledDate: null };
+        }
+        // check pending tasks
+        if ('type' in filter && filter.type === 'pending') {
+          conditions = {
+            ...conditions,
+            isCompleted: false,
+            $and: [
+              {
+                scheduledDate: {
+                  $exists: true,
+                  $lte: new Date(new Date().setHours('00', '00', '00'))
+                }
+              },
+              {
+                scheduledDate: { $ne: null }
+              }
+            ]
+
+          };
+        }
+        // filter for [startAt, EndAt]
+        // if ('startAt' in filter && 'endAt' in filter && filter.startAt && filter.endAt) {
+        //   conditions.$and = conditions.$and || [];
+        //   // legacy check for existing records when scheduled field not present
+        //   // Not required for new Data
+        //   if ('isCompleted' in filter && !filter.isCompleted) {
+        //     conditions.$and.push({
+        //       $or: [
+        //         { scheduledDate: { $gte: new Date(filter.startAt), $lte: new Date(filter.endAt) } },
+        //         { scheduledDate: { $exists: false } }
+        //       ]
+        //     });
+        //   } else {
+        //     conditions.$and.push({ scheduledDate: { $gte: new Date(filter.startAt), $lte: new Date(filter.endAt) } });
+        //   }
+        // } else if ('startAt' in filter && filter.startAt) { // filter in range [startAt]
+        //   conditions.$and = conditions.$and || [];
+        //   // legacy check for existing records when scheduled field not present
+        //   // Not required for new Data
+        //   if ('isCompleted' in filter && !filter.isCompleted) {
+        //     conditions.$and.push({
+        //       $or: [
+        //         { scheduledDate: { $gte: new Date(filter.startAt) } },
+        //         { scheduledDate: { $exists: false } }
+        //       ]
+        //     });
+        //   } else {
+        //     conditions.$and.push({ scheduledDate: { $gte: new Date(filter.startAt) } });
+        //   }
+        // } else if ('endAt' in filter && filter.endAt) { // filter in range [endAt]
+        //   conditions.$and = conditions.$and || [];
+        //   // legacy check for existing records when scheduled field not present
+        //   // Not required for new Data
+        //   if ('isCompleted' in filter && !filter.isCompleted) {
+        //     conditions.$and.push({
+        //       $or: [
+        //         { scheduledDate: { $lte: new Date(filter.endAt) } },
+        //         { scheduledDate: { $exists: false } }
+        //       ]
+        //     });
+        //   } else {
+        //     conditions.$and.push({ scheduledDate: { $lte: new Date(filter.endAt) } });
+        //   }
+        // }
       } else {
         conditions.$and = [
           {
