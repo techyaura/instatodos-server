@@ -156,7 +156,7 @@ class TodoService {
           conditions = { ...conditions, label: customObjectId };
         }
         // filter for isCompleted flag
-        if ('isCompleted' in filter && filter.isCompleted) {
+        if ('isCompleted' in filter) {
           conditions = { ...conditions, isCompleted: filter.isCompleted };
         }
         // check tasks for today
