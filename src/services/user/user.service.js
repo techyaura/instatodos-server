@@ -41,7 +41,7 @@ class AuthService {
     })
       .then((response) => {
         if (!response) {
-          return Promise.reject(new Error('No User Found'));
+          return Promise.reject(new Error('INVALID_OTP'));
         }
         return {
           message: 'Email succsessfully verified',
