@@ -8,6 +8,12 @@ const todoTypes = () => `
     p4
   }
 
+  enum TodoEnumType{
+    today
+    backlog
+    pending
+  }
+
   input TodoLabelInputType {
     name: String!
   }
@@ -40,6 +46,9 @@ const todoTypes = () => `
     isCompleted: Boolean
     title_contains: String
     labelId: ID
+    startAt: Date
+    endAt: Date,
+    type: TodoEnumType
   }
 
   type TodoCommentType {

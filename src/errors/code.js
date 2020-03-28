@@ -63,7 +63,12 @@ module.exports = {
   509: 'Bandwidth limit exceeded',
   510: 'Not extended',
   511: 'Network authentication required',
-  TokenExpiredError: {
+  INVALID_OTP: {
+    status: 400,
+    code: 'INVALID_OTP',
+    message: 'Please enter valid OTP'
+  },
+  TokenENpiredError: {
     status: 401,
     code: 'TOKEN_EXPIRED',
     message: 'Token Expired'
