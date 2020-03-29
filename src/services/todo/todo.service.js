@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 const { TodoModel, TodoLabelModel } = require('../../models');
 
 class TodoService {
@@ -164,7 +165,8 @@ class TodoService {
           conditions = {
             ...conditions,
             scheduledDate: {
-              $gte: new Date(new Date().setHours('00', '00', '00'))
+              $gte: new Date(moment().hours(0).minutes(0).seconds(0)),
+              $lt: new Date(moment().hours(23).minutes(59).seconds(59))
             }
           };
         }
@@ -181,7 +183,7 @@ class TodoService {
               {
                 scheduledDate: {
                   $exists: true,
-                  $lte: new Date(new Date().setHours('00', '00', '00'))
+                  $lte: new Date(moment().hours(0).minutes(0).seconds(0))
                 }
               },
               {
@@ -305,9 +307,9 @@ class TodoService {
                     isCompleted: '$isCompleted',
                     isInProgress: '$isInProgress',
                     // createdAt: '$createdAt',
-                    createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: 'Asia/Kolkata' } },
+                    createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
                     updatedAt: '$updatedAt',
-                    scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate', timezone: 'Asia/Kolkata' } },
+                    scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate' } },
                     user: '$user',
                     comments: '$comments',
                     priority: '$priority'
