@@ -152,8 +152,8 @@ class TodoService {
         }
         // filter for label
         if ('labelId' in filter && filter.labelId) {
-          const customObjectId = mongoose.Types.ObjectId(filter.labelId);
-          conditions = { ...conditions, label: customObjectId };
+          const labelIds = filter.labelId.map(labelId => mongoose.Types.ObjectId(labelId));
+          conditions = { ...conditions, label: { $in: labelIds } };
         }
         // filter for isCompleted flag
         if ('isCompleted' in filter) {
@@ -333,20 +333,17 @@ class TodoService {
       const { todos, todosCount } = response[0];
       const mapTodos = todos.map((todo) => {
         const { email } = todo.user[0];
-        let label = null;
-        if (todo.label && todo.label.length) {
-          // eslint-disable-next-line prefer-destructuring
-          label = todo.label[0];
-          // title = name;
-          // id = _id;
-        }
+        // let label = null;
+        // if (todo.label && todo.label.length) {
+        //   // eslint-disable-next-line prefer-destructuring
+        //   label = todo.label[0];
+        //   // title = name;
+        //   // id = _id;
+        // }
         return {
           ...todo,
           user: {
             email
-          },
-          label: {
-            ...label
           }
         };
       });

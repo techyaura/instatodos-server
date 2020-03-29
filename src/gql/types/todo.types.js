@@ -33,7 +33,7 @@ const todoTypes = () => `
     isCompleted: Boolean
     isInProgress: Boolean
     priority: TodoPriorityEnumType
-    label: ID
+    label: [ID]
   }
 
   input TodoSortInputType {
@@ -45,7 +45,7 @@ const todoTypes = () => `
   input TodoFilterInputType {
     isCompleted: Boolean
     title_contains: String
-    labelId: ID
+    labelId: [ID]
     startAt: Date
     endAt: Date,
     type: TodoEnumType
@@ -67,7 +67,7 @@ const todoTypes = () => `
       updatedAt: Date
       scheduledDate: Date
       comments: [TodoCommentType]
-      label: TodoLabelListType
+      label: [TodoLabelListType]
   }
 
   type TodoCompletedType {

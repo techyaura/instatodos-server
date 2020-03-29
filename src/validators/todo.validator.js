@@ -5,12 +5,12 @@ const addTodoSchema = Joi.object().keys({
     .min(4)
     .max(60)
     .required(),
-  label: Joi.string().optional(),
+  label: Joi.array().items(Joi.string()).optional(),
   scheduledDate: Joi.date().allow(null)
 });
 const updateTodoSchema = Joi.object().keys({
   id: Joi.string().required(),
-  label: Joi.string().optional(),
+  label: Joi.array().items(Joi.string()).optional(),
   title: Joi.string()
     .min(4)
     .max(60)
