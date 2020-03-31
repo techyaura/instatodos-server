@@ -164,6 +164,7 @@ class TodoService {
         if ('type' in filter && filter.type === 'today') {
           conditions = {
             ...conditions,
+            isCompleted: false,
             scheduledDate: {
               $gte: new Date(moment().hours(0).minutes(0).seconds(0)),
               $lt: new Date(moment().hours(23).minutes(59).seconds(59))

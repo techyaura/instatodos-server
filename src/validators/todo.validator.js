@@ -6,7 +6,8 @@ const addTodoSchema = Joi.object().keys({
     .max(60)
     .required(),
   label: Joi.array().items(Joi.string()).optional(),
-  scheduledDate: Joi.date().allow(null)
+  scheduledDate: Joi.date().allow(null),
+  priority: Joi.string().optional()
 });
 const updateTodoSchema = Joi.object().keys({
   id: Joi.string().required(),
