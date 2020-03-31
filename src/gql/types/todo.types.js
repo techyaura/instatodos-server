@@ -40,6 +40,7 @@ const todoTypes = () => `
     createdAt: SortEnumType
     updatedAt: SortEnumType
     scheduledDate: SortEnumType
+    priority: SortEnumType
   }
 
   input TodoFilterInputType {
