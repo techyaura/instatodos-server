@@ -173,7 +173,8 @@ class TodoService {
         }
         // check backlogs tasks
         if ('type' in filter && filter.type === 'backlog') {
-          conditions = { ...conditions, isCompleted: false, scheduledDate: null };
+          // TODO:// will subject to change when intriduce Next week tasks
+          conditions = { ...conditions, isCompleted: false, $or: [{ scheduledDate: null }, { scheduledDate: { $gt: new Date(moment().hours(23).minutes(59).seconds(59)) } }] };
         }
         // check pending tasks
         if ('type' in filter && filter.type === 'pending') {
