@@ -240,25 +240,22 @@ class TodoService {
         //   }
         // }
       } else {
-        conditions.$and = [
-          {
-            isCompleted: false
-          },
-          {
-            $or: [
-              {
-                createdAt: {
-                  $lt: new Date()
-                }
-              },
-              {
-                createdAt: {
-                  $gte: new Date()
-                }
+        conditions = {
+          ...conditions,
+          isCompleted: false,
+          $or: [
+            {
+              createdAt: {
+                $lt: new Date()
               }
-            ]
-          }
-        ];
+            },
+            {
+              createdAt: {
+                $gte: new Date()
+              }
+            }
+          ]
+        };
       }
       const response = await this.TodoModel
         .aggregate([

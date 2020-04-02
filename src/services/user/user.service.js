@@ -110,10 +110,7 @@ class AuthService {
   }
 
   resetPassword(postBody) {
-    const { hashToken, password, confirmPassword } = postBody;
-    if (password !== confirmPassword) {
-      return Promise.reject(new Error('PASSWORD NOT MATCHED'));
-    }
+    const { hashToken, password } = postBody;
     return this.UserModel
       .findOne({ hashToken, status: true, isDeleted: false })
       .then((user) => {

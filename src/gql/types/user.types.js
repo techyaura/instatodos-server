@@ -31,7 +31,6 @@ const userTypes = () => `
     input ResetPasswordInputType {
       password: String!
       hashToken: String!
-      confirmPassword: String!
     }
 
     input UserForgotPasswordInputType {

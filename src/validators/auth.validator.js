@@ -38,10 +38,6 @@ const resetPasswordSchema = Joi.object().keys({
   password: Joi.string()
     .min(6)
     .max(30)
-    .required(),
-  confirmPassword: Joi.string()
-    .min(6)
-    .max(30)
     .required()
 });
 
