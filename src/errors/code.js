@@ -84,8 +84,8 @@ module.exports = {
     message: 'This email address not exist'
   },
   INVALID_CREDENTIALS: {
-    status: 401,
+    status: 400,
     code: 'INVALID_CREDENTIALS',
-    message: 'You are not Authorized'
+    message: 'Email/password is incorrect'
   }
 };
