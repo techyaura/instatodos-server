@@ -1,6 +1,7 @@
 version: "3.7"
 services:
     web:
+        # command: npm start
         container_name: 'instatodos'
         restart: always
         build:
@@ -11,7 +12,7 @@ services:
         environment: 
             PORT: ${PORT}
             NODE_ENV: ${NODE_ENV}"
-            DIRPATH: ${DIRPATH}
+            # DIRPATH: ${DIRPATH}
         env_file:
             - .env.$NODE_ENV
         expose:
