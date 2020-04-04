@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+    web:
+        container_name: 'instatodos'
+        restart: always
+        build:
+            context: .
+        volumes:  
+            - .:/usr/src/app
+            - /usr/src/app/node_modules
+        environment: 
+            PORT: ${PORT}
+            NODE_ENV: ${NODE_ENV}"
+            DIRPATH: ${DIRPATH}
+        env_file:
+            - .env.$NODE_ENV
+        expose:
+            - $PORT/tcp
+        ports:
+            - '$PORT:$PORT'

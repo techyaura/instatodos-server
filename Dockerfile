@@ -1,11 +1,9 @@
 FROM ubuntu
 FROM node:lts
 LABEL maintainer="techyaura <techyaura@gmail.com>"
-ENV DIRPATH /usr/src
-WORKDIR $DIRPATH/instant-todo
+ENV DIRPATH /usr/src/app
+WORKDIR $DIRPATH
 COPY package*.json ./
 RUN npm install
 COPY . .
-ENV NODE_ENV development
-EXPOSE 9000
-CMD [ "node", "index.js" ]
+CMD [ "npm", "run", "watch" ]
