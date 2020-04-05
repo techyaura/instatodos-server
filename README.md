@@ -1,7 +1,3 @@
-# https://instatodo.herokuapp.com/
-  
-This is the backend for [instant-todos](https://instant-todos.netlify.com) which powers the instant-todos
-
 
 ## How to configure for use! 
 
