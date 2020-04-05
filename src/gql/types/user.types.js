@@ -1,7 +1,22 @@
 const userTypes = () => `
-  type ResetSuccessType {
+    type ResetSuccessType {
       ok: Boolean,
       message: String!
+    }
+
+    input ProfileInputType {
+      firstname: String
+      lastname: String
+    }
+
+    input PasswordInputType {
+      password: String!
+    }
+
+    type ProfileSuccessType {
+      firstname: String
+      lastname: String
+      _id: String
     }
 
     type EmailRequestSuccessType {
@@ -57,7 +72,9 @@ const userTypes = () => `
       register(input: UserRegisterInputType!): EmailRequestSuccessType
       emailVerificationByOtp(input: EmailVerificationInputType!): EmailRequestSuccessType
       userForgotpassword(input: UserForgotPasswordInputType!): EmailRequestSuccessType
-      userResetPassword(input: ResetPasswordInputType!): ResetSuccessType
+      userResetPassword(input: ResetPasswordInputType!): ResetSuccessType,
+      updateProfile(input: ProfileInputType): ProfileSuccessType,
+      updatePassword(input: PasswordInputType!): SuccessType,
     }
 `;
 

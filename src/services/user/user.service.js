@@ -131,6 +131,33 @@ class AuthService {
       throw err;
     }
   }
+
+  updatePassword({ user }, postBody) {
+    const { password } = postBody;
+    return this.UserModel
+      .findOne({ _id: user._id, status: true, isDeleted: false })
+      .then(async (response) => {
+        if (!response) {
+          return Promise.reject(new Error('No User Found'));
+        }
+        response.password = password;
+        await response.save();
+        return { ok: true, message: 'Password Changed successfully' };
+      })
+      .catch(err => Promise.reject(err));
+  }
+
+  async updateProfile({ user }, postBody) {
+    try {
+      const update = {
+        firstname: postBody.firstname,
+        lastname: postBody.lastname
+      };
+      return await this.UserModel.findOneAndUpdate({ _id: user._id }, { $set: update });
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 module.exports = new AuthService();
