@@ -1,6 +1,7 @@
 FROM ubuntu
 FROM node:lts
 LABEL maintainer="techyaura <techyaura@gmail.com>"
+ENV TZ Asia/Kolkata
 ENV DIRPATH /usr/src/app
 WORKDIR $DIRPATH
 COPY package*.json ./
