@@ -1,6 +1,8 @@
 
 require('./env');
 const express = require('express');
+const cluster = require('cluster');
+const cCPUs = require('os').cpus().length;
 const graphqlHTTP = require('express-graphql');
 const morgan = require('morgan');
 const cors = require('cors');
@@ -19,7 +21,23 @@ class Boot {
     this.host = process.env.HOST || '0.0.0.0';
     this.port = process.env.PORT || 8080;
     this.environment = process.env.environment;
-    this.boostrapExpress();
+    if (cluster.isMaster) {
+      // eslint-disable-next-line no-plusplus
+      for (let i = 0; i < cCPUs; i++) {
+        cluster.fork();
+      }
+
+      cluster.on('online', (worker) => {
+        // eslint-disable-next-line no-console
+        console.log(`Worker ${worker.process.pid} is online.`);
+      });
+      cluster.on('exit', (worker, code, signal) => {
+        // eslint-disable-next-line no-console
+        console.log(`worker ${worker.process.pid} died.`);
+      });
+    } else {
+      this.boostrapExpress();
+    }
   }
 
   /**
