@@ -46,4 +46,3 @@ extend type Mutation {
   updateThought(id: ID!, input: ThoughtInputType!): SuccessType!
   deleteThought(id: ID!): SuccessType!
 }
-  
