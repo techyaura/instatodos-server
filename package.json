@@ -26,6 +26,7 @@
     "graphql-tools": "^4.0.7",
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.5.1",
+    "merge-graphql-schemas": "^1.7.7",
     "moment": "^2.24.0",
     "mongoose": "^5.9.2",
     "morgan": "^1.9.1",
