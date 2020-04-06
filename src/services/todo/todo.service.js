@@ -11,7 +11,10 @@ class TodoService {
   async addTodo({ user }, postBody) {
     const todo = this.TodoModel({ ...postBody, user: user._id });
     try {
-      await todo.save();
+      const response = await todo.save();
+      if (postBody.notes && postBody.notes !== 'undefined') {
+        await this.addTodoComment({ user }, { todoId: response._id }, { description: postBody.notes });
+      }
       return { message: 'Todo has been succesfully added', ok: true };
     } catch (err) {
       throw err;
@@ -195,50 +198,6 @@ class TodoService {
 
           };
         }
-        // filter for [startAt, EndAt]
-        // if ('startAt' in filter && 'endAt' in filter && filter.startAt && filter.endAt) {
-        //   conditions.$and = conditions.$and || [];
-        //   // legacy check for existing records when scheduled field not present
-        //   // Not required for new Data
-        //   if ('isCompleted' in filter && !filter.isCompleted) {
-        //     conditions.$and.push({
-        //       $or: [
-        //         { scheduledDate: { $gte: new Date(filter.startAt), $lte: new Date(filter.endAt) } },
-        //         { scheduledDate: { $exists: false } }
-        //       ]
-        //     });
-        //   } else {
-        //     conditions.$and.push({ scheduledDate: { $gte: new Date(filter.startAt), $lte: new Date(filter.endAt) } });
-        //   }
-        // } else if ('startAt' in filter && filter.startAt) { // filter in range [startAt]
-        //   conditions.$and = conditions.$and || [];
-        //   // legacy check for existing records when scheduled field not present
-        //   // Not required for new Data
-        //   if ('isCompleted' in filter && !filter.isCompleted) {
-        //     conditions.$and.push({
-        //       $or: [
-        //         { scheduledDate: { $gte: new Date(filter.startAt) } },
-        //         { scheduledDate: { $exists: false } }
-        //       ]
-        //     });
-        //   } else {
-        //     conditions.$and.push({ scheduledDate: { $gte: new Date(filter.startAt) } });
-        //   }
-        // } else if ('endAt' in filter && filter.endAt) { // filter in range [endAt]
-        //   conditions.$and = conditions.$and || [];
-        //   // legacy check for existing records when scheduled field not present
-        //   // Not required for new Data
-        //   if ('isCompleted' in filter && !filter.isCompleted) {
-        //     conditions.$and.push({
-        //       $or: [
-        //         { scheduledDate: { $lte: new Date(filter.endAt) } },
-        //         { scheduledDate: { $exists: false } }
-        //       ]
-        //     });
-        //   } else {
-        //     conditions.$and.push({ scheduledDate: { $lte: new Date(filter.endAt) } });
-        //   }
-        // }
       } else {
         conditions = {
           ...conditions,
@@ -297,6 +256,20 @@ class TodoService {
             }
           },
           {
+            $unwind: {
+              path: '$comments',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'comments.userId',
+              foreignField: '_id',
+              as: 'comments.userId'
+            }
+          },
+          {
             $facet: {
               todos: [
                 {
@@ -312,6 +285,21 @@ class TodoService {
                     user: '$user',
                     comments: '$comments',
                     priority: '$priority'
+                  }
+                },
+                {
+                  $group: {
+                    _id: '$_id',
+                    notes: { $push: '$comments' },
+                    user: { $first: '$user' },
+                    title: { $first: '$title' },
+                    label: { $first: '$label' },
+                    isCompleted: { $first: '$isCompleted' },
+                    isInProgress: { $first: '$isInProgress' },
+                    createdAt: { $first: '$createdAt' },
+                    updatedAt: { $first: '$updatedAt' },
+                    scheduledDate: { $first: '$scheduledDate' },
+                    priority: { $first: '$priority' }
                   }
                 },
                 {
@@ -334,13 +322,13 @@ class TodoService {
       const { todos, todosCount } = response[0];
       const mapTodos = todos.map((todo) => {
         const { email } = todo.user[0];
-        // let label = null;
-        // if (todo.label && todo.label.length) {
-        //   // eslint-disable-next-line prefer-destructuring
-        //   label = todo.label[0];
-        //   // title = name;
-        //   // id = _id;
-        // }
+        if (todo.notes && todo.notes.length) {
+          todo.notes = todo.notes.map(comment => ({
+            _id: comment._id,
+            description: comment.description,
+            userId: (Array.isArray(comment.userId) && comment.userId.length) ? comment.userId[0] : null
+          }));
+        }
         return {
           ...todo,
           user: {
@@ -373,8 +361,11 @@ class TodoService {
     return this.TodoModel.updateOne({
       user: user._id, isDeleted: false, status: true, _id: id
     }, { $set: postBody })
-      .then((response) => {
+      .then(async (response) => {
         if (response && response.n !== 0) {
+          if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
+            await this.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
+          }
           return { message: 'Todo has been succesfully updated', ok: true };
         }
         return Promise.reject(new Error(403));
@@ -403,7 +394,7 @@ class TodoService {
       const { description } = postBody;
       const response = await this.TodoModel.updateOne({
         user: userId, isDeleted: false, _id: todoId
-      }, { $push: { comments: { description } } });
+      }, { $push: { comments: { description, userId } } });
       if (response && response.n !== 0) {
         return { message: 'Todo has been succesfully commented', ok: true };
       }

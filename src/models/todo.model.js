@@ -8,6 +8,9 @@ const { ObjectId } = Schema;
 const commentSchema = new Schema({
   description: {
     type: String
+  },
+  userId: {
+    type: ObjectId, ref: 'User'
   }
 }, {
   timestamps: {}

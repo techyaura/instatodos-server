@@ -22,6 +22,7 @@ type TodoLabelListType {
 
 input TodoCommentInputType {
   description: String!
+  _id: ID
 }
 
 input TodoInputType {
@@ -31,6 +32,8 @@ input TodoInputType {
   isInProgress: Boolean
   priority: TodoPriorityEnumType
   label: [ID]
+  notes: String
+  noteId: String
 }
 
 input TodoSortInputType {
@@ -52,6 +55,12 @@ input TodoFilterInputType {
 type TodoCommentType {
   description: String
   _id: String
+  userId: CommentUserType
+}
+
+type CommentUserType {
+  email: String
+  _id: String
 }
 
 type TodoType {
@@ -64,7 +73,7 @@ type TodoType {
   createdAt: Date!
   updatedAt: Date
   scheduledDate: Date
-  comments: [TodoCommentType]
+  notes: [TodoCommentType]
   label: [TodoLabelListType]
 }
 
