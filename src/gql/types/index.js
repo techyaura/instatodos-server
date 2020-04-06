@@ -1,12 +1,4 @@
-const { sharedTypes } = require('./shared.types');
-const { todoTypes } = require('./todo.types');
-const { userTypes } = require('./user.types');
-const { thoughtTypes } = require('./thought.types');
+const { fileLoader, mergeTypes } = require('merge-graphql-schemas');
 
-const typeDefs = () => `
-  ${sharedTypes}
-  ${todoTypes}
-  ${userTypes}
-  ${thoughtTypes}
-`;
-module.exports = typeDefs();
+const typeDefs = mergeTypes(fileLoader(`${__dirname}/*.graphql`), { all: true });
+module.exports = typeDefs;

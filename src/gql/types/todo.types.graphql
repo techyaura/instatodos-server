@@ -1,0 +1,103 @@
+enum TodoPriorityEnumType {
+  P1
+  P2
+  P3
+  P4
+}
+
+enum TodoEnumType{
+  today
+  backlog
+  pending
+}
+
+input TodoLabelInputType {
+  name: String!
+}
+
+type TodoLabelListType {
+  name: String
+  _id: String
+}
+
+input TodoCommentInputType {
+  description: String!
+}
+
+input TodoInputType {
+  title: String
+  scheduledDate: Date
+  isCompleted: Boolean
+  isInProgress: Boolean
+  priority: TodoPriorityEnumType
+  label: [ID]
+}
+
+input TodoSortInputType {
+  createdAt: SortEnumType
+  updatedAt: SortEnumType
+  scheduledDate: SortEnumType
+  priority: SortEnumType
+}
+
+input TodoFilterInputType {
+  isCompleted: Boolean
+  title_contains: String
+  labelId: [ID]
+  startAt: Date
+  endAt: Date,
+  type: TodoEnumType
+}
+
+type TodoCommentType {
+  description: String
+  _id: String
+}
+
+type TodoType {
+  _id: String!
+  title: String!
+  user: User
+  priority: TodoPriorityEnumType
+  isCompleted: Boolean
+  isInProgress: Boolean
+  createdAt: Date!
+  updatedAt: Date
+  scheduledDate: Date
+  comments: [TodoCommentType]
+  label: [TodoLabelListType]
+}
+
+type TodoCompletedType {
+  _id: String!
+  list: [TodoType]
+  count: Int
+}
+
+type TodoListType {
+  totalCount: Int
+  data: [TodoType]
+}
+
+type TodoListCompletedType {
+  totalCount: Int
+  data: [TodoCompletedType]
+}
+
+type Query {
+  todoCompleted: TodoListCompletedType
+  todoList (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ): TodoListType
+  todoView(id: ID!): TodoType
+  todoLabelList: [TodoLabelListType]
+}
+
+type Mutation {
+  addTodo(input: TodoInputType!): SuccessType!
+  updateTodo(id: ID!, input: TodoInputType!): SuccessType!
+  deleteTodo(id: ID!): SuccessType!
+  addTodoComment(todoId: ID!, input: TodoCommentInputType!): SuccessType!
+  updateTodoComment(id: ID!, todoId: ID!, input: TodoCommentInputType!): SuccessType!
+  addTodoLabel(input: TodoLabelInputType): SuccessType!
+  updateTodoLabel(id: ID!, input: TodoLabelInputType): SuccessType!
+  deleteTodoLabel(id: ID!): SuccessType!
+}
