@@ -68,7 +68,7 @@ module.exports = {
     code: 'INVALID_OTP',
     message: 'Please enter valid OTP'
   },
-  TokenENpiredError: {
+  TokenExpiredError: {
     status: 401,
     code: 'TOKEN_EXPIRED',
     message: 'Token Expired'
