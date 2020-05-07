@@ -123,6 +123,13 @@ class TodoService {
   }
 
   async listTodo({ user }, params) {
+    let searchQuery = '';
+    let labelLookUp = {
+      from: 'todolabels',
+      localField: 'label',
+      foreignField: '_id',
+      as: 'label'
+    };
     try {
       const {
         filter, first = 100, offset = 1, sort
@@ -151,13 +158,26 @@ class TodoService {
       if (typeof (filter) === 'object' && !!filter) {
         // filter for title name
         if ('title_contains' in filter && filter.title_contains) {
-          conditions.$and = conditions.$and || [];
-          conditions.$and.push({ title: { $regex: filter.title_contains, $options: 'gi' } });
+          searchQuery = filter.title_contains;
+          conditions = { ...conditions, title: { $regex: searchQuery, $options: 'gi' } };
         }
         // filter for label
-        if ('labelId' in filter && filter.labelId) {
+        if ('labelId' in filter && !!filter.labelId) {
           const labelIds = filter.labelId.map(labelId => mongoose.Types.ObjectId(labelId));
           conditions = { ...conditions, label: { $in: labelIds } };
+          if (filter.label) {
+            labelLookUp = {
+              from: 'todolabels',
+              pipeline: [
+                {
+                  $match: {
+                    name: { $regex: searchQuery, $options: 'gi' }
+                  }
+                }
+              ],
+              as: 'label'
+            };
+          }
         }
         // filter for isCompleted flag
         if ('isCompleted' in filter) {
@@ -177,7 +197,14 @@ class TodoService {
         // check backlogs tasks
         if ('type' in filter && filter.type === 'backlog') {
           // TODO:// will subject to change when intriduce Next week tasks
-          conditions = { ...conditions, isCompleted: false, $or: [{ scheduledDate: null }, { scheduledDate: { $gt: new Date(moment().hours(23).minutes(59).seconds(59)) } }] };
+          conditions = {
+            ...conditions,
+            isCompleted: false,
+            $or: [
+              { scheduledDate: null },
+              { scheduledDate: { $gt: new Date(moment().hours(23).minutes(59).seconds(59)) } }
+            ]
+          };
         }
         // check pending tasks
         if ('type' in filter && filter.type === 'pending') {
@@ -248,12 +275,7 @@ class TodoService {
             }
           },
           {
-            $lookup: {
-              from: 'todolabels',
-              localField: 'label',
-              foreignField: '_id',
-              as: 'label'
-            }
+            $lookup: labelLookUp
           },
           {
             $unwind: {
