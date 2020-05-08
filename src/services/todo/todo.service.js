@@ -29,11 +29,114 @@ class TodoService {
     }
   }
 
-  async completedTodo({ user }) {
-    const conditions = {
-      user: mongoose.Types.ObjectId(user._id),
-      isCompleted: true
+  static createFilters(user, { filter = null, sort = null }) {
+    let conditions = {
+      user: mongoose.Types.ObjectId(user._id)
     };
+    let searchQuery = '';
+    let labelLookUp = {
+      from: 'todolabels',
+      localField: 'label',
+      foreignField: '_id',
+      as: 'label'
+    };
+    // sort object condition
+    let sortObject = { createdAt: -1 };
+    if (typeof (sort) === 'object' && !!sort) {
+      sortObject = {};
+      Object.keys(sort).forEach((key) => {
+        if (sort[key] === 'DESC') {
+          sortObject[key] = -1;
+        }
+        if (sort[key] === 'ASC') {
+          sortObject[key] = 1;
+        }
+      });
+    }
+    if (typeof (filter) === 'object' && !!filter) {
+      // filter for title name
+      if ('title_contains' in filter && filter.title_contains) {
+        searchQuery = filter.title_contains;
+        conditions = { ...conditions, title: { $regex: searchQuery, $options: 'gi' } };
+      }
+      // filter for label
+      if ('labelId' in filter && !!filter.labelId) {
+        const labelIds = filter.labelId.map(labelId => mongoose.Types.ObjectId(labelId));
+        conditions = { ...conditions, label: { $in: labelIds } };
+        if (filter.label) {
+          labelLookUp = {
+            from: 'todolabels',
+            pipeline: [
+              {
+                $match: {
+                  name: { $regex: searchQuery, $options: 'gi' }
+                }
+              }
+            ],
+            as: 'label'
+          };
+        }
+      }
+      // filter for isCompleted flag
+      if ('isCompleted' in filter) {
+        conditions = { ...conditions, isCompleted: filter.isCompleted };
+      }
+      // check tasks for today
+      if ('type' in filter && filter.type === 'today') {
+        conditions = {
+          ...conditions,
+          isCompleted: false,
+          scheduledDate: {
+            $gte: new Date(moment().hours(0).minutes(0).seconds(0)),
+            $lt: new Date(moment().hours(23).minutes(59).seconds(59))
+          }
+        };
+      }
+      // check backlogs tasks
+      if ('type' in filter && filter.type === 'backlog') {
+        // TODO:// will subject to change when intriduce Next week tasks
+        conditions = {
+          ...conditions,
+          isCompleted: false,
+          $or: [
+            { scheduledDate: null },
+            { scheduledDate: { $gt: new Date(moment().hours(23).minutes(59).seconds(59)) } }
+          ]
+        };
+      }
+      // check pending tasks
+      if ('type' in filter && filter.type === 'pending') {
+        conditions = {
+          ...conditions,
+          isCompleted: false,
+          $and: [
+            {
+              scheduledDate: {
+                $exists: true,
+                $lte: new Date(moment().hours(0).minutes(0).seconds(0))
+              }
+            },
+            {
+              scheduledDate: { $ne: null }
+            }
+          ]
+
+        };
+      }
+    } else {
+      conditions = {
+        ...conditions
+      };
+    }
+    return { conditions, sortObject, labelLookUp };
+  }
+
+  async completedTodo({ user }, {
+    first = 10, offset = 1, filter = null, sort = null
+  }) {
+    const { conditions: conditionsObJ, sortObject, labelLookUp } = this.constructor.createFilters(user, { filter, sort });
+    let conditions = conditionsObJ;
+    conditions = { ...conditions, isCompleted: true };
     try {
       const response = await this.TodoModel
         .aggregate([
@@ -66,12 +169,7 @@ class TodoService {
             }
           },
           {
-            $lookup: {
-              from: 'todolabels',
-              localField: 'label',
-              foreignField: '_id',
-              as: 'label'
-            }
+            $lookup: labelLookUp
           },
           {
             $facet: {
@@ -97,8 +195,17 @@ class TodoService {
                   }
                 },
                 {
-                  $sort: { _id: -1 }
-                }
+                  $project: {
+                    updatedAt: '$_id',
+                    list: 1,
+                    count: 1
+                  }
+                },
+                {
+                  $sort: sortObject
+                },
+                { $skip: (offset - 1) * first },
+                { $limit: first }
               ],
               todosCount: [
                 {
@@ -122,250 +229,130 @@ class TodoService {
     }
   }
 
-  async listTodo({ user }, params) {
-    let searchQuery = '';
-    let labelLookUp = {
-      from: 'todolabels',
-      localField: 'label',
-      foreignField: '_id',
-      as: 'label'
-    };
-    try {
-      const {
-        filter, first = 100, offset = 1, sort
-      } = params;
-
-      // define conditions
-      let conditions = {
-        user: mongoose.Types.ObjectId(user._id)
-      };
-
-      // sort object condition
-      let sortObject = { createdAt: -1 };
-      if (typeof (sort) === 'object' && !!sort) {
-        sortObject = {};
-        Object.keys(sort).forEach((key) => {
-          if (sort[key] === 'DESC') {
-            sortObject[key] = -1;
+  async listTodo({ user }, {
+    first = 10, offset = 1, filter = null, sort = null
+  }) {
+    const { conditions, sortObject, labelLookUp } = this.constructor.createFilters(user, { filter, sort });
+    const response = await this.TodoModel
+      .aggregate([
+        {
+          $match: conditions
+        },
+        {
+          $project: {
+            name: 1,
+            title: '$title',
+            label: '$label',
+            isCompleted: '$isCompleted',
+            isInProgress: '$isInProgress',
+            createdAt: '$createdAt',
+            updatedAt: '$updatedAt',
+            scheduledDate: '$scheduledDate',
+            priority: '$priority',
+            user: '$user',
+            comments: '$comments',
+            month: { $month: '$createdAt' },
+            day: { $dayOfMonth: '$createdAt' },
+            year: { $year: '$createdAt' }
           }
-          if (sort[key] === 'ASC') {
-            sortObject[key] = 1;
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user',
+            foreignField: '_id',
+            as: 'user'
           }
-        });
-      }
-
-      // Check & define filter conditions
-      if (typeof (filter) === 'object' && !!filter) {
-        // filter for title name
-        if ('title_contains' in filter && filter.title_contains) {
-          searchQuery = filter.title_contains;
-          conditions = { ...conditions, title: { $regex: searchQuery, $options: 'gi' } };
-        }
-        // filter for label
-        if ('labelId' in filter && !!filter.labelId) {
-          const labelIds = filter.labelId.map(labelId => mongoose.Types.ObjectId(labelId));
-          conditions = { ...conditions, label: { $in: labelIds } };
-          if (filter.label) {
-            labelLookUp = {
-              from: 'todolabels',
-              pipeline: [
-                {
-                  $match: {
-                    name: { $regex: searchQuery, $options: 'gi' }
-                  }
-                }
-              ],
-              as: 'label'
-            };
+        },
+        {
+          $lookup: labelLookUp
+        },
+        {
+          $unwind: {
+            path: '$comments',
+            preserveNullAndEmptyArrays: true
           }
-        }
-        // filter for isCompleted flag
-        if ('isCompleted' in filter) {
-          conditions = { ...conditions, isCompleted: filter.isCompleted };
-        }
-        // check tasks for today
-        if ('type' in filter && filter.type === 'today') {
-          conditions = {
-            ...conditions,
-            isCompleted: false,
-            scheduledDate: {
-              $gte: new Date(moment().hours(0).minutes(0).seconds(0)),
-              $lt: new Date(moment().hours(23).minutes(59).seconds(59))
-            }
-          };
-        }
-        // check backlogs tasks
-        if ('type' in filter && filter.type === 'backlog') {
-          // TODO:// will subject to change when intriduce Next week tasks
-          conditions = {
-            ...conditions,
-            isCompleted: false,
-            $or: [
-              { scheduledDate: null },
-              { scheduledDate: { $gt: new Date(moment().hours(23).minutes(59).seconds(59)) } }
-            ]
-          };
-        }
-        // check pending tasks
-        if ('type' in filter && filter.type === 'pending') {
-          conditions = {
-            ...conditions,
-            isCompleted: false,
-            $and: [
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'comments.userId',
+            foreignField: '_id',
+            as: 'comments.userId'
+          }
+        },
+        {
+          $facet: {
+            todos: [
               {
-                scheduledDate: {
-                  $exists: true,
-                  $lte: new Date(moment().hours(0).minutes(0).seconds(0))
+                $project: {
+                  title: '$title',
+                  label: '$label',
+                  isCompleted: '$isCompleted',
+                  isInProgress: '$isInProgress',
+                  // createdAt: '$createdAt',
+                  createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                  updatedAt: '$updatedAt',
+                  scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate' } },
+                  user: '$user',
+                  comments: '$comments',
+                  priority: '$priority'
                 }
               },
               {
-                scheduledDate: { $ne: null }
+                $group: {
+                  _id: '$_id',
+                  notes: { $push: '$comments' },
+                  user: { $first: '$user' },
+                  title: { $first: '$title' },
+                  label: { $first: '$label' },
+                  isCompleted: { $first: '$isCompleted' },
+                  isInProgress: { $first: '$isInProgress' },
+                  createdAt: { $first: '$createdAt' },
+                  updatedAt: { $first: '$updatedAt' },
+                  scheduledDate: { $first: '$scheduledDate' },
+                  priority: { $first: '$priority' }
+                }
+              },
+              {
+                $sort: sortObject
+              },
+              { $skip: (offset - 1) * first },
+              { $limit: first }
+            ],
+            todosCount: [
+              {
+                $group: {
+                  _id: null,
+                  count: { $sum: 1 }
+                }
               }
             ]
-
-          };
+          }
         }
-      } else {
-        conditions = {
-          ...conditions,
-          isCompleted: false,
-          $or: [
-            {
-              createdAt: {
-                $lt: new Date()
-              }
-            },
-            {
-              createdAt: {
-                $gte: new Date()
-              }
-            }
-          ]
-        };
+      ]);
+    const { todos, todosCount } = response[0];
+    const mapTodos = todos.map((todo) => {
+      const { email } = todo.user[0];
+      if (todo.notes && todo.notes.length) {
+        todo.notes = todo.notes.map(comment => ({
+          _id: comment._id,
+          description: comment.description,
+          userId: (Array.isArray(comment.userId) && comment.userId.length) ? comment.userId[0] : null
+        }));
       }
-      const response = await this.TodoModel
-        .aggregate([
-          {
-            $match: conditions
-          },
-          {
-            $project: {
-              name: 1,
-              title: '$title',
-              label: '$label',
-              isCompleted: '$isCompleted',
-              isInProgress: '$isInProgress',
-              createdAt: '$createdAt',
-              updatedAt: '$updatedAt',
-              scheduledDate: '$scheduledDate',
-              priority: '$priority',
-              user: '$user',
-              comments: '$comments',
-              month: { $month: '$createdAt' },
-              day: { $dayOfMonth: '$createdAt' },
-              year: { $year: '$createdAt' }
-            }
-          },
-          {
-            $lookup: {
-              from: 'users',
-              localField: 'user',
-              foreignField: '_id',
-              as: 'user'
-            }
-          },
-          {
-            $lookup: labelLookUp
-          },
-          {
-            $unwind: {
-              path: '$comments',
-              preserveNullAndEmptyArrays: true
-            }
-          },
-          {
-            $lookup: {
-              from: 'users',
-              localField: 'comments.userId',
-              foreignField: '_id',
-              as: 'comments.userId'
-            }
-          },
-          {
-            $facet: {
-              todos: [
-                {
-                  $project: {
-                    title: '$title',
-                    label: '$label',
-                    isCompleted: '$isCompleted',
-                    isInProgress: '$isInProgress',
-                    // createdAt: '$createdAt',
-                    createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-                    updatedAt: '$updatedAt',
-                    scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate' } },
-                    user: '$user',
-                    comments: '$comments',
-                    priority: '$priority'
-                  }
-                },
-                {
-                  $group: {
-                    _id: '$_id',
-                    notes: { $push: '$comments' },
-                    user: { $first: '$user' },
-                    title: { $first: '$title' },
-                    label: { $first: '$label' },
-                    isCompleted: { $first: '$isCompleted' },
-                    isInProgress: { $first: '$isInProgress' },
-                    createdAt: { $first: '$createdAt' },
-                    updatedAt: { $first: '$updatedAt' },
-                    scheduledDate: { $first: '$scheduledDate' },
-                    priority: { $first: '$priority' }
-                  }
-                },
-                {
-                  $sort: sortObject
-                },
-                { $skip: (offset - 1) * first },
-                { $limit: first }
-              ],
-              todosCount: [
-                {
-                  $group: {
-                    _id: null,
-                    count: { $sum: 1 }
-                  }
-                }
-              ]
-            }
-          }
-        ]);
-      const { todos, todosCount } = response[0];
-      const mapTodos = todos.map((todo) => {
-        const { email } = todo.user[0];
-        if (todo.notes && todo.notes.length) {
-          todo.notes = todo.notes.map(comment => ({
-            _id: comment._id,
-            description: comment.description,
-            userId: (Array.isArray(comment.userId) && comment.userId.length) ? comment.userId[0] : null
-          }));
+      return {
+        ...todo,
+        user: {
+          email
         }
-        return {
-          ...todo,
-          user: {
-            email
-          }
-        };
-      });
-      const { count } = todosCount[0] || 0;
-      return Promise.resolve({
-        totalCount: count,
-        data: mapTodos
-      });
-    } catch (err) {
-      throw err;
-    }
+      };
+    });
+    const { count } = todosCount[0] || 0;
+    return Promise.resolve({
+      totalCount: count,
+      data: mapTodos
+    });
   }
 
   async updateTodo({ user }, { id }, postBody) {

@@ -43,6 +43,10 @@ input TodoSortInputType {
   priority: SortEnumType
 }
 
+input TodoCompletedSortInputType {
+  updatedAt: SortEnumType
+}
+
 input TodoFilterInputType {
   isCompleted: Boolean
   title_contains: String
@@ -94,7 +98,7 @@ type TodoListCompletedType {
 }
 
 type Query {
-  todoCompleted: TodoListCompletedType
+  todoCompleted (first: Int, offset: Int, sort: TodoCompletedSortInputType ) : TodoListCompletedType
   todoList (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ): TodoListType
   todoView(id: ID!): TodoType
   todoLabelList: [TodoLabelListType]
