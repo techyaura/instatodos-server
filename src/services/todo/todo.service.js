@@ -172,35 +172,35 @@ class TodoService {
             $lookup: labelLookUp
           },
           {
+            $project: {
+              title: '$title',
+              label: '$label',
+              isCompleted: '$isCompleted',
+              isInProgress: '$isInProgress',
+              createdAt: '$createdAt',
+              updatedAt: '$updatedAt',
+              user: '$user',
+              comments: '$comments',
+              priority: '$priority'
+            }
+          },
+          {
+            $group: {
+              _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: 'Asia/Kolkata' } },
+              list: { $push: '$$ROOT' },
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $project: {
+              updatedAt: '$_id',
+              list: 1,
+              count: 1
+            }
+          },
+          {
             $facet: {
               todos: [
-                {
-                  $project: {
-                    title: '$title',
-                    label: '$label',
-                    isCompleted: '$isCompleted',
-                    isInProgress: '$isInProgress',
-                    createdAt: '$createdAt',
-                    updatedAt: '$updatedAt',
-                    user: '$user',
-                    comments: '$comments',
-                    priority: '$priority'
-                  }
-                },
-                {
-                  $group: {
-                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: 'Asia/Kolkata' } },
-                    list: { $push: '$$ROOT' },
-                    count: { $sum: 1 }
-                  }
-                },
-                {
-                  $project: {
-                    updatedAt: '$_id',
-                    list: 1,
-                    count: 1
-                  }
-                },
                 {
                   $sort: sortObject
                 },
@@ -282,23 +282,23 @@ class TodoService {
           }
         },
         {
+          $project: {
+            title: '$title',
+            label: '$label',
+            isCompleted: '$isCompleted',
+            isInProgress: '$isInProgress',
+            // createdAt: '$createdAt',
+            createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            updatedAt: '$updatedAt',
+            scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate' } },
+            user: '$user',
+            comments: '$comments',
+            priority: '$priority'
+          }
+        },
+        {
           $facet: {
             todos: [
-              {
-                $project: {
-                  title: '$title',
-                  label: '$label',
-                  isCompleted: '$isCompleted',
-                  isInProgress: '$isInProgress',
-                  // createdAt: '$createdAt',
-                  createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-                  updatedAt: '$updatedAt',
-                  scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate' } },
-                  user: '$user',
-                  comments: '$comments',
-                  priority: '$priority'
-                }
-              },
               {
                 $group: {
                   _id: '$_id',
