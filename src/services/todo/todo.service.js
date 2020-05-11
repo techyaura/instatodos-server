@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 const { TodoModel, TodoLabelModel } = require('../../models');
+const { CommonFunctionUtil } = require('../../utils');
 
 class TodoService {
   constructor() {
@@ -455,7 +456,12 @@ class TodoService {
     try {
       const { user } = context;
       const { _id: userId } = user;
-      await this.TodoLabelModel({ ...postBody, user: userId }).save();
+      const { name } = postBody;
+      const isExist = await this.checkUniqueLabel(name, user);
+      if (isExist) {
+        throw new Error('Label Should be unique');
+      }
+      await this.TodoLabelModel({ ...postBody, user: userId, slug: CommonFunctionUtil.slugify(name) }).save();
       return { message: 'Todo label has been succesfully added', ok: true };
     } catch (err) {
       throw err;
@@ -467,13 +473,26 @@ class TodoService {
       const { id: todoLabelId } = params;
       const { _id: userId } = user;
       const { name } = postBody;
+      const isExist = await this.checkUniqueLabel(name, user);
+      if (isExist) {
+        throw new Error('Label Should be unique');
+      }
+      const slug = CommonFunctionUtil.slugify(name);
       const response = await this.TodoLabelModel.updateOne({
         user: userId, _id: todoLabelId
-      }, { $set: { name } });
+      }, { $set: { name, slug } });
       if (response && response.n !== 0) {
         return { message: 'TodoLabel has been succesfully updated', ok: true };
       }
       return Promise.reject(new Error(403));
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async checkUniqueLabel(label, user) {
+    try {
+      return await this.TodoLabelModel.findOne({ name: label, user: user._id }).then(data => (!!(data)));
     } catch (err) {
       throw err;
     }

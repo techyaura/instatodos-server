@@ -17,6 +17,7 @@ input TodoLabelInputType {
 
 type TodoLabelListType {
   name: String
+  slug: String
   _id: String
 }
 
