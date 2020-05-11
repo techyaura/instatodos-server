@@ -31,7 +31,9 @@ class TodoService {
 
   static createFilters(user, { filter = null, sort = null }) {
     let conditions = {
-      user: mongoose.Types.ObjectId(user._id)
+      user: mongoose.Types.ObjectId(user._id),
+      status: true,
+      isDeleted: false
     };
     let searchQuery = '';
     let labelLookUp = {
@@ -384,8 +386,10 @@ class TodoService {
 
   async deleteTodo({ user }, params) {
     try {
-      const response = await this.TodoModel.deleteOne({
-        user: user._id, isDeleted: false, status: true, _id: params.id
+      const response = await this.TodoModel.updateOne({
+        user: user._id, _id: params.id, isDeleted: false, status: true
+      }, {
+        isDeleted: true, status: false
       });
       if (response && response.n !== 0) {
         return { ok: true, message: 'Todo deleted successfully' };
