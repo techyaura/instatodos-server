@@ -102,6 +102,15 @@ class TodoService {
           }
         };
       }
+      if ('type' in filter && filter.type === 'upcoming') {
+        conditions = {
+          ...conditions,
+          isCompleted: false,
+          scheduledDate: {
+            $gte: new Date(moment().hours(23).minutes(59).seconds(59))
+          }
+        };
+      }
       // check backlogs tasks
       if ('type' in filter && filter.type === 'backlog') {
         // TODO:// will subject to change when intriduce Next week tasks
@@ -204,6 +213,104 @@ class TodoService {
           {
             $project: {
               updatedAt: '$_id',
+              list: 1,
+              count: 1
+            }
+          },
+          {
+            $facet: {
+              todos: [
+                {
+                  $sort: sortObject
+                },
+                { $skip: (offset - 1) * first },
+                { $limit: first }
+              ],
+              todosCount: [
+                {
+                  $group: {
+                    _id: null,
+                    count: { $sum: 1 }
+                  }
+                }
+              ]
+            }
+          }
+        ]);
+      const { todos, todosCount } = response[0];
+      const { count } = todosCount[0] || 0;
+      return Promise.resolve({
+        totalCount: count,
+        data: todos
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async upcomingTodo({ user }, {
+    first = 10, offset = 1, filter = null, sort = null
+  }) {
+    const { conditions, sortObject, labelLookUp } = this.constructor.createFilters(user, { filter, sort });
+    try {
+      const response = await this.TodoModel
+        .aggregate([
+          {
+            $match: conditions
+          },
+          {
+            $project: {
+              name: 1,
+              title: '$title',
+              label: '$label',
+              isCompleted: '$isCompleted',
+              isInProgress: '$isInProgress',
+              createdAt: '$createdAt',
+              scheduledDate: '$scheduledDate',
+              updatedAt: '$updatedAt',
+              priority: '$priority',
+              user: '$user',
+              comments: '$comments'
+              // month: { $month: '$createdAt' },
+              // day: { $dayOfMonth: '$createdAt' },
+              // year: { $year: '$createdAt' }
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'user',
+              foreignField: '_id',
+              as: 'user'
+            }
+          },
+          {
+            $lookup: labelLookUp
+          },
+          // {
+          //   $project: {
+          //     title: '$title',
+          //     label: '$label',
+          //     isCompleted: '$isCompleted',
+          //     isInProgress: '$isInProgress',
+          //     createdAt: '$createdAt',
+          //     updatedAt: '$updatedAt',
+          //     scheduledDate: 'scheduledDate',
+          //     user: '$user',
+          //     comments: '$comments',
+          //     priority: '$priority'
+          //   }
+          // },
+          {
+            $group: {
+              _id: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate', timezone: 'Asia/Kolkata' } },
+              list: { $push: '$$ROOT' },
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $project: {
+              scheduledDate: '$_id',
               list: 1,
               count: 1
             }

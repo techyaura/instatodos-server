@@ -9,6 +9,7 @@ enum TodoEnumType{
   today
   backlog
   pending
+  upcoming
 }
 
 input TodoLabelInputType {
@@ -46,6 +47,7 @@ input TodoSortInputType {
 
 input TodoCompletedSortInputType {
   updatedAt: SortEnumType
+  scheduledDate: SortEnumType
 }
 
 input TodoFilterInputType {
@@ -103,6 +105,7 @@ type TodoListCompletedType {
 }
 
 type Query {
+  todoUpcoming (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ) : TodoListCompletedType
   todoCompleted (filter: TodoCompletedFilterInputType, first: Int, offset: Int, sort: TodoCompletedSortInputType ) : TodoListCompletedType
   todoList (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ): TodoListType
   todoView(id: ID!): TodoType
