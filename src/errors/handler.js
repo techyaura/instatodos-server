@@ -34,12 +34,12 @@ module.exports = (err, req, res, next, isExpressSpecificError = false) => {
   // Error specific to Graphql
   if (name === 'GraphQLError') {
     const error = createError(message);
-    res.statusCode = error.status;
     response = {
+      statusCode: error.status,
       ...error
     };
   }
   response = { ...response, locations, path };
-  winston.error(`${response.status || 500} - ${response.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+  // winston.error(`${response.status || 500} - ${response.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
   return response;
 };
