@@ -58,7 +58,7 @@ class Boot {
           /** Clear console for every server restart while development */
           // console.clear(); // eslint-disable-line no-console
         }
-        console.log(success(`Running a GraphQL API server on http://${this.host}:${this.port} in ${process.env.NODE_ENV} mode`)); // eslint-disable-line no-console
+        console.log(`🚀 Running GraphQL server at http://${this.host}:${this.port} in ${process.env.NODE_ENV} mode`); // eslint-disable-line no-console
         return this.app;
       });
     } catch (err) {
