@@ -15,7 +15,7 @@ const updateTodoSchema = Joi.object().keys({
   label: Joi.array().items(Joi.string()).optional(),
   title: Joi.string()
     .min(4)
-    .max(60)
+    .max(100)
     .optional(),
   isCompleted: Joi.boolean().optional(),
   isInProgress: Joi.boolean().optional(),
