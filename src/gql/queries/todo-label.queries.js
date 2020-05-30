@@ -4,6 +4,6 @@ const { ContextMiddleware } = require('../../middlewares');
 module.exports = {
   todoLabelList: async (root, args, context) => {
     await ContextMiddleware(context);
-    return TodoService.todoLabelList(context);
+    return TodoService.todoLabelListCount(context);
   }
 };
