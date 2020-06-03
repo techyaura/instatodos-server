@@ -20,6 +20,7 @@ type TodoLabelListType {
   name: String
   slug: String
   _id: String
+  count: Int
 }
 
 input TodoCommentInputType {

@@ -628,6 +628,73 @@ class TodoService {
       throw err;
     }
   }
+
+  async todoLabelListCount({ user }) {
+    try {
+      return await this.TodoLabelModel
+        .aggregate([
+          {
+            $match: { isDeleted: false, user: mongoose.Types.ObjectId(user._id) }
+          },
+          {
+            $lookup: {
+              from: 'todos',
+              let: { osss: '$_id' },
+              pipeline: [
+                {
+                  $match: {
+                    isDeleted: false,
+                    isCompleted: false,
+                    label: { $ne: null },
+                    $expr: {
+                      $and: [
+                        { $in: ['$$osss', '$label'] }
+                      ]
+                    }
+                  }
+                }
+              ],
+              as: 'label'
+            }
+          },
+          {
+            $unwind: {
+              path: '$label',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $project: {
+              _id: 1,
+              name: { $toLower: '$name' },
+              label: 1
+            }
+          },
+          {
+            $group: {
+              _id: '$name',
+              labelId: { $first: '$_id' },
+              name: { $first: '$name' },
+              slug: { $first: '$_slug' },
+              todos: { $push: '$label' }
+            }
+          },
+          {
+            $project: {
+              _id: '$labelId',
+              name: '$name',
+              slug: '$slug',
+              count: { $sum: { $size: '$todos' } }
+            }
+          },
+          {
+            $sort: { name: 1 }
+          }
+        ]);
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 module.exports = new TodoService();

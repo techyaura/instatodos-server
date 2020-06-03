@@ -9,8 +9,6 @@ const morgan = require('morgan');
 const cors = require('cors');
 const http = require('http');
 
-console.log(graphqlExpress);
-
 const app = express();
 const dbConnection = require('./db');
 const { success, error, warning } = require('../utils/console-log');
@@ -25,9 +23,9 @@ class Boot {
     this.host = process.env.HOST || '0.0.0.0';
     this.port = process.env.PORT || 8080;
     this.environment = process.env.environment;
-    if (process.env.CLUSTER_ACTIVE) {
+    if (process.env.IS_CLUSTER_ENABLED) {
       if (cluster.isMaster) {
-      // eslint-disable-next-line no-plusplus
+        // eslint-disable-next-line no-plusplus
         for (let i = 0; i < cCPUs; i++) {
           cluster.fork();
         }
@@ -66,7 +64,7 @@ class Boot {
           /** Clear console for every server restart while development */
           // console.clear(); // eslint-disable-line no-console
         }
-        console.log(success(`Running a GraphQL API server on http://${this.host}:${this.port} in ${process.env.NODE_ENV} mode`)); // eslint-disable-line no-console
+        console.log(`🚀 Running GraphQL server at http://${this.host}:${this.port} in ${process.env.NODE_ENV} mode`); // eslint-disable-line no-console
         return this.app;
       });
     } catch (err) {
