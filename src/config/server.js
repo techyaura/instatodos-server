@@ -125,10 +125,10 @@ class Boot {
       },
       subscriptions: {
         onConnect: (connectionParams, webSocket, context) => {
-          console.log(connectionParams);
+          console.log('Connected');
         },
         onDisconnect: (webSocket, context) => {
-          console.log(context);
+          console.log('DISCONNECTED');
         }
       }
     });

@@ -1,3 +1,34 @@
+# Queries -------------------------------------------
+
+type Query {
+  todoUpcoming (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ) : TodoListCompletedType
+  todoCompleted (filter: TodoCompletedFilterInputType, first: Int, offset: Int, sort: TodoCompletedSortInputType ) : TodoListCompletedType
+  todoList (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ): TodoListType
+  todoView(id: ID!): TodoType
+  todoLabelList: [TodoLabelListType]
+}
+
+# Mutations -------------------------------------------
+
+type Mutation {
+  addTodo(input: TodoInputType!): SuccessType!
+  updateTodo(id: ID!, input: TodoInputType!): SuccessType!
+  deleteTodo(id: ID!): SuccessType!
+  addTodoComment(todoId: ID!, input: TodoCommentInputType!): SuccessType!
+  updateTodoComment(id: ID!, todoId: ID!, input: TodoCommentInputType!): SuccessType!
+  addTodoLabel(input: TodoLabelInputType): SuccessType!
+  updateTodoLabel(id: ID!, input: TodoLabelInputType): SuccessType!
+  deleteTodoLabel(id: ID!): SuccessType!
+}
+
+# Subscriptions -------------------------------------------
+
+type Subscription {
+  postAdded: TodoType
+}
+
+# Types -------------------------------------------
+
 enum TodoPriorityEnumType {
   P1
   P2
@@ -103,23 +134,4 @@ type TodoListType {
 type TodoListCompletedType {
   totalCount: Int
   data: [TodoCompletedType]
-}
-
-type Query {
-  todoUpcoming (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ) : TodoListCompletedType
-  todoCompleted (filter: TodoCompletedFilterInputType, first: Int, offset: Int, sort: TodoCompletedSortInputType ) : TodoListCompletedType
-  todoList (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ): TodoListType
-  todoView(id: ID!): TodoType
-  todoLabelList: [TodoLabelListType]
-}
-
-type Mutation {
-  addTodo(input: TodoInputType!): SuccessType!
-  updateTodo(id: ID!, input: TodoInputType!): SuccessType!
-  deleteTodo(id: ID!): SuccessType!
-  addTodoComment(todoId: ID!, input: TodoCommentInputType!): SuccessType!
-  updateTodoComment(id: ID!, todoId: ID!, input: TodoCommentInputType!): SuccessType!
-  addTodoLabel(input: TodoLabelInputType): SuccessType!
-  updateTodoLabel(id: ID!, input: TodoLabelInputType): SuccessType!
-  deleteTodoLabel(id: ID!): SuccessType!
 }
