@@ -25,7 +25,15 @@ type ThoughtType {
 
 input ThoughtInputType {
   title: String!
-  description: String!
+  description: String
+  accomplishTenure: Date
+  isPinned: Boolean
+  isAchieved: Boolean
+}
+
+input ThoughtUpdateInputType {
+  title: String
+  description: String
   accomplishTenure: Date
   isPinned: Boolean
   isAchieved: Boolean
@@ -43,6 +51,6 @@ extend type Query {
 
 extend type Mutation {
   addThought(input: ThoughtInputType!): SuccessType!
-  updateThought(id: ID!, input: ThoughtInputType!): SuccessType!
+  updateThought(id: ID!, input: ThoughtUpdateInputType!): SuccessType!
   deleteThought(id: ID!): SuccessType!
 }
