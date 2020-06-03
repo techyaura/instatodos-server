@@ -14,9 +14,7 @@ const schema = new mongoose.Schema({
     required: true
   },
   description: {
-    type: String,
-    default: true,
-    required: true
+    type: String
   },
   accomplishTenure: {
     type: Date,
