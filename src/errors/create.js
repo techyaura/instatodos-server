@@ -1,13 +1,13 @@
 
 const messages = require('./code');
 
-module.exports = function createError(code) {
-  if (messages.hasOwnProperty(code)) {
-    return messages[code];
+module.exports = function createError(message, code) {
+  if (messages.hasOwnProperty(message)) {
+    return messages[message];
   }
   return {
-    code: 'ValidationError',
-    message: code,
+    code: code || 'ValidationError',
+    message,
     status: 400
   };
 };

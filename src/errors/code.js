@@ -78,9 +78,9 @@ module.exports = {
     code: 'INVALID_TOKEN',
     message: 'Token Invalid'
   },
-  No_User_Found: {
+  NO_USER_FOUND: {
     status: 400,
-    code: 'No_User_Found',
+    code: 'NO_USER_FOUND',
     message: 'This email address not exist'
   },
   INVALID_CREDENTIALS: {

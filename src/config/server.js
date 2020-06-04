@@ -1,10 +1,11 @@
+/* eslint-disable no-console */
 
 require('./env');
 const express = require('express');
 const cluster = require('cluster');
 const cCPUs = require('os').cpus().length;
 const graphqlHTTP = require('express-graphql');
-const { graphqlExpress, ApolloServer, gql } = require('apollo-server-express');
+const { ApolloServer } = require('apollo-server-express');
 const morgan = require('morgan');
 const cors = require('cors');
 const http = require('http');
@@ -16,6 +17,7 @@ const schema = require('../gql');
 const winston = require('./winston');
 const { AuthMiddleware } = require('../middlewares');
 const errorHandler = require('../errors/handler');
+
 
 class Boot {
   constructor() {
@@ -32,11 +34,11 @@ class Boot {
 
         cluster.on('online', (worker) => {
         // eslint-disable-next-line no-console
-          console.log(`Worker ${worker.process.pid} is online.`);
+          success(`Worker ${worker.process.pid} is online.`);
         });
-        cluster.on('exit', (worker, code, signal) => {
+        cluster.on('exit', (worker) => {
         // eslint-disable-next-line no-console
-          console.log(`worker ${worker.process.pid} died.`);
+          error(`worker ${worker.process.pid} died.`);
         });
       } else {
         this.boostrapExpress();
@@ -64,7 +66,7 @@ class Boot {
           /** Clear console for every server restart while development */
           // console.clear(); // eslint-disable-line no-console
         }
-        console.log(`🚀 Running GraphQL server at http://${this.host}:${this.port} in ${process.env.NODE_ENV} mode`); // eslint-disable-line no-console
+        // success(`🚀 Running GraphQL server at http://${this.host}:${this.port} in ${process.env.NODE_ENV} mode`); // eslint-disable-line no-console
         return this.app;
       });
     } catch (err) {
@@ -119,15 +121,16 @@ class Boot {
       // engine: {
       //   rewriteError: ((err, request, response) => errorHandler(err, request, response))
       // },
-      formatError: (err, request, response) => {
-        console.log(response);
-        return errorHandler(err, request, response);
+      formatError: (err) => {
+        const formatError = errorHandler(err);
+        // winston.error(`${response.status || 500} - ${response.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        return formatError;
       },
       subscriptions: {
-        onConnect: (connectionParams, webSocket, context) => {
+        onConnect: () => {
           console.log('Connected');
         },
-        onDisconnect: (webSocket, context) => {
+        onDisconnect: () => {
           console.log('DISCONNECTED');
         }
       }
@@ -137,8 +140,8 @@ class Boot {
     app.use('/graphql', AuthMiddleware.jwt);
     server.applyMiddleware({ app });
     httpServer.listen(this.port, () => {
-      console.log(`🚀 Server ready at http://localhost:${this.port}${server.graphqlPath}`);
-      console.log(`🚀 Subscriptions ready at ws://localhost:${this.port}${server.subscriptionsPath}`);
+      console.log(success(`🚀 Server ready at http://localhost:${this.port}${server.graphqlPath}`));
+      console.log(success(`🚀 Subscriptions ready at ws://localhost:${this.port}${server.subscriptionsPath}`));
     });
   }
 
