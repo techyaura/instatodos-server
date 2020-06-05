@@ -118,6 +118,7 @@ type TodoType {
   scheduledDate: Date
   notes: [TodoCommentType]
   label: [TodoLabelListType]
+  subTasks: [SubTask]
 }
 
 type TodoCompletedType {
@@ -134,4 +135,18 @@ type TodoListType {
 type TodoListCompletedType {
   totalCount: Int
   data: [TodoCompletedType]
+}
+
+type SubTask {
+  _id: String!
+  title: String!
+  user: User
+  priority: TodoPriorityEnumType
+  isCompleted: Boolean
+  isInProgress: Boolean
+  createdAt: Date!
+  updatedAt: Date
+  scheduledDate: Date
+  notes: [TodoCommentType]
+  label: [TodoLabelListType]
 }

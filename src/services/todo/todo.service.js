@@ -364,24 +364,24 @@ class TodoService {
         {
           $match: conditions
         },
-        {
-          $project: {
-            name: 1,
-            title: '$title',
-            label: '$label',
-            isCompleted: '$isCompleted',
-            isInProgress: '$isInProgress',
-            createdAt: '$createdAt',
-            updatedAt: '$updatedAt',
-            scheduledDate: '$scheduledDate',
-            priority: '$priority',
-            user: '$user',
-            comments: '$comments',
-            month: { $month: '$createdAt' },
-            day: { $dayOfMonth: '$createdAt' },
-            year: { $year: '$createdAt' }
-          }
-        },
+        // {
+        //   $project: {
+        //     name: 1,
+        //     title: '$title',
+        //     label: '$label',
+        //     isCompleted: '$isCompleted',
+        //     isInProgress: '$isInProgress',
+        //     createdAt: '$createdAt',
+        //     updatedAt: '$updatedAt',
+        //     scheduledDate: '$scheduledDate',
+        //     priority: '$priority',
+        //     user: '$user',
+        //     comments: '$comments',
+        //     month: { $month: '$createdAt' },
+        //     day: { $dayOfMonth: '$createdAt' },
+        //     year: { $year: '$createdAt' }
+        //   }
+        // },
         {
           $lookup: {
             from: 'users',
@@ -419,8 +419,22 @@ class TodoService {
             scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate' } },
             user: '$user',
             comments: '$comments',
-            priority: '$priority'
+            priority: '$priority',
+            parent: '$parent'
           }
+        },
+        {
+          $graphLookup: {
+            from: 'todos',
+            startWith: '$_id',
+            connectFromField: 'parent',
+            connectToField: 'parent',
+            as: 'subTasks',
+            maxDepth: 1
+          }
+        },
+        {
+          $match: { $or: [{ parent: null }, { parent: { $exists: false } }] }
         },
         {
           $facet: {
@@ -437,7 +451,8 @@ class TodoService {
                   createdAt: { $first: '$createdAt' },
                   updatedAt: { $first: '$updatedAt' },
                   scheduledDate: { $first: '$scheduledDate' },
-                  priority: { $first: '$priority' }
+                  priority: { $first: '$priority' },
+                  subTasks: { $first: '$subTasks' }
                 }
               },
               {
