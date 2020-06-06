@@ -1,22 +1,22 @@
 version: "3"
 services:
-    mongo:
-        image: mongo:latest
-        container_name: mongoinsta
-        ports:
-         - "27019:27017"
-        volumes:
-         - $HOME/DOCKER_VOLUME/app/hdp/mongo/data:$HOME/DOCKER_VOLUME/data/db     
-    app:
-        restart: always
-        container_name: insta_todo
-        environment:
-            NODE_ENV: development
-        build: .
-        volumes:
-            - .:/app
-            - /app/node_modules
-        links:
-            - mongo
-        ports:
-            - '9000:9000'
+  mongo:
+    image: mongo:latest
+    container_name: mongoinsta
+    ports:
+      - "27017:27017"
+    volumes:
+      - $HOME/DOCKER_VOLUME/app/hdp/mongo/data:$HOME/DOCKER_VOLUME/data/db
+  app:
+    restart: always
+    container_name: insta_todo
+    environment:
+      NODE_ENV: development
+    build: .
+    volumes:
+      - .:/app
+      - /app/node_modules
+    links:
+      - mongo
+    ports:
+      - "9000:8080"
