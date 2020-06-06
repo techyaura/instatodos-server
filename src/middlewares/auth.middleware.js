@@ -31,8 +31,11 @@ module.exports = {
         return next(new Error('INVALID_GRANT'));
       })
       .then((user) => {
-        req.user = user;
-        return next();
+        if (user) {
+          req.user = user;
+          return next();
+        }
+        return next(new Error('INVALID_GRANT'));
       })
       .catch(err => next(err));
   }

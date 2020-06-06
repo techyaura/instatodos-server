@@ -5,20 +5,24 @@ const addTodoSchema = Joi.object().keys({
     .min(4)
     .max(60)
     .required(),
-  label: Joi.string().optional(),
-  scheduledDate: Joi.date().allow(null)
+  label: Joi.array().items(Joi.string()).optional(),
+  scheduledDate: Joi.date().allow(null),
+  priority: Joi.string().optional(),
+  notes: Joi.string().optional()
 });
 const updateTodoSchema = Joi.object().keys({
   id: Joi.string().required(),
-  label: Joi.string().optional(),
+  label: Joi.array().items(Joi.string()).optional(),
   title: Joi.string()
     .min(4)
-    .max(60)
+    .max(100)
     .optional(),
   isCompleted: Joi.boolean().optional(),
   isInProgress: Joi.boolean().optional(),
   priority: Joi.string().optional(),
-  scheduledDate: Joi.date().optional().allow(null)
+  scheduledDate: Joi.date().optional().allow(null),
+  notes: Joi.string().optional(),
+  noteId: Joi.string().optional()
 });
 const addTodoCommentSchema = Joi.object().keys({
   todoId: Joi.string().required(),

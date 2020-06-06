@@ -11,7 +11,14 @@ const modelSchema = new Schema(
     firstname: { type: String },
     lastname: { type: String },
     username: { type: String },
-    password: String,
+    country: { type: String },
+    timezone: {
+      type: String
+    },
+    password: {
+      type: String,
+      required: true
+    },
     email: {
       type: String,
       required: true

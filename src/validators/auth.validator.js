@@ -38,8 +38,10 @@ const resetPasswordSchema = Joi.object().keys({
   password: Joi.string()
     .min(6)
     .max(30)
-    .required(),
-  confirmPassword: Joi.string()
+    .required()
+});
+const passwordSchema = Joi.object().keys({
+  password: Joi.string()
     .min(6)
     .max(30)
     .required()
@@ -65,5 +67,9 @@ module.exports = {
   async resetPasswordValidator(req) {
     const reqBody = req.body || req;
     await Joi.validate(reqBody, resetPasswordSchema);
+  },
+  async passwordValidator(req) {
+    const reqBody = req.body || req;
+    await Joi.validate(reqBody, passwordSchema);
   }
 };

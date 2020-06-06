@@ -63,6 +63,11 @@ module.exports = {
   509: 'Bandwidth limit exceeded',
   510: 'Not extended',
   511: 'Network authentication required',
+  INVALID_OTP: {
+    status: 400,
+    code: 'INVALID_OTP',
+    message: 'Please enter valid OTP'
+  },
   TokenExpiredError: {
     status: 401,
     code: 'TOKEN_EXPIRED',
@@ -73,14 +78,14 @@ module.exports = {
     code: 'INVALID_TOKEN',
     message: 'Token Invalid'
   },
-  No_User_Found: {
+  NO_USER_FOUND: {
     status: 400,
-    code: 'No_User_Found',
+    code: 'NO_USER_FOUND',
     message: 'This email address not exist'
   },
   INVALID_CREDENTIALS: {
-    status: 401,
+    status: 400,
     code: 'INVALID_CREDENTIALS',
-    message: 'You are not Authorized'
+    message: 'Email/password is incorrect'
   }
 };

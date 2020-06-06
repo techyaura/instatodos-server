@@ -1,16 +1,5 @@
 
-# Instant-TODOS
-[TODO UI Link](https://instant-todos.netlify.com)
-  
-
-## Intro
-
-This is a TODO-API implementation using Graphql + Node Js + Mongodb (Using mongoose as ORM)
-
-
-## How to use!
-
-  
+## How to configure for use! 
 
 - create the files `env.development` for local & `.env.production` for production
 ```sh
@@ -20,8 +9,7 @@ SENDGRID_API_KEY=<SENDGRID_API_KEY>
 JWT_SECRET=<JWT_SECRET>
 SMTP_FROM_EMAIL=<SMTP_FROM_EMAIL>
 ```
-GRAPHQl API's - ([live-url-on-heroku](https://instatodo.herokuapp.com/graphql))
-
+GRAPHQl API's - 
 1. Register (Create User)
 
 ```sh

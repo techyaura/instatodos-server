@@ -1,9 +1,14 @@
+/* eslint-disable no-console */
 
 require('./env');
 const express = require('express');
+const cluster = require('cluster');
+const cCPUs = require('os').cpus().length;
 const graphqlHTTP = require('express-graphql');
+const { ApolloServer } = require('apollo-server-express');
 const morgan = require('morgan');
 const cors = require('cors');
+const http = require('http');
 
 const app = express();
 const dbConnection = require('./db');
@@ -13,12 +18,34 @@ const winston = require('./winston');
 const { AuthMiddleware } = require('../middlewares');
 const errorHandler = require('../errors/handler');
 
+
 class Boot {
   constructor() {
     this.app = app;
+    this.host = process.env.HOST || '0.0.0.0';
     this.port = process.env.PORT || 8080;
-    this.environment = process.env.environment || 'local';
-    this.boostrapExpress();
+    this.environment = process.env.environment;
+    if (process.env.IS_CLUSTER_ENABLED) {
+      if (cluster.isMaster) {
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < cCPUs; i++) {
+          cluster.fork();
+        }
+
+        cluster.on('online', (worker) => {
+        // eslint-disable-next-line no-console
+          success(`Worker ${worker.process.pid} is online.`);
+        });
+        cluster.on('exit', (worker) => {
+        // eslint-disable-next-line no-console
+          error(`worker ${worker.process.pid} died.`);
+        });
+      } else {
+        this.boostrapExpress();
+      }
+    } else {
+      this.boostrapExpress();
+    }
   }
 
   /**
@@ -32,14 +59,14 @@ class Boot {
         this.useCors(),
         this.useMorgan(),
         this.useGraphQl(),
-        this.useLogger(),
-        this.useListen()
+        this.useLogger()
+        // this.useListen()
       ]).then(() => {
         if (process.env.NODE_ENV === 'development') {
           /** Clear console for every server restart while development */
           // console.clear(); // eslint-disable-line no-console
         }
-        console.log(success(`Running a GraphQL API server on PORT: ${this.port} in ${this.environment} mode`)); // eslint-disable-line no-console
+        // success(`🚀 Running GraphQL server at http://${this.host}:${this.port} in ${process.env.NODE_ENV} mode`); // eslint-disable-line no-console
         return this.app;
       });
     } catch (err) {
@@ -85,8 +112,37 @@ class Boot {
    * @name useGraphQl
    * @description configure express with gRaphql
    */
+  // eslint-disable-next-line class-methods-use-this
   useGraphQl() {
-    return this.app.use('/graphql', AuthMiddleware.jwt, this.constructor.graphQlHttpConfig());
+    const server = new ApolloServer({
+      schema,
+      debug: process.env.NODE_ENV === 'development',
+      context: ({ req }) => ({ ...req, startTime: Date.now() }),
+      // engine: {
+      //   rewriteError: ((err, request, response) => errorHandler(err, request, response))
+      // },
+      formatError: (err) => {
+        const formatError = errorHandler(err);
+        // winston.error(`${response.status || 500} - ${response.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        return formatError;
+      },
+      subscriptions: {
+        onConnect: () => {
+          console.log('Connected');
+        },
+        onDisconnect: () => {
+          console.log('DISCONNECTED');
+        }
+      }
+    });
+    const httpServer = http.createServer(app);
+    server.installSubscriptionHandlers(httpServer);
+    app.use('/graphql', AuthMiddleware.jwt);
+    server.applyMiddleware({ app });
+    httpServer.listen(this.port, () => {
+      console.log(success(`🚀 Server ready at http://localhost:${this.port}${server.graphqlPath}`));
+      console.log(success(`🚀 Subscriptions ready at ws://localhost:${this.port}${server.subscriptionsPath}`));
+    });
   }
 
   /**

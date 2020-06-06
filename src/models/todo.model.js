@@ -8,6 +8,9 @@ const { ObjectId } = Schema;
 const commentSchema = new Schema({
   description: {
     type: String
+  },
+  userId: {
+    type: ObjectId, ref: 'User'
   }
 }, {
   timestamps: {}
@@ -18,7 +21,7 @@ const schema = new mongoose.Schema({
     type: ObjectId, ref: 'User'
   },
   label: {
-    type: ObjectId,
+    type: [ObjectId],
     ref: 'TodoLabel',
     default: null
   },
@@ -32,8 +35,8 @@ const schema = new mongoose.Schema({
   },
   priority: {
     type: String,
-    enum: ['p1', 'p2', 'p3', 'p4'],
-    default: 'p4'
+    enum: ['P1', 'P2', 'P3', 'P4'],
+    default: 'P4'
   },
   isCompleted: {
     type: Boolean,

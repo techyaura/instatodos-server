@@ -1,0 +1,152 @@
+# Queries -------------------------------------------
+
+type Query {
+  todoUpcoming (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ) : TodoListCompletedType
+  todoCompleted (filter: TodoCompletedFilterInputType, first: Int, offset: Int, sort: TodoCompletedSortInputType ) : TodoListCompletedType
+  todoList (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ): TodoListType
+  todoView(id: ID!): TodoType
+  todoLabelList: [TodoLabelListType]
+}
+
+# Mutations -------------------------------------------
+
+type Mutation {
+  addTodo(input: TodoInputType!): SuccessType!
+  updateTodo(id: ID!, input: TodoInputType!): SuccessType!
+  deleteTodo(id: ID!): SuccessType!
+  addTodoComment(todoId: ID!, input: TodoCommentInputType!): SuccessType!
+  updateTodoComment(id: ID!, todoId: ID!, input: TodoCommentInputType!): SuccessType!
+  addTodoLabel(input: TodoLabelInputType): SuccessType!
+  updateTodoLabel(id: ID!, input: TodoLabelInputType): SuccessType!
+  deleteTodoLabel(id: ID!): SuccessType!
+}
+
+# Subscriptions -------------------------------------------
+
+type Subscription {
+  postAdded: TodoType
+}
+
+# Types -------------------------------------------
+
+enum TodoPriorityEnumType {
+  P1
+  P2
+  P3
+  P4
+}
+
+enum TodoEnumType{
+  today
+  backlog
+  pending
+  upcoming
+}
+
+input TodoLabelInputType {
+  name: String!
+}
+
+type TodoLabelListType {
+  name: String
+  slug: String
+  _id: String
+  count: Int
+}
+
+input TodoCommentInputType {
+  description: String!
+  _id: ID
+}
+
+input TodoInputType {
+  title: String
+  scheduledDate: Date
+  isCompleted: Boolean
+  isInProgress: Boolean
+  priority: TodoPriorityEnumType
+  label: [ID]
+  notes: String
+  noteId: String
+}
+
+input TodoSortInputType {
+  createdAt: SortEnumType
+  updatedAt: SortEnumType
+  scheduledDate: SortEnumType
+  priority: SortEnumType
+}
+
+input TodoCompletedSortInputType {
+  updatedAt: SortEnumType
+  scheduledDate: SortEnumType
+}
+
+input TodoFilterInputType {
+  isCompleted: Boolean
+  title_contains: String
+  labelId: [ID]
+  startAt: Date
+  endAt: Date,
+  type: TodoEnumType
+}
+
+input TodoCompletedFilterInputType {
+  title_contains: String
+}
+
+type TodoCommentType {
+  description: String
+  _id: String
+  userId: CommentUserType
+}
+
+type CommentUserType {
+  email: String
+  _id: String
+}
+
+type TodoType {
+  _id: String!
+  title: String!
+  user: User
+  priority: TodoPriorityEnumType
+  isCompleted: Boolean
+  isInProgress: Boolean
+  createdAt: Date!
+  updatedAt: Date
+  scheduledDate: Date
+  notes: [TodoCommentType]
+  label: [TodoLabelListType]
+  subTasks: [SubTask]
+}
+
+type TodoCompletedType {
+  _id: String!
+  list: [TodoType]
+  count: Int
+}
+
+type TodoListType {
+  totalCount: Int
+  data: [TodoType]
+}
+
+type TodoListCompletedType {
+  totalCount: Int
+  data: [TodoCompletedType]
+}
+
+type SubTask {
+  _id: String!
+  title: String!
+  user: User
+  priority: TodoPriorityEnumType
+  isCompleted: Boolean
+  isInProgress: Boolean
+  createdAt: Date!
+  updatedAt: Date
+  scheduledDate: Date
+  notes: [TodoCommentType]
+  label: [TodoLabelListType]
+}

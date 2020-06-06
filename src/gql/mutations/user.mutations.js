@@ -1,8 +1,13 @@
 const { UserService, TemplateService } = require('../../services');
 const {
-  registerVerificationValidator, emailValidator, registerValidator, resetPasswordValidator
+  registerVerificationValidator,
+  emailValidator,
+  registerValidator,
+  resetPasswordValidator,
+  passwordValidator
 } = require('../../validators');
 const { EmailUtil, CommonFunctionUtil } = require('../../utils');
+const { ContextMiddleware } = require('../../middlewares');
 
 
 module.exports = {
@@ -82,5 +87,13 @@ module.exports = {
     return resetPasswordValidator(args.input, res, next)
       .then(() => UserService.resetPassword({ ...args.input }))
       .then(() => ({ message: 'Password reset successfully', ok: true }));
+  },
+  updateProfile: async (root, args, context) => {
+    await ContextMiddleware(context);
+    return UserService.updateProfile(context, { ...args.input });
+  },
+  updatePassword: async (root, args, context) => {
+    await ContextMiddleware(context, passwordValidator(args.input));
+    return UserService.updatePassword(context, { ...args.input });
   }
 };

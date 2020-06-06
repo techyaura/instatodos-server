@@ -9,7 +9,7 @@ module.exports = {
         auth: payload,
         exp: Math.floor(new Date().getTime() / 1000) + 7 * 24 * 60 * 60
       },
-      tokenSecret,
+      tokenSecret
     );
   },
 

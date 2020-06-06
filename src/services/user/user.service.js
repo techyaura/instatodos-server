@@ -1,3 +1,4 @@
+const { ApolloError, AuthenticationError, ForbiddenError } = require('apollo-server');
 const { JwtUtil } = require('../../utils');
 
 const { UserModel } = require('../../models');
@@ -12,7 +13,7 @@ class AuthService {
     return this.UserModel.findOne({ email })
       .then((response) => {
         if (response) {
-          return Promise.reject(new Error('Email address not available'));
+          return Promise.reject(new ApolloError('Email address not available'));
         }
         return Promise.resolve(true);
       })
@@ -41,7 +42,7 @@ class AuthService {
     })
       .then((response) => {
         if (!response) {
-          return Promise.reject(new Error('No User Found'));
+          return Promise.reject(new ApolloError('INVALID_OTP'));
         }
         return {
           message: 'Email succsessfully verified',
@@ -62,14 +63,14 @@ class AuthService {
     )
       .then((user) => {
         if (!user) {
-          throw new Error('No_User_Found');
+          throw new ForbiddenError('NO_USER_FOUND');
         }
         return new Promise((resolve, reject) => new UserModel().comparePassword(postBody.password, user, (err, valid) => {
           if (err) {
             return reject(err);
           }
           if (!valid) {
-            return reject(new Error('INVALID_CREDENTIALS'));
+            return reject(new AuthenticationError('INVALID_CREDENTIALS'));
           }
           const token = this.JwtService.issueToken(
             user._id /* eslint no-underscore-dangle: 0 */
@@ -98,7 +99,7 @@ class AuthService {
     )
       .then((response) => {
         if (!response) {
-          return Promise.reject(new Error(`No account exist with ${email}`));
+          return Promise.reject(new ForbiddenError(`No account exist with ${email}`));
         }
         return {
           email,
@@ -110,15 +111,12 @@ class AuthService {
   }
 
   resetPassword(postBody) {
-    const { hashToken, password, confirmPassword } = postBody;
-    if (password !== confirmPassword) {
-      return Promise.reject(new Error('PASSWORD NOT MATCHED'));
-    }
+    const { hashToken, password } = postBody;
     return this.UserModel
       .findOne({ hashToken, status: true, isDeleted: false })
       .then((user) => {
         if (!user) {
-          return Promise.reject(new Error('No User Found'));
+          return Promise.reject(new ForbiddenError('No User Found'));
         }
         user.password = password;
         user.hashToken = '';
@@ -130,6 +128,33 @@ class AuthService {
   async profile({ user }) {
     try {
       return await this.UserModel.findById(user._id);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  updatePassword({ user }, postBody) {
+    const { password } = postBody;
+    return this.UserModel
+      .findOne({ _id: user._id, status: true, isDeleted: false })
+      .then(async (response) => {
+        if (!response) {
+          return Promise.reject(new ForbiddenError('No User Found'));
+        }
+        response.password = password;
+        await response.save();
+        return { ok: true, message: 'Password Changed successfully' };
+      })
+      .catch(err => Promise.reject(err));
+  }
+
+  async updateProfile({ user }, postBody) {
+    try {
+      const update = {
+        firstname: postBody.firstname,
+        lastname: postBody.lastname
+      };
+      return await this.UserModel.findOneAndUpdate({ _id: user._id }, { $set: update });
     } catch (err) {
       throw err;
     }
