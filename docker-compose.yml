@@ -6,7 +6,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - $HOME/DOCKER_VOLUME/app/hdp/mongo/data:$HOME/DOCKER_VOLUME/data/db
+      - $HOME/DOCKER_VOLUME/mongo-insta/data:/data/db
   app:
     restart: always
     container_name: insta_todo

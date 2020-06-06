@@ -1,8 +1,10 @@
-FROM ubuntu:latest
-FROM node:10.16.1
+FROM alpine:3.7
+FROM node:alpine
+RUN apk add --no-cache && npm i -g nodemon
 LABEL maintainer="techyaura <techyaura@gmail.com>"
 ENV TZ Asia/Kolkata
-ENV DIRPATH /usr/src/app
+ENV DIRPATH /app
+ENV NODE_ENV development
 WORKDIR $DIRPATH
 COPY package*.json ./
 RUN npm install
