@@ -22,6 +22,33 @@ class TodoService {
     }
   }
 
+  async updateTodo({ user }, { id }, postBody) {
+    postBody = {
+      ...postBody,
+      $currentDate: {
+        updatedAt: true
+      }
+    };
+    if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
+      postBody = {
+        ...postBody, isInProgress: false
+      };
+    }
+    return this.TodoModel.updateOne({
+      user: user._id, isDeleted: false, status: true, _id: id
+    }, { $set: postBody })
+      .then(async (response) => {
+        if (response && response.n !== 0) {
+          if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
+            await this.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
+          }
+          return { message: 'Todo has been succesfully updated', ok: true };
+        }
+        return Promise.reject(new Error(403));
+      })
+      .catch(err => Promise.reject(err));
+  }
+
   async viewTodo({ user }, params) {
     try {
       return await this.TodoModel.findOne({ _id: params.id, user: user._id }).populate({ path: 'user' });
@@ -172,23 +199,6 @@ class TodoService {
             $match: conditions
           },
           {
-            $project: {
-              name: 1,
-              title: '$title',
-              label: '$label',
-              isCompleted: '$isCompleted',
-              isInProgress: '$isInProgress',
-              createdAt: '$createdAt',
-              updatedAt: '$updatedAt',
-              priority: '$priority',
-              user: '$user',
-              comments: '$comments',
-              month: { $month: '$createdAt' },
-              day: { $dayOfMonth: '$createdAt' },
-              year: { $year: '$createdAt' }
-            }
-          },
-          {
             $lookup: {
               from: 'users',
               localField: 'user',
@@ -200,7 +210,16 @@ class TodoService {
             $lookup: labelLookUp
           },
           {
+            $lookup: {
+              from: 'projects',
+              localField: 'projectId',
+              foreignField: '_id',
+              as: 'project'
+            }
+          },
+          {
             $project: {
+              project: { $arrayElemAt: ['$project', 0] },
               title: '$title',
               label: '$label',
               isCompleted: '$isCompleted',
@@ -280,9 +299,6 @@ class TodoService {
               priority: '$priority',
               user: '$user',
               comments: '$comments'
-              // month: { $month: '$createdAt' },
-              // day: { $dayOfMonth: '$createdAt' },
-              // year: { $year: '$createdAt' }
             }
           },
           {
@@ -294,22 +310,33 @@ class TodoService {
             }
           },
           {
+            $lookup: {
+              from: 'projects',
+              localField: 'projectId',
+              foreignField: '_id',
+              as: 'project'
+            }
+          },
+          {
             $lookup: labelLookUp
           },
-          // {
-          //   $project: {
-          //     title: '$title',
-          //     label: '$label',
-          //     isCompleted: '$isCompleted',
-          //     isInProgress: '$isInProgress',
-          //     createdAt: '$createdAt',
-          //     updatedAt: '$updatedAt',
-          //     scheduledDate: 'scheduledDate',
-          //     user: '$user',
-          //     comments: '$comments',
-          //     priority: '$priority'
-          //   }
-          // },
+          {
+            $project: {
+              title: '$title',
+              project: { $arrayElemAt: ['$project', 0] },
+              projectId: 1,
+              label: '$label',
+              isCompleted: '$isCompleted',
+              isInProgress: '$isInProgress',
+              createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+              updatedAt: '$updatedAt',
+              scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate' } },
+              user: '$user',
+              comments: '$comments',
+              priority: '$priority'
+            }
+          },
+
           {
             $group: {
               _id: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate', timezone: 'Asia/Kolkata' } },
@@ -364,30 +391,20 @@ class TodoService {
         {
           $match: conditions
         },
-        // {
-        //   $project: {
-        //     name: 1,
-        //     title: '$title',
-        //     label: '$label',
-        //     isCompleted: '$isCompleted',
-        //     isInProgress: '$isInProgress',
-        //     createdAt: '$createdAt',
-        //     updatedAt: '$updatedAt',
-        //     scheduledDate: '$scheduledDate',
-        //     priority: '$priority',
-        //     user: '$user',
-        //     comments: '$comments',
-        //     month: { $month: '$createdAt' },
-        //     day: { $dayOfMonth: '$createdAt' },
-        //     year: { $year: '$createdAt' }
-        //   }
-        // },
         {
           $lookup: {
             from: 'users',
             localField: 'user',
             foreignField: '_id',
             as: 'user'
+          }
+        },
+        {
+          $lookup: {
+            from: 'projects',
+            localField: 'projectId',
+            foreignField: '_id',
+            as: 'project'
           }
         },
         {
@@ -410,6 +427,8 @@ class TodoService {
         {
           $project: {
             title: '$title',
+            project: { $arrayElemAt: ['$project', 0] },
+            projectId: 1,
             label: '$label',
             isCompleted: '$isCompleted',
             isInProgress: '$isInProgress',
@@ -442,6 +461,8 @@ class TodoService {
               {
                 $group: {
                   _id: '$_id',
+                  project: { $first: '$project' },
+                  projectId: { $first: '$projectId' },
                   notes: { $push: '$comments' },
                   user: { $first: '$user' },
                   title: { $first: '$title' },
@@ -494,33 +515,6 @@ class TodoService {
       totalCount: count,
       data: mapTodos
     });
-  }
-
-  async updateTodo({ user }, { id }, postBody) {
-    postBody = {
-      ...postBody,
-      $currentDate: {
-        updatedAt: true
-      }
-    };
-    if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
-      postBody = {
-        ...postBody, isInProgress: false
-      };
-    }
-    return this.TodoModel.updateOne({
-      user: user._id, isDeleted: false, status: true, _id: id
-    }, { $set: postBody })
-      .then(async (response) => {
-        if (response && response.n !== 0) {
-          if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
-            await this.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
-          }
-          return { message: 'Todo has been succesfully updated', ok: true };
-        }
-        return Promise.reject(new Error(403));
-      })
-      .catch(err => Promise.reject(err));
   }
 
   async deleteTodo({ user }, params) {

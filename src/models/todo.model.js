@@ -25,7 +25,7 @@ const schema = new mongoose.Schema({
     ref: 'TodoLabel',
     default: null
   },
-  project: {
+  projectId: {
     type: ObjectId,
     ref: 'Project',
     default: null

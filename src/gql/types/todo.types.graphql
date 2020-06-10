@@ -5,7 +5,6 @@ type Query {
   todoCompleted (filter: TodoCompletedFilterInputType, first: Int, offset: Int, sort: TodoCompletedSortInputType ) : TodoListCompletedType
   todoList (filter: TodoFilterInputType, first: Int, offset: Int, sort: TodoSortInputType ): TodoListType
   todoView(id: ID!): TodoType
-  todoLabelList: [TodoLabelListType]
 }
 
 # Mutations -------------------------------------------
@@ -14,11 +13,6 @@ type Mutation {
   addTodo(input: TodoInputType!): SuccessType!
   updateTodo(id: ID!, input: TodoInputType!): SuccessType!
   deleteTodo(id: ID!): SuccessType!
-  addTodoComment(todoId: ID!, input: TodoCommentInputType!): SuccessType!
-  updateTodoComment(id: ID!, todoId: ID!, input: TodoCommentInputType!): SuccessType!
-  addTodoLabel(input: TodoLabelInputType): SuccessType!
-  updateTodoLabel(id: ID!, input: TodoLabelInputType): SuccessType!
-  deleteTodoLabel(id: ID!): SuccessType!
 }
 
 # Subscriptions -------------------------------------------
@@ -43,29 +37,14 @@ enum TodoEnumType{
   upcoming
 }
 
-input TodoLabelInputType {
-  name: String!
-}
-
-type TodoLabelListType {
-  name: String
-  slug: String
-  _id: String
-  count: Int
-}
-
-input TodoCommentInputType {
-  description: String!
-  _id: ID
-}
-
 input TodoInputType {
   title: String
+  projectId: ID
+  label: [ID]
   scheduledDate: Date
   isCompleted: Boolean
   isInProgress: Boolean
   priority: TodoPriorityEnumType
-  label: [ID]
   notes: String
   noteId: String
 }
@@ -86,6 +65,7 @@ input TodoFilterInputType {
   isCompleted: Boolean
   title_contains: String
   labelId: [ID]
+  projectId: ID
   startAt: Date
   endAt: Date,
   type: TodoEnumType
@@ -93,17 +73,6 @@ input TodoFilterInputType {
 
 input TodoCompletedFilterInputType {
   title_contains: String
-}
-
-type TodoCommentType {
-  description: String
-  _id: String
-  userId: CommentUserType
-}
-
-type CommentUserType {
-  email: String
-  _id: String
 }
 
 type TodoType {
@@ -116,6 +85,8 @@ type TodoType {
   createdAt: Date!
   updatedAt: Date
   scheduledDate: Date
+  projectId: ID
+  project: TodoProjectListType
   notes: [TodoCommentType]
   label: [TodoLabelListType]
   subTasks: [SubTask]
@@ -139,6 +110,7 @@ type TodoListCompletedType {
 
 type SubTask {
   _id: String!
+  projectId: ID
   title: String!
   user: User
   priority: TodoPriorityEnumType

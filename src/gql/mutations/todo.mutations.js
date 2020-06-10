@@ -1,6 +1,6 @@
 const { POST_ADDED, pubSub } = require('../events');
 
-const { TodoService } = require('../../services');
+const { TodoService, ProjectService } = require('../../services');
 const { ContextMiddleware, TodoMiddlewares } = require('../../middlewares');
 const {
   addTodoValidator, updateTodoValidator, addTodoCommentValidator, updateTodoCommentValidator
@@ -8,7 +8,7 @@ const {
 
 module.exports = {
   addTodo: async (root, args, context) => {
-    pubSub.publish(POST_ADDED, { postAdded: { title: args.input.title } });
+    // pubSub.publish(POST_ADDED, { postAdded: { title: args.input.title } });
     await ContextMiddleware(context, addTodoValidator(args.input));
     return TodoService.addTodo(context, args.input);
   },

@@ -1,6 +1,7 @@
 const Joi = require('joi');
 
 const addTodoSchema = Joi.object().keys({
+  projectId: Joi.string().optional(),
   title: Joi.string()
     .min(4)
     .max(60)
@@ -12,6 +13,7 @@ const addTodoSchema = Joi.object().keys({
 });
 const updateTodoSchema = Joi.object().keys({
   id: Joi.string().required(),
+  projectId: Joi.string().optional(),
   label: Joi.array().items(Joi.string()).optional(),
   title: Joi.string()
     .min(4)

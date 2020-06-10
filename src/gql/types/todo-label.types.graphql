@@ -1,0 +1,23 @@
+# Queries -------------------------------------------
+type Query {
+  todoLabelList: [TodoLabelListType]
+}
+
+# Mutations -------------------------------------------
+type Mutation {
+  addTodoLabel(input: TodoLabelInputType): SuccessType!
+  updateTodoLabel(id: ID!, input: TodoLabelInputType): SuccessType!
+  deleteTodoLabel(id: ID!): SuccessType!
+}
+
+# Types -------------------------------------------
+input TodoLabelInputType {
+  name: String!
+}
+
+type TodoLabelListType {
+  name: String
+  slug: String
+  _id: String
+  count: Int
+}

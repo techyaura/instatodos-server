@@ -1,0 +1,22 @@
+# Mutations -------------------------------------------
+type Mutation {
+  addTodoComment(todoId: ID!, input: TodoCommentInputType!): SuccessType!
+  updateTodoComment(id: ID!, todoId: ID!, input: TodoCommentInputType!): SuccessType!
+}
+
+# Types -------------------------------------------
+input TodoCommentInputType {
+  description: String!
+  _id: ID
+}
+
+type TodoCommentType {
+  description: String
+  _id: String
+  userId: CommentUserType
+}
+
+type CommentUserType {
+  email: String
+  _id: String
+}
