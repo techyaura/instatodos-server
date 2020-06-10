@@ -6,7 +6,7 @@ const addTodoSchema = Joi.object().keys({
     .min(4)
     .max(60)
     .required(),
-  label: Joi.array().items(Joi.string()).optional(),
+  labelIds: Joi.array().items(Joi.string()).optional(),
   scheduledDate: Joi.date().allow(null),
   priority: Joi.string().optional(),
   notes: Joi.string().optional()
@@ -14,7 +14,7 @@ const addTodoSchema = Joi.object().keys({
 const updateTodoSchema = Joi.object().keys({
   id: Joi.string().required(),
   projectId: Joi.string().optional(),
-  label: Joi.array().items(Joi.string()).optional(),
+  labelIds: Joi.array().items(Joi.string()).optional(),
   title: Joi.string()
     .min(4)
     .max(100)

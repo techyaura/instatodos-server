@@ -40,7 +40,7 @@ enum TodoEnumType{
 input TodoInputType {
   title: String
   projectId: ID
-  label: [ID]
+  labelIds: [ID]
   scheduledDate: Date
   isCompleted: Boolean
   isInProgress: Boolean
@@ -64,7 +64,7 @@ input TodoCompletedSortInputType {
 input TodoFilterInputType {
   isCompleted: Boolean
   title_contains: String
-  labelId: [ID]
+  labelIds: [ID]
   projectId: ID
   startAt: Date
   endAt: Date,
@@ -88,7 +88,7 @@ type TodoType {
   projectId: ID
   project: TodoProjectListType
   notes: [TodoCommentType]
-  label: [TodoLabelListType]
+  labels: [TodoLabelListType]
   subTasks: [SubTask]
 }
 
@@ -120,5 +120,5 @@ type SubTask {
   updatedAt: Date
   scheduledDate: Date
   notes: [TodoCommentType]
-  label: [TodoLabelListType]
+  labels: [TodoLabelListType]
 }

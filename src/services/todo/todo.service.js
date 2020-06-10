@@ -66,9 +66,9 @@ class TodoService {
     let searchQuery = '';
     let labelLookUp = {
       from: 'todolabels',
-      localField: 'label',
+      localField: 'labelIds',
       foreignField: '_id',
-      as: 'label'
+      as: 'labels'
     };
     // sort object condition
     let sortObject = { createdAt: -1 };
@@ -90,9 +90,9 @@ class TodoService {
         conditions = { ...conditions, title: { $regex: searchQuery, $options: 'gi' } };
       }
       // filter for label
-      if ('labelId' in filter && !!filter.labelId) {
+      if ('labelIds' in filter && !!filter.labelId) {
         const labelIds = filter.labelId.map(labelId => mongoose.Types.ObjectId(labelId));
-        conditions = { ...conditions, label: { $in: labelIds } };
+        conditions = { ...conditions, labelIds: { $in: labelIds } };
         if (filter.label) {
           labelLookUp = {
             from: 'todolabels',
@@ -103,7 +103,7 @@ class TodoService {
                 }
               }
             ],
-            as: 'label'
+            as: 'labels'
           };
         }
       }
@@ -221,7 +221,7 @@ class TodoService {
             $project: {
               project: { $arrayElemAt: ['$project', 0] },
               title: '$title',
-              label: '$label',
+              labels: '$labels',
               isCompleted: '$isCompleted',
               isInProgress: '$isInProgress',
               createdAt: '$createdAt',
@@ -290,7 +290,7 @@ class TodoService {
             $project: {
               name: 1,
               title: '$title',
-              label: '$label',
+              labels: '$labels',
               isCompleted: '$isCompleted',
               isInProgress: '$isInProgress',
               createdAt: '$createdAt',
@@ -325,7 +325,7 @@ class TodoService {
               title: '$title',
               project: { $arrayElemAt: ['$project', 0] },
               projectId: 1,
-              label: '$label',
+              labels: '$labels',
               isCompleted: '$isCompleted',
               isInProgress: '$isInProgress',
               createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
@@ -429,7 +429,7 @@ class TodoService {
             title: '$title',
             project: { $arrayElemAt: ['$project', 0] },
             projectId: 1,
-            label: '$label',
+            labels: '$labels',
             isCompleted: '$isCompleted',
             isInProgress: '$isInProgress',
             // createdAt: '$createdAt',
@@ -466,7 +466,7 @@ class TodoService {
                   notes: { $push: '$comments' },
                   user: { $first: '$user' },
                   title: { $first: '$title' },
-                  label: { $first: '$label' },
+                  labels: { $first: '$labels' },
                   isCompleted: { $first: '$isCompleted' },
                   isInProgress: { $first: '$isInProgress' },
                   createdAt: { $first: '$createdAt' },
@@ -648,27 +648,27 @@ class TodoService {
           {
             $lookup: {
               from: 'todos',
-              let: { osss: '$_id' },
+              let: { labelId: '$_id' },
               pipeline: [
                 {
                   $match: {
                     isDeleted: false,
                     isCompleted: false,
-                    label: { $ne: null },
+                    labelIds: { $ne: null },
                     $expr: {
                       $and: [
-                        { $in: ['$$osss', '$label'] }
+                        { $in: ['$$labelId', '$labelIds'] }
                       ]
                     }
                   }
                 }
               ],
-              as: 'label'
+              as: 'labels'
             }
           },
           {
             $unwind: {
-              path: '$label',
+              path: '$labels',
               preserveNullAndEmptyArrays: true
             }
           },
@@ -676,7 +676,8 @@ class TodoService {
             $project: {
               _id: 1,
               name: { $toLower: '$name' },
-              label: 1
+              label: 1,
+              slug: 1
             }
           },
           {
@@ -684,8 +685,8 @@ class TodoService {
               _id: '$name',
               labelId: { $first: '$_id' },
               name: { $first: '$name' },
-              slug: { $first: '$_slug' },
-              todos: { $push: '$label' }
+              slug: { $first: '$slug' },
+              todos: { $push: '$labels' }
             }
           },
           {
