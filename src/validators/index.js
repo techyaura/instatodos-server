@@ -6,11 +6,14 @@ const todoLabelValidator = require('./todo-label.validator');
 
 const thoughtValidator = require('./thought.validator');
 
+const projectValidator = require('./project.validator');
+
 const validators = {
   ...authValidator,
   ...todoValidator,
   ...todoLabelValidator,
-  ...thoughtValidator
+  ...thoughtValidator,
+  ...projectValidator
 };
 
 module.exports = validators;

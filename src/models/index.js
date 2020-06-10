@@ -7,5 +7,6 @@ module.exports = {
   UserModel,
   TodoModel,
   TodoLabelModel,
-  ThoughtModel
+  ThoughtModel,
+  ProjectModel: require('./project.model')
 };

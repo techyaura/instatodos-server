@@ -1,0 +1,24 @@
+# Queries -------------------------------------------
+type Query {
+  todoProjectList: [TodoProjectListType]
+}
+
+# Mutations -------------------------------------------
+type Mutation {
+  addTodoProject(input: TodoProjectInputType): SuccessType!
+  updateTodoProject(id: ID!, input: TodoProjectInputType): SuccessType!
+  deleteTodoProject(id: ID!): SuccessType!
+}
+
+############ TYPES ##################
+
+input TodoProjectInputType {
+  name: String!
+}
+
+type TodoProjectListType {
+  name: String
+  slug: String
+  _id: String
+  count: Int
+}
