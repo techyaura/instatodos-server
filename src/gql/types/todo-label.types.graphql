@@ -13,11 +13,15 @@ type Mutation {
 # Types -------------------------------------------
 input TodoLabelInputType {
   name: String!
+  color: String
+  description: String
 }
 
 type TodoLabelListType {
   name: String
   slug: String
   _id: String
+  color: String
+  description: String
   count: Int
 }

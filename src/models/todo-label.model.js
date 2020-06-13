@@ -7,11 +7,20 @@ const { ObjectId } = Schema;
 
 const schema = new mongoose.Schema({
   user: {
-    type: ObjectId, ref: 'User'
+    type: ObjectId,
+    ref: 'User'
   },
   name: {
     type: String,
     required: true
+  },
+  color: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    default: null
   },
   slug: {
     type: String,

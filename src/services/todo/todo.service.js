@@ -608,9 +608,10 @@ class TodoService {
         throw new Error('Label Should be unique');
       }
       const slug = CommonFunctionUtil.slugify(name);
+      postBody.slug = slug;
       const response = await this.TodoLabelModel.updateOne({
         user: userId, _id: todoLabelId
-      }, { $set: { name, slug } });
+      }, { $set: postBody });
       if (response && response.n !== 0) {
         return { message: 'TodoLabel has been succesfully updated', ok: true };
       }
@@ -682,7 +683,9 @@ class TodoService {
               _id: 1,
               name: { $toLower: '$name' },
               label: 1,
-              slug: 1
+              slug: 1,
+              color: 1,
+              description: 1
             }
           },
           {
@@ -691,14 +694,18 @@ class TodoService {
               labelId: { $first: '$_id' },
               name: { $first: '$name' },
               slug: { $first: '$slug' },
+              color: { $first: '$color' },
+              description: { $first: '$description' },
               todos: { $push: '$labels' }
             }
           },
           {
             $project: {
               _id: '$labelId',
-              name: '$name',
-              slug: '$slug',
+              name: 1,
+              slug: 1,
+              color: 1,
+              description: 1,
               count: { $sum: { $size: '$todos' } }
             }
           },
