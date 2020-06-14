@@ -114,7 +114,7 @@ class TodoService {
 
       // filter for isCompleted flag
       if ('projectId' in filter) {
-        conditions = { ...conditions, projectId: filter.projectId };
+        conditions = { ...conditions, projectId: mongoose.Types.ObjectId(filter.projectId) };
       }
       // check tasks for today
       if ('type' in filter && filter.type === 'today') {
