@@ -1,5 +1,7 @@
 const { ApolloError, AuthenticationError, ForbiddenError } = require('apollo-server');
 const { JwtUtil } = require('../../utils');
+const TodoService = require('../todo/todo.service');
+const ProjectService = require('../project/project.service');
 
 const { UserModel } = require('../../models');
 
@@ -23,6 +25,10 @@ class AuthService {
   register(postBody) {
     return this.UserModel(postBody)
       .save()
+      .then(user => Promise.all([
+        TodoService.labelDefaultOnRgister({ user }),
+        ProjectService.projectDefaultOnRgister({ user })
+      ]))
       .then(() => Promise.resolve({ message: 'User succsessfully registered', ...postBody }))
       .catch(err => Promise.reject(err));
   }

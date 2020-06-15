@@ -145,6 +145,19 @@ class ProjectService {
       throw err;
     }
   }
+
+  async projectDefaultOnRgister({ user }) {
+    const { _id: userId } = user;
+    const projects = [{
+      name: 'Personal'
+    }];
+    const mappedArray = projects.map((item) => {
+      item.slug = CommonFunctionUtil.slugify(item.name);
+      item.user = userId;
+      return item;
+    });
+    await this.ProjectModel.create(mappedArray);
+  }
 }
 
 module.exports = new ProjectService();

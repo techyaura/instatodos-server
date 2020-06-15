@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
+const { label } = require('joi');
 const { TodoModel, TodoLabelModel } = require('../../models');
 const { CommonFunctionUtil } = require('../../utils');
 
@@ -716,6 +717,27 @@ class TodoService {
     } catch (err) {
       throw err;
     }
+  }
+
+  async labelDefaultOnRgister({ user }) {
+    const { _id: userId } = user;
+    const labels = [{
+      name: 'Important',
+      color: '#d73a4a'
+    },
+    {
+      name: 'Priority',
+      color: '#e4e669'
+    }, {
+      name: 'Help',
+      color: '#e4e669'
+    }];
+    const mappedArray = labels.map((item) => {
+      item.slug = CommonFunctionUtil.slugify(item.name);
+      item.user = userId;
+      return item;
+    });
+    await this.TodoLabelModel.create(mappedArray);
   }
 }
 
