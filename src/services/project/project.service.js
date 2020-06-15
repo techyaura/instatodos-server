@@ -94,7 +94,7 @@ class ProjectService {
                   $match: {
                     isDeleted: false,
                     isCompleted: false,
-                    label: { $ne: null },
+                    projectId: { $ne: null },
                     $expr: {
                       $and: [
                         { $eq: ['$$nativeProjectId', '$projectId'] }
@@ -112,14 +112,14 @@ class ProjectService {
               preserveNullAndEmptyArrays: true
             }
           },
-          {
-            $project: {
-              _id: 1,
-              name: { $toLower: '$name' },
-              label: 1,
-              slug: 1
-            }
-          },
+          // {
+          //   $project: {
+          //     _id: 1,
+          //     name: { $toLower: '$name' },
+          //     slug: 1,
+          //     list: 1
+          //   }
+          // },
           {
             $group: {
               _id: '$name',

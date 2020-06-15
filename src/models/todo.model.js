@@ -53,7 +53,7 @@ const schema = new mongoose.Schema({
   },
   scheduledDate: {
     type: Date,
-    default: new Date()
+    default: null
   },
   isDeleted: {
     type: Boolean,

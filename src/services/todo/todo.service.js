@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
-const { label } = require('joi');
 const { TodoModel, TodoLabelModel } = require('../../models');
 const { CommonFunctionUtil } = require('../../utils');
 
