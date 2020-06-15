@@ -730,7 +730,7 @@ class TodoService {
       color: '#e4e669'
     }, {
       name: 'Help',
-      color: '#e4e669'
+      color: '#008672'
     }];
     const mappedArray = labels.map((item) => {
       item.slug = CommonFunctionUtil.slugify(item.name);
