@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const addThoughtSchema = Joi.object().keys({
   title: Joi.string().min(4).max(100).required(),
-  description: Joi.string().min(10).optional()
+  description: Joi.string().optional()
     .allow(''),
   accomplishTenure: Joi.date().optional(),
   isPinned: Joi.boolean().optional(),
@@ -11,7 +11,7 @@ const addThoughtSchema = Joi.object().keys({
 const updateThoughtSchema = Joi.object().keys({
   id: Joi.string().required(),
   title: Joi.string().min(4).max(100),
-  description: Joi.string().min(10).optional()
+  description: Joi.string().optional()
     .allow(''),
   accomplishTenure: Joi.date().optional(),
   isPinned: Joi.boolean().optional(),

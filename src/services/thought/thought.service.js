@@ -32,9 +32,15 @@ class ThoughtService {
     };
 
     if (filter && Object.keys(filter).length) {
-      if ('q' in filter) {
+      if ('q' in filter && filter.q !== null) {
         conditions.$or = conditions.$or || [];
-        conditions.$or.push({ title: { $regex: filter.q, $options: 'gi' } }, { description: { $regex: filter.q, $options: 'gi' } });
+        conditions = {
+          ...conditions,
+          $or: [
+            { title: { $regex: filter.q, $options: 'gi' } },
+            { description: { $regex: filter.q, $options: 'gi' } }
+          ]
+        };
       }
       if ('isPinned' in filter) {
         conditions = { ...conditions, isPinned: filter.isPinned };
@@ -43,17 +49,19 @@ class ThoughtService {
         if (filter.isAchieved === true) {
           conditions = { ...conditions, isAchieved: true };
         } else {
-          conditions.$or = conditions.$or || [];
-          conditions.$or.push({
-            isAchieved: false
-          });
-          conditions.$or.push({
-            isAchieved: null
-          });
+          conditions = {
+            ...conditions,
+            $and: [
+              {
+                $or: [
+                  { isAchieved: false }, { isAchieved: null }
+                ]
+              }
+            ]
+          };
         }
       }
     }
-
     try {
       const response = await this.ThoughtModel
         .aggregate([

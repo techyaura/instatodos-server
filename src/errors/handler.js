@@ -10,14 +10,6 @@ module.exports = (err, req, res, next, isExpressSpecificError = false) => {
     message: 'Something went wrong, Please try again.',
     code
   };
-  // Error specific to Graphql
-  if (name === 'GraphQLError') {
-    const error = createError(message, code);
-    response = {
-      statusCode: error.status,
-      ...error
-    };
-  }
   // Error specific to Express only
   if (typeof (isExpressSpecificError) !== 'undefined' && isExpressSpecificError) {
     if (message === 'INVALID_GRANT') {
@@ -40,6 +32,14 @@ module.exports = (err, req, res, next, isExpressSpecificError = false) => {
     }
     // winston.error(`${response.status || 500} - ${response.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     return res.json(response);
+  }
+  // Error specific to Graphql
+  if (name === 'GraphQLError') {
+    const error = createError(message, code);
+    response = {
+      statusCode: error.status,
+      ...error
+    };
   }
   response = { ...response, locations, path };
   return response;
