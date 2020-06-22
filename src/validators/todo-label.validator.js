@@ -5,7 +5,9 @@ const addTodoLabelSchema = Joi.object().keys({
     .regex(/^\S+$/)
     .min(2)
     .max(60)
-    .required()
+    .required(),
+  description: Joi.string().optional().allow(''),
+  color: Joi.string().required()
 });
 const updateTodoLabelSchema = Joi.object().keys({
   id: Joi.string().required(),
@@ -13,7 +15,9 @@ const updateTodoLabelSchema = Joi.object().keys({
     .regex(/^\S+$/)
     .min(2)
     .max(30)
-    .required()
+    .required(),
+  description: Joi.string().optional().allow(''),
+  color: Joi.string().required()
 });
 module.exports = {
   async addTodoLabelValidator(req) {
