@@ -1,5 +1,14 @@
 const Joi = require('joi');
 
+const subTask = Joi.object().keys({
+  title: Joi.string().required(),
+  isCompleted: Joi.boolean().optional()
+});
+// const subTaskUpdate = Joi.object().keys({
+//   title: Joi.string().required(),
+//   isCompleted: Joi.boolean().optional()
+// });
+
 const addTodoSchema = Joi.object().keys({
   projectId: Joi.string().optional(),
   title: Joi.string()
@@ -14,7 +23,7 @@ const addTodoSchema = Joi.object().keys({
 const updateTodoSchema = Joi.object().keys({
   id: Joi.string().required(),
   projectId: Joi.string().optional(),
-  labelIds: Joi.array().items(Joi.string()).optional(),
+  labelIds: Joi.array().items().optional(),
   title: Joi.string()
     .min(4)
     .max(100)
@@ -24,7 +33,8 @@ const updateTodoSchema = Joi.object().keys({
   priority: Joi.string().optional(),
   scheduledDate: Joi.date().optional().allow(null),
   notes: Joi.string().optional(),
-  noteId: Joi.string().optional()
+  noteId: Joi.string().optional(),
+  subTasks: Joi.array().items(subTask).optional()
 });
 const addTodoCommentSchema = Joi.object().keys({
   todoId: Joi.string().required(),

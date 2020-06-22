@@ -34,19 +34,47 @@ class TodoService {
         ...postBody, isInProgress: false
       };
     }
-    return this.TodoModel.updateOne({
-      user: user._id, isDeleted: false, status: true, _id: id
-    }, { $set: postBody })
-      .then(async (response) => {
-        if (response && response.n !== 0) {
-          if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
-            await this.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
-          }
-          return { message: 'Todo has been succesfully updated', ok: true };
+    const { subTasks = [] } = postBody;
+    let savedSubTasks = [];
+    if (subTasks.length) {
+      savedSubTasks = subTasks.map(item => ({
+        ...item,
+        parent: id
+      }));
+    }
+    try {
+      const response = await TodoModel.updateOne({
+        user: user._id, isDeleted: false, status: true, _id: id
+      }, { $set: postBody });
+      if (savedSubTasks.length) {
+        await this.TodoModel.create(savedSubTasks);
+      } else {
+        await this.TodoModel.remove({ parent: id });
+      }
+      if (response && response.n !== 0) {
+        if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
+          await this.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
         }
-        return Promise.reject(new Error(403));
-      })
-      .catch(err => Promise.reject(err));
+        return { message: 'Todo has been succesfully updated', ok: true };
+      }
+      return Promise.reject(new Error(403));
+    } catch (err) {
+      return Promise.reject(err);
+    }
+
+    // return this.TodoModel.updateOne({
+    //   user: user._id, isDeleted: false, status: true, _id: id
+    // }, { $set: postBody })
+    //   .then(async (response) => {
+    //     if (response && response.n !== 0) {
+    //       if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
+    //         await this.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
+    //       }
+    //       return { message: 'Todo has been succesfully updated', ok: true };
+    //     }
+    //     return Promise.reject(new Error(403));
+    //   })
+    //   .catch(err => Promise.reject(err));
   }
 
   async viewTodo({ user }, params) {

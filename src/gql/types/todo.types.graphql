@@ -47,6 +47,7 @@ input TodoInputType {
   priority: TodoPriorityEnumType
   notes: String
   noteId: String
+  subTasks: [TodoInputType]
 }
 
 input TodoSortInputType {
@@ -89,7 +90,7 @@ type TodoType {
   project: TodoProjectListType
   notes: [TodoCommentType]
   labels: [TodoLabelListType]
-  subTasks: [SubTask]
+  subTasks: [TodoType]
 }
 
 type TodoCompletedType {
@@ -108,17 +109,17 @@ type TodoListCompletedType {
   data: [TodoCompletedType]
 }
 
-type SubTask {
-  _id: String!
-  projectId: ID
-  title: String!
-  user: User
-  priority: TodoPriorityEnumType
-  isCompleted: Boolean
-  isInProgress: Boolean
-  createdAt: Date!
-  updatedAt: Date
-  scheduledDate: Date
-  notes: [TodoCommentType]
-  labels: [TodoLabelListType]
-}
+# type SubTask {
+#   _id: String!
+#   projectId: ID
+#   title: String!
+#   user: User
+#   priority: TodoPriorityEnumType
+#   isCompleted: Boolean
+#   isInProgress: Boolean
+#   createdAt: Date!
+#   updatedAt: Date
+#   scheduledDate: Date
+#   notes: [TodoCommentType]
+#   labels: [TodoLabelListType]
+# }

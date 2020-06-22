@@ -17,6 +17,9 @@ const commentSchema = new Schema({
 });
 
 const schema = new mongoose.Schema({
+  parent: {
+    type: ObjectId, ref: 'Todo'
+  },
   user: {
     type: ObjectId, ref: 'User'
   },
