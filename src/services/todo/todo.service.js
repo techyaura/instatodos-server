@@ -47,6 +47,7 @@ class TodoService {
         user: user._id, isDeleted: false, status: true, _id: id
       }, { $set: postBody });
       if (savedSubTasks.length) {
+        await this.TodoModel.remove({ parent: id });
         await this.TodoModel.create(savedSubTasks);
       } else {
         await this.TodoModel.remove({ parent: id });
