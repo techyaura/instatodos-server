@@ -89,6 +89,7 @@ module.exports = {
       .then(() => ({ message: 'Password reset successfully', ok: true }));
   },
   updateProfile: async (root, args, context) => {
+    console.log(args);
     await ContextMiddleware(context);
     return UserService.updateProfile(context, { ...args.input });
   },

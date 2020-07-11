@@ -1,3 +1,17 @@
+extend type Query {
+  login(input: UserLoginInputType!): UserLoginSuccessType!
+  profile: UserInfoType!
+}
+
+extend type Mutation {
+  register(input: UserRegisterInputType!): EmailRequestSuccessType
+  emailVerificationByOtp(input: EmailVerificationInputType!): EmailRequestSuccessType
+  userForgotpassword(input: UserForgotPasswordInputType!): EmailRequestSuccessType
+  userResetPassword(input: ResetPasswordInputType!): ResetSuccessType,
+  updateProfile(input: ProfileInputType): ProfileSuccessType,
+  updatePassword(input: PasswordInputType!): SuccessType,
+}
+
 type ResetSuccessType {
   ok: Boolean,
   message: String!
@@ -6,6 +20,7 @@ type ResetSuccessType {
 input ProfileInputType {
   firstname: String
   lastname: String
+  profileImg: Upload
 }
 
 input PasswordInputType {
@@ -62,16 +77,4 @@ input EmailVerificationInputType {
   otp: String!
 }
 
-extend type Query {
-  login(input: UserLoginInputType!): UserLoginSuccessType!
-  profile: UserInfoType!
-}
-
-extend type Mutation {
-  register(input: UserRegisterInputType!): EmailRequestSuccessType
-  emailVerificationByOtp(input: EmailVerificationInputType!): EmailRequestSuccessType
-  userForgotpassword(input: UserForgotPasswordInputType!): EmailRequestSuccessType
-  userResetPassword(input: ResetPasswordInputType!): ResetSuccessType,
-  updateProfile(input: ProfileInputType): ProfileSuccessType,
-  updatePassword(input: PasswordInputType!): SuccessType,
-}
+scalar Upload

@@ -9,6 +9,7 @@ const { ApolloServer } = require('apollo-server-express');
 const morgan = require('morgan');
 const cors = require('cors');
 const http = require('http');
+const { graphqlUploadExpress } = require('graphql-upload');
 
 const app = express();
 const dbConnection = require('./db');
@@ -17,7 +18,6 @@ const schema = require('../gql');
 const winston = require('./winston');
 const { AuthMiddleware } = require('../middlewares');
 const errorHandler = require('../errors/handler');
-
 
 class Boot {
   constructor() {
@@ -139,7 +139,9 @@ class Boot {
     app.use(express.urlencoded({ limit: '50mb' }));
     const httpServer = http.createServer(app);
     server.installSubscriptionHandlers(httpServer);
-    app.use('/graphql', AuthMiddleware.jwt);
+    app.use('/graphql',
+      graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
+      AuthMiddleware.jwt);
     server.applyMiddleware({ app });
     httpServer.listen(this.port, () => {
       console.log(success(`🚀 Server ready at http://localhost:${this.port}${server.graphqlPath}`));
