@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
+const { exist } = require('joi');
 const { TodoModel, TodoLabelModel } = require('../../models');
 const { CommonFunctionUtil } = require('../../utils');
 
@@ -41,7 +42,7 @@ class TodoService {
     if (subTasks.length) {
       savedSubTasks = subTasks.map(item => ({
         ...item,
-        parent: id,
+        // parent: id,
         projectId: postBody.projectId || null,
         user: user._id
         // labelIds: postBody.labelIds || null // TODO LATER
@@ -51,12 +52,22 @@ class TodoService {
       const response = await TodoModel.updateOne({
         user: user._id, isDeleted: false, status: true, _id: id
       }, { $set: postBody });
+
+      // const existingSubTasks = await this.TodoModel.find({ parent: id });
       if (savedSubTasks.length) {
-        await this.TodoModel.remove({ parent: id });
-        await this.TodoModel.create(savedSubTasks);
-      } else {
-        await this.TodoModel.remove({ parent: id });
+        // const toBeDeltedSubTasks = existingSubTasks.filter(existItem => savedSubTasks.filter(item => item._id && item._id !== existItem._id));
+        await Promise.all(savedSubTasks.map(async item => this.TodoModel.update({ parent: id, _id: item.id }, item, { upsert: true })));
+        // await Promise.all(toBeDeltedSubTasks.map(async item => this.TodoModel.remove({ _id: item._id })));
       }
+
+      // if (savedSubTasks.length) {
+      //   await this.TodoModel.find({ parent: id });
+
+      //   // await this.TodoModel.remove({ parent: id });
+      //   await this.TodoModel.create(savedSubTasks);
+      // } else {
+      //   await this.TodoModel.remove({ parent: id });
+      // }
       if (response && response.n !== 0) {
         if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
           await this.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
