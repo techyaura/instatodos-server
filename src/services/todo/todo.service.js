@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
-const { exist } = require('joi');
 const { TodoModel, TodoLabelModel } = require('../../models');
 const { CommonFunctionUtil } = require('../../utils');
 
@@ -42,7 +41,7 @@ class TodoService {
     if (subTasks.length) {
       savedSubTasks = subTasks.map(item => ({
         ...item,
-        // parent: id,
+        parent: id,
         projectId: postBody.projectId || null,
         user: user._id
         // labelIds: postBody.labelIds || null // TODO LATER
