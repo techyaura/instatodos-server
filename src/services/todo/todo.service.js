@@ -3,6 +3,8 @@ const moment = require('moment');
 const { TodoModel, TodoLabelModel } = require('../../models');
 const { CommonFunctionUtil } = require('../../utils');
 
+const timeZoneValue = 'Asia/Kolkata';
+
 class TodoService {
   constructor() {
     this.TodoModel = TodoModel;
@@ -39,7 +41,10 @@ class TodoService {
     if (subTasks.length) {
       savedSubTasks = subTasks.map(item => ({
         ...item,
-        parent: id
+        parent: id,
+        projectId: postBody.projectId || null,
+        user: user._id
+        // labelIds: postBody.labelIds || null // TODO LATER
       }));
     }
     try {
@@ -268,7 +273,7 @@ class TodoService {
           },
           {
             $group: {
-              _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: 'Asia/Kolkata' } },
+              _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: timeZoneValue } },
               list: { $push: '$$ROOT' },
               count: { $sum: 1 }
             }

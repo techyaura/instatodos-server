@@ -1,7 +1,7 @@
 scalar Date
  
 type User {
-  email: String!
+  email: String
 }
 
 type SuccessType {
