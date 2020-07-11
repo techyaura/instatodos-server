@@ -54,20 +54,20 @@ class TodoService {
       }, { $set: postBody });
 
       // const existingSubTasks = await this.TodoModel.find({ parent: id });
-      if (savedSubTasks.length) {
-        // const toBeDeltedSubTasks = existingSubTasks.filter(existItem => savedSubTasks.filter(item => item._id && item._id !== existItem._id));
-        await Promise.all(savedSubTasks.map(async item => this.TodoModel.update({ parent: id, _id: item.id }, item, { upsert: true })));
-        // await Promise.all(toBeDeltedSubTasks.map(async item => this.TodoModel.remove({ _id: item._id })));
-      }
-
       // if (savedSubTasks.length) {
-      //   await this.TodoModel.find({ parent: id });
-
-      //   // await this.TodoModel.remove({ parent: id });
-      //   await this.TodoModel.create(savedSubTasks);
-      // } else {
-      //   await this.TodoModel.remove({ parent: id });
+      // const toBeDeltedSubTasks = existingSubTasks.filter(existItem => savedSubTasks.filter(item => item._id && item._id !== existItem._id));
+      // await Promise.all(savedSubTasks.map(async item => this.TodoModel.update({ parent: id, _id: item.id }, item, { upsert: true })));
+      // await Promise.all(toBeDeltedSubTasks.map(async item => this.TodoModel.remove({ _id: item._id })));
       // }
+
+      if (savedSubTasks.length) {
+        await this.TodoModel.find({ parent: id });
+
+        // await this.TodoModel.remove({ parent: id });
+        await this.TodoModel.create(savedSubTasks);
+      } else {
+        await this.TodoModel.remove({ parent: id });
+      }
       if (response && response.n !== 0) {
         if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
           await this.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
