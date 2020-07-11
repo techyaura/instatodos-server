@@ -61,9 +61,9 @@ class TodoService {
       // }
 
       if (savedSubTasks.length) {
-        await this.TodoModel.find({ parent: id });
+        // await this.TodoModel.find({ parent: id });
 
-        // await this.TodoModel.remove({ parent: id });
+        await this.TodoModel.remove({ parent: id });
         await this.TodoModel.create(savedSubTasks);
       } else {
         await this.TodoModel.remove({ parent: id });
