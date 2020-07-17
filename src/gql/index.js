@@ -1,4 +1,4 @@
-const { GraphQLUpload } = require('graphql-upload');
+// const { GraphQLUpload } = require('graphql-upload');
 const { makeExecutableSchema } = require('graphql-tools');
 const queries = require('./queries');
 const mutations = require('./mutations');
@@ -7,7 +7,7 @@ const subscriptions = require('./subscriptions');
 const types = require('./types');
 
 const resolvers = {
-  Upload: GraphQLUpload,
+  // Upload: GraphQLUpload,
   ...queries,
   ...mutations,
   ...subscriptions

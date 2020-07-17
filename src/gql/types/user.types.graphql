@@ -43,6 +43,7 @@ type UserInfoType {
   id: ID!
   firstname: String
   lastname: String
+  profilePic: UserProfilePic
 }
 
 type UserLoginSuccessType {
@@ -74,6 +75,10 @@ input UserRegisterInputType {
 input EmailVerificationInputType {
   hashToken: String!
   otp: String!
+}
+
+type UserProfilePic {
+  url: String
 }
 
 scalar Upload

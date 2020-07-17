@@ -18,7 +18,6 @@ module.exports = {
       obj.overwrite = true;
     }
     try {
-      console.log(path);
       const response = await cloudinary.v2.uploader.upload(file.path, obj);
       const { url, public_id: publicIdKey } = response;
       return {

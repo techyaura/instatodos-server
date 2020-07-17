@@ -160,7 +160,7 @@ class AuthService {
         firstname: postBody.firstname,
         lastname: postBody.lastname
       };
-      if (typeof postBody !== 'undefined') {
+      if (postBody && typeof postBody.profilePic !== 'undefined') {
         update.profilePic = postBody.profilePic;
       }
       return await this.UserModel.findOneAndUpdate({ _id: user._id }, { $set: update });

@@ -90,13 +90,15 @@ module.exports = {
   },
   updateProfile: async (root, args, context) => {
     await ContextMiddleware(context);
-    const postBody = args.input;
-    if (context.body.variables.image) {
+    await UserService.updateProfile(context, { ...args.input });
+    const stream = typeof (context.body.variables.image) !== 'undefined' ? await context.body.variables.image : null;
+    const postBody = {};
+    if (stream) {
       const {
         createReadStream, filename, mimetype
-      } = await context.body.variables.image;
+      } = stream;
       const publicIdkey = context.user.profilePic && context.user.profilePic.publicId;
-      const { url, publicId } = await uploadProfileImage(createReadStream(), publicIdkey);
+      const { url, publicId } = await uploadProfileImage(await createReadStream(), publicIdkey);
       postBody.profilePic = {
         url,
         publicId,
@@ -104,7 +106,8 @@ module.exports = {
         filename
       };
     }
-    await UserService.updateProfile(context, postBody);
+    const body = { ...postBody, ...args.input };
+    await UserService.updateProfile(context, body);
   },
   updatePassword: async (root, args, context) => {
     await ContextMiddleware(context, passwordValidator(args.input));
