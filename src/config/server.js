@@ -3,13 +3,13 @@
 require('./env');
 const express = require('express');
 const cluster = require('cluster');
+const bodyParser = require('body-parser');
 const cCPUs = require('os').cpus().length;
 const graphqlHTTP = require('express-graphql');
 const { ApolloServer } = require('apollo-server-express');
 const morgan = require('morgan');
 const cors = require('cors');
 const http = require('http');
-const { graphqlUploadExpress } = require('graphql-upload');
 
 const app = express();
 const dbConnection = require('./db');
@@ -33,11 +33,11 @@ class Boot {
         }
 
         cluster.on('online', (worker) => {
-        // eslint-disable-next-line no-console
+          // eslint-disable-next-line no-console
           success(`Worker ${worker.process.pid} is online.`);
         });
         cluster.on('exit', (worker) => {
-        // eslint-disable-next-line no-console
+          // eslint-disable-next-line no-console
           error(`worker ${worker.process.pid} died.`);
         });
       } else {
@@ -56,7 +56,7 @@ class Boot {
     try {
       await dbConnection();
       return Promise.all([
-        this.useCors(),
+        // this.useCors(),
         this.useMorgan(),
         this.useGraphQl(),
         this.useLogger()
@@ -123,9 +123,15 @@ class Boot {
       // },
       formatError: (err) => {
         const formatError = errorHandler(err);
+        console.log(err);
         // winston.error(`${response.status || 500} - ${response.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
         return formatError;
       },
+      // engine: {
+      //   rewriteError: (err) => {
+      //     console.log(err);
+      //   }
+      // },
       subscriptions: {
         onConnect: () => {
           console.log('Connected');
@@ -136,11 +142,12 @@ class Boot {
       }
     });
     app.use(express.json({ limit: '50mb' }));
-    app.use(express.urlencoded({ limit: '50mb' }));
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(cors());
     const httpServer = http.createServer(app);
     server.installSubscriptionHandlers(httpServer);
     app.use('/graphql',
-      graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
+      // graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
       AuthMiddleware.jwt);
     server.applyMiddleware({ app });
     httpServer.listen(this.port, () => {

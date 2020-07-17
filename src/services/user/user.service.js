@@ -38,14 +38,14 @@ class AuthService {
       otp: postBody.otp,
       hashToken: postBody.hashToken
     },
-    {
-      status: true,
-      otp: ''
-    },
-    {
-      upsert: false,
-      new: true
-    })
+      {
+        status: true,
+        otp: ''
+      },
+      {
+        upsert: false,
+        new: true
+      })
       .then((response) => {
         if (!response) {
           return Promise.reject(new ApolloError('INVALID_OTP'));
@@ -160,6 +160,9 @@ class AuthService {
         firstname: postBody.firstname,
         lastname: postBody.lastname
       };
+      if (typeof postBody !== 'undefined') {
+        update.profilePic = postBody.profilePic;
+      }
       return await this.UserModel.findOneAndUpdate({ _id: user._id }, { $set: update });
     } catch (err) {
       throw err;

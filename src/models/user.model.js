@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const bcrypt = require('bcrypt-nodejs');
+const { string } = require('joi');
 
 const SALT_WORK_FACTOR = 10;
 
@@ -25,6 +26,12 @@ const modelSchema = new Schema(
     },
     otp: { type: String },
     hashToken: { type: String },
+    profilePIc: {
+      url: String,
+      publicId: String,
+      mimetype: String,
+      filename: String
+    },
     lastLogin: {
       type: Date,
       default: Date.now

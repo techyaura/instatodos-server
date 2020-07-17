@@ -2,12 +2,11 @@ const createError = require('./create');
 
 module.exports = (err, req, res, next, isExpressSpecificError = false) => {
   const {
-    name, message, locations, path, extensions = {}
+    name, message = null, locations, path, extensions = {}
   } = err;
-  const { code = 'ValidationError' } = extensions;
+  const { code = 'ValidationError' } = name || extensions;
   let response = {
-    status: 500,
-    message: 'Something went wrong, Please try again.',
+    message,
     code
   };
   // Error specific to Express only
@@ -41,6 +40,10 @@ module.exports = (err, req, res, next, isExpressSpecificError = false) => {
       ...error
     };
   }
-  response = { ...response, locations, path };
+  response = {
+    ...response,
+    locations,
+    status: (code !== 'INTERNAL_SERVER_ERROR') ? 400 : 500
+  };
   return response;
 };

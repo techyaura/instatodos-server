@@ -1,4 +1,5 @@
 const { UserService, TemplateService } = require('../../services');
+const { uploadProfileImage } = require('../../utils/upload');
 const {
   registerVerificationValidator,
   emailValidator,
@@ -8,7 +9,6 @@ const {
 } = require('../../validators');
 const { EmailUtil, CommonFunctionUtil } = require('../../utils');
 const { ContextMiddleware } = require('../../middlewares');
-
 
 module.exports = {
   emailVerificationByOtp: (root, args, context) => {
@@ -89,9 +89,22 @@ module.exports = {
       .then(() => ({ message: 'Password reset successfully', ok: true }));
   },
   updateProfile: async (root, args, context) => {
-    console.log(args);
     await ContextMiddleware(context);
-    return UserService.updateProfile(context, { ...args.input });
+    const postBody = args.input;
+    if (context.body.variables.image) {
+      const {
+        createReadStream, filename, mimetype
+      } = await context.body.variables.image;
+      const publicIdkey = context.user.profilePic && context.user.profilePic.publicId;
+      const { url, publicId } = await uploadProfileImage(createReadStream(), publicIdkey);
+      postBody.profilePic = {
+        url,
+        publicId,
+        mimetype,
+        filename
+      };
+    }
+    await UserService.updateProfile(context, postBody);
   },
   updatePassword: async (root, args, context) => {
     await ContextMiddleware(context, passwordValidator(args.input));

@@ -8,7 +8,7 @@ extend type Mutation {
   emailVerificationByOtp(input: EmailVerificationInputType!): EmailRequestSuccessType
   userForgotpassword(input: UserForgotPasswordInputType!): EmailRequestSuccessType
   userResetPassword(input: ResetPasswordInputType!): ResetSuccessType,
-  updateProfile(input: ProfileInputType): ProfileSuccessType,
+  updateProfile(input: ProfileInputType, image: Upload): ProfileSuccessType,
   updatePassword(input: PasswordInputType!): SuccessType,
 }
 
@@ -20,7 +20,6 @@ type ResetSuccessType {
 input ProfileInputType {
   firstname: String
   lastname: String
-  profileImg: Upload
 }
 
 input PasswordInputType {
