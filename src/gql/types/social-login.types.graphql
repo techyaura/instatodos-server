@@ -1,0 +1,13 @@
+# Mutations
+extend type Mutation {
+  googleLogin(input: GoogleInputType!): UserLoginSuccessType!
+}
+
+# Field Types
+input GoogleInputType {
+  firstname: String!,
+  lastname: String,
+  email: String!,
+  gID: String!,
+  profilePic: String!
+}

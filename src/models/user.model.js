@@ -8,6 +8,10 @@ const SALT_WORK_FACTOR = 10;
 
 const modelSchema = new Schema(
   {
+    // Google ID
+    gId: {
+      type: String
+    },
     firstname: { type: String },
     lastname: { type: String },
     username: { type: String },

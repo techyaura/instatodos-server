@@ -71,7 +71,6 @@ input UserRegisterInputType {
   password: String!
 }
 
-
 input EmailVerificationInputType {
   hashToken: String!
   otp: String!
