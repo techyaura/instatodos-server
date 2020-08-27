@@ -6,7 +6,26 @@ const {
   addTodoValidator, updateTodoValidator, addTodoCommentValidator, updateTodoCommentValidator
 } = require('../../validators');
 
-module.exports = {
+const queries = {
+  todoList: async (root, args, context) => {
+    await ContextMiddleware(context);
+    return TodoService.listTodo(context, args);
+  },
+  todoView: async (root, args, context) => {
+    await ContextMiddleware(context);
+    return TodoService.viewTodo(args);
+  },
+  todoCompleted: async (root, args, context) => {
+    await ContextMiddleware(context);
+    return TodoService.completedTodo(context, args);
+  },
+  todoUpcoming: async (root, args, context) => {
+    await ContextMiddleware(context);
+    return TodoService.upcomingTodo(context, args);
+  }
+};
+
+const mutations = {
   addTodo: async (root, args, context) => {
     // pubSub.publish(POST_ADDED, { postAdded: { title: args.input.title } });
     await ContextMiddleware(context, addTodoValidator(args.input));
@@ -28,4 +47,17 @@ module.exports = {
     await ContextMiddleware(context, updateTodoCommentValidator({ ...args.input, todoId: args.todoId, id: args.id }));
     return TodoService.updateTodoComment(context, args, args.input);
   }
+};
+
+const subscriptions = {
+  postAdded: {
+    // Additional event labels can be passed to asyncIterator creation
+    subscribe: () => pubSub.asyncIterator([POST_ADDED])
+  }
+};
+
+module.exports = {
+  queries,
+  mutations,
+  subscriptions
 };

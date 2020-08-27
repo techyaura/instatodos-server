@@ -1,20 +1,9 @@
-// const { GraphQLUpload } = require('graphql-upload');
-const { makeExecutableSchema } = require('graphql-tools');
-const queries = require('./queries');
-const mutations = require('./mutations');
-const subscriptions = require('./subscriptions');
-
-const types = require('./types');
-
-const resolvers = {
-  // Upload: GraphQLUpload,
-  ...queries,
-  ...mutations,
-  ...subscriptions
-};
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const resolvers = require('./resolvers');
+const typeDefs = require('./types');
 
 const schema = makeExecutableSchema({
-  typeDefs: types,
+  typeDefs,
   resolvers
 });
 

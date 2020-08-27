@@ -1,3 +1,5 @@
+const { loginValidator } = require('../../validators');
+const { ContextMiddleware } = require('../../middlewares');
 const { UserService, TemplateService } = require('../../services');
 const { uploadProfileImage } = require('../../utils/upload');
 const {
@@ -8,9 +10,20 @@ const {
   passwordValidator
 } = require('../../validators');
 const { EmailUtil, CommonFunctionUtil } = require('../../utils');
-const { ContextMiddleware } = require('../../middlewares');
 
-module.exports = {
+const queries = {
+  login: async (root, args, context) => {
+    const { res, next } = context;
+    await loginValidator(args.input, res, next);
+    return UserService.login(args.input);
+  },
+  profile: async (root, args, context) => {
+    await ContextMiddleware(context);
+    return UserService.profile(context);
+  }
+};
+
+const mutations = {
   emailVerificationByOtp: (root, args, context) => {
     const { res, next } = context;
     return registerVerificationValidator(args.input, res, next)
@@ -113,4 +126,9 @@ module.exports = {
     await ContextMiddleware(context, passwordValidator(args.input));
     return UserService.updatePassword(context, { ...args.input });
   }
+};
+
+module.exports = {
+  queries,
+  mutations
 };

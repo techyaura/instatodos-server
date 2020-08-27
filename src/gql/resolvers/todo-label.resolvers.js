@@ -2,7 +2,14 @@ const { TodoService } = require('../../services');
 const { ContextMiddleware } = require('../../middlewares');
 const { addTodoLabelValidator, updateTodoLabelValidator } = require('../../validators');
 
-module.exports = {
+const queries = {
+  todoLabelList: async (root, args, context) => {
+    await ContextMiddleware(context);
+    return TodoService.todoLabelListCount(context);
+  }
+};
+
+const mutations = {
   addTodoLabel: async (root, args, context) => {
     await ContextMiddleware(context, addTodoLabelValidator(args.input));
     return TodoService.addTodoLabel(context, args.input);
@@ -15,4 +22,9 @@ module.exports = {
     await ContextMiddleware(context);
     return TodoService.deleteTodoLabel(context, args);
   }
+};
+
+module.exports = {
+  queries,
+  mutations
 };
