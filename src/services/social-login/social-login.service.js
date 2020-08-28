@@ -28,9 +28,9 @@ class SocialLoginService {
       email: postBody.email,
       gId: postBody.gID,
       profilePic: {
-        url: postBody.gID
+        url: postBody.profile_image
       },
-      password: postBody.email,
+      password: postBody.gID,
       status: true
     }).save();
     const newUser = await this.UserModel.findOne({

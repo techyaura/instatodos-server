@@ -9,5 +9,5 @@ input GoogleInputType {
   lastname: String,
   email: String!,
   gID: String!,
-  profilePic: String!
+  profile_image: String!
 }
