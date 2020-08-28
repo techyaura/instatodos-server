@@ -1,7 +1,6 @@
 const { JwtUtil } = require('../../utils');
 const TodoService = require('../todo/todo.service');
 const ProjectService = require('../project/project.service');
-const { CommonFunctionUtil } = require('../../utils/common-function.util');
 
 const { UserModel } = require('../../models');
 
@@ -31,14 +30,16 @@ class SocialLoginService {
       profilePic: {
         url: postBody.gID
       },
-      password: postBody.email
+      password: postBody.email,
+      status: true
     }).save();
     const newUser = await this.UserModel.findOne({
       email: postBody.email,
       gId: postBody.gID
-    });
-    await TodoService.labelDefaultOnRgister({ newUser });
-    await ProjectService.projectDefaultOnRgister({ newUser });
+    }).lean();
+
+    await TodoService.labelDefaultOnRgister({ user: newUser });
+    await ProjectService.projectDefaultOnRgister({ user: newUser });
     return this.__generateResponse(newUser);
   }
 
