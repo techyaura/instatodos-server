@@ -27,6 +27,9 @@ const modelSchema = new Schema(
       type: String,
       required: true
     },
+    refreshToken: {
+      type: String
+    },
     otp: { type: String },
     hashToken: { type: String },
     profilePic: {
@@ -91,9 +94,9 @@ modelSchema.pre('beforeUpdate', (values, next) => bcrypt.genSalt(10, (err, salt)
 modelSchema.methods.comparePassword = (password, user, cb) => bcrypt.compare(password, user.password, (err, match) => {
   if (err) return cb(err);
   if (match) {
-    return cb(null, true);
+    return cb(true);
   }
-  return cb(null, false);
+  return cb(false);
 });
 
 modelSchema.set('toObject', { virtuals: true });

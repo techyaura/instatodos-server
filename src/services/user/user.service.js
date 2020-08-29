@@ -2,7 +2,6 @@ const { ApolloError, AuthenticationError, ForbiddenError } = require('apollo-ser
 const { JwtUtil } = require('../../utils');
 const TodoService = require('../todo/todo.service');
 const ProjectService = require('../project/project.service');
-
 const { UserModel } = require('../../models');
 
 class AuthService {
@@ -59,41 +58,23 @@ class AuthService {
       .catch(err => Promise.reject(err));
   }
 
-  login(postBody) {
-    return this.UserModel.findOne(
+  async login(postBody) {
+    const user = await this.UserModel.findOne(
       {
         isDeleted: false,
         status: true,
         email: postBody.email
       }
-    )
-      .then((user) => {
-        if (!user) {
-          throw new ForbiddenError('NO_USER_FOUND');
-        }
-        return new Promise((resolve, reject) => new UserModel().comparePassword(postBody.password, user, (err, valid) => {
-          if (err) {
-            return reject(err);
-          }
-          if (!valid) {
-            return reject(new AuthenticationError('INVALID_CREDENTIALS'));
-          }
-          const token = this.JwtService.issueToken(
-            user._id /* eslint no-underscore-dangle: 0 */
-          );
-          return resolve({
-            message: 'User successfully logged in',
-            token,
-            user: {
-              email: user.email,
-              id: user._id
-            }
-          });
-        }));
-      })
-      .catch((err) => {
-        throw err;
-      });
+    ).lean();
+    if (!user) {
+      throw new ForbiddenError('NO_USER_FOUND');
+    }
+    return new Promise((resolve, reject) => new UserModel().comparePassword(postBody.password, user, (isValidPassword) => {
+      if (isValidPassword) {
+        return resolve(JwtUtil.authenticate(user));
+      }
+      return reject(new AuthenticationError('INVALID_CREDENTIALS'));
+    }));
   }
 
   forgotPasswordByOtp(postBody) {
@@ -132,11 +113,12 @@ class AuthService {
   }
 
   async profile({ user }) {
-    try {
-      return await this.UserModel.findById(user._id);
-    } catch (err) {
-      throw err;
+    const response = await this.UserModel.findOne({ _id: user._id }).lean();
+    if (response) {
+      const { _id, ...userObj } = response;
+      return { ...userObj, id: _id, _id };
     }
+    throw new Error('NO_USER_FOUND');
   }
 
   updatePassword({ user }, postBody) {
@@ -155,18 +137,25 @@ class AuthService {
   }
 
   async updateProfile({ user }, postBody) {
-    try {
-      const update = {
-        firstname: postBody.firstname,
-        lastname: postBody.lastname
-      };
-      if (postBody && typeof postBody.profilePic !== 'undefined') {
-        update.profilePic = postBody.profilePic;
-      }
-      return await this.UserModel.findOneAndUpdate({ _id: user._id }, { $set: update });
-    } catch (err) {
-      throw err;
+    const update = {
+      firstname: postBody.firstname,
+      lastname: postBody.lastname
+    };
+    if (postBody && typeof postBody.profilePic !== 'undefined') {
+      update.profilePic = postBody.profilePic;
     }
+    await this.UserModel.findOneAndUpdate({ _id: user._id }, { $set: update });
+  }
+
+  async refreshToken({ user }, postBody) {
+    const existUser = await this.UserModel.findOne({
+      _id: user._id,
+      refreshToken: postBody.refreshToken
+    }).lean();
+    if (existUser) {
+      return JwtUtil.authenticate(existUser, 'Token has been generated');
+    }
+    throw new ForbiddenError('NO_USER_FOUND');
   }
 }
 

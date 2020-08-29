@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const CommonFunctionUtil = require('./common-function.util');
 
 const tokenSecret = process.env.JWT_SECRET;
 module.exports = {
@@ -21,5 +22,27 @@ module.exports = {
       }
       return reject(err);
     }));
+  },
+  /**
+   * Generate login Response
+   * @param {object} user - user object
+   * @param {string} [ message ] - message to be shown
+   */
+  authenticate(user, message) {
+    const token = this.issueToken(
+      user._id /* eslint no-underscore-dangle: 0 */
+    );
+    const response = {
+      message: message || 'User successfully logged in',
+      refreshToken: CommonFunctionUtil.generateHash(),
+      token
+    };
+    if (typeof message === 'undefined') {
+      response.user = {
+        email: user.email,
+        id: user._id
+      };
+    }
+    return response;
   }
 };

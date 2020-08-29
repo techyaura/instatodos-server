@@ -10,6 +10,7 @@ extend type Mutation {
   userResetPassword(input: ResetPasswordInputType!): ResetSuccessType,
   updateProfile(input: ProfileInputType, image: Upload): ProfileSuccessType,
   updatePassword(input: PasswordInputType!): SuccessType,
+  refreshToken(input: IRefreshTokenInput!): IRefreshTokenType!
 }
 
 type ResetSuccessType {
@@ -49,6 +50,7 @@ type UserInfoType {
 type UserLoginSuccessType {
   message: String!
   token: String!
+  refreshToken: String!
   user: UserInfoType!
 }
 
@@ -81,3 +83,14 @@ type UserProfilePic {
 }
 
 scalar Upload
+
+# Refresh Token Body
+input IRefreshTokenInput {
+  refreshToken: String!
+}
+
+# Refresh response
+type IRefreshTokenType {
+  token: String!
+  refreshToken: String!
+}

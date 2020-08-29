@@ -1,6 +1,7 @@
 const { JwtUtil } = require('../../utils');
 const TodoService = require('../todo/todo.service');
 const ProjectService = require('../project/project.service');
+const { CommonFunctionUtil } = require('../../utils');
 
 const { UserModel } = require('../../models');
 
@@ -22,6 +23,7 @@ class SocialLoginService {
     if (existUser) {
       return this.__generateResponse(existUser);
     }
+    const refreshToken = CommonFunctionUtil.generateHash();
     await this.UserModel({
       firstname: postBody.firstname,
       lastname: postBody.lastname,
@@ -31,7 +33,8 @@ class SocialLoginService {
         url: postBody.profile_image
       },
       password: postBody.gID,
-      status: true
+      status: true,
+      refreshToken
     }).save();
     const newUser = await this.UserModel.findOne({
       email: postBody.email,
