@@ -91,6 +91,7 @@ type TodoType {
   notes: [TodoCommentType]
   labels: [TodoLabelListType]
   subTasks: [TodoType]
+  parent: String
 }
 
 type TodoCompletedType {
