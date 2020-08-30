@@ -39,13 +39,17 @@ class TodoService {
     const { subTasks = [] } = postBody;
     let savedSubTasks = [];
     if (subTasks.length) {
-      savedSubTasks = subTasks.map(item => ({
-        ...item,
-        parent: id,
-        projectId: postBody.projectId || null,
-        user: user._id
-        // labelIds: postBody.labelIds || null // TODO LATER
-      }));
+      savedSubTasks = subTasks.map((item) => {
+        if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
+          item.isCompleted = true;
+        }
+        return {
+          ...item,
+          parent: id,
+          projectId: postBody.projectId || null,
+          user: user._id
+        };
+      });
     }
     try {
       const response = await TodoModel.updateOne({
@@ -241,7 +245,7 @@ class TodoService {
   }) {
     const { conditions: conditionsObJ, sortObject, labelLookUp } = this.constructor.createFilters(user, { filter, sort });
     let conditions = conditionsObJ;
-    conditions = { ...conditions, isCompleted: true };
+    conditions = { ...conditions, isCompleted: true, $or: [{ parent: { $exists: false } }, { parent: null }] };
     try {
       const response = await this.TodoModel
         .aggregate([
@@ -268,6 +272,16 @@ class TodoService {
             }
           },
           {
+            $graphLookup: {
+              from: 'todos',
+              startWith: '$_id',
+              connectFromField: 'parent',
+              connectToField: 'parent',
+              as: 'subTasks',
+              maxDepth: 1
+            }
+          },
+          {
             $project: {
               project: { $arrayElemAt: ['$project', 0] },
               title: '$title',
@@ -278,7 +292,8 @@ class TodoService {
               updatedAt: '$updatedAt',
               user: '$user',
               comments: '$comments',
-              priority: '$priority'
+              priority: '$priority',
+              subTasks: '$subTasks'
             }
           },
           {
