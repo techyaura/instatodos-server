@@ -16,12 +16,13 @@ module.exports = {
     if (publicId) {
       obj.public_id = publicId;
       obj.overwrite = true;
+      obj.secure = true;
     }
     try {
       const response = await cloudinary.v2.uploader.upload(file.path, obj);
-      const { url, public_id: publicIdKey } = response;
+      const { secure_url: securedUrl, public_id: publicIdKey } = response;
       return {
-        url,
+        url: securedUrl,
         publicId: publicIdKey
       };
     } catch (err) {
