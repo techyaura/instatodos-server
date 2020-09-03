@@ -3,13 +3,21 @@ const { ContextMiddleware } = require('../../middlewares');
 const { addTodoCommentValidator, updateTodoCommentValidator } = require('../../validators');
 
 const mutations = {
-  addTodoComment: async (root, args, context) => {
-    await ContextMiddleware(context, addTodoCommentValidator({ ...args.input, todoId: args.todoId }));
-    return TodoCommentService.addTodoComment(context, args, args.input);
+  addTodoComment: async (_, args, context) => {
+    try {
+      await ContextMiddleware(context, addTodoCommentValidator({ ...args.input, todoId: args.todoId }));
+      return TodoCommentService.addTodoComment(context, args, args.input);
+    } catch (err) {
+      throw err;
+    }
   },
-  updateTodoComment: async (root, args, context) => {
-    await ContextMiddleware(context, updateTodoCommentValidator({ ...args.input, todoId: args.todoId, id: args.id }));
-    return TodoCommentService.updateTodoComment(context, args, args.input);
+  updateTodoComment: async (_, args, context) => {
+    try {
+      await ContextMiddleware(context, updateTodoCommentValidator({ ...args.input, todoId: args.todoId, id: args.id }));
+      return TodoCommentService.updateTodoComment(context, args, args.input);
+    } catch (err) {
+      throw err;
+    }
   }
 };
 

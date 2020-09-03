@@ -82,31 +82,35 @@ const mutations = {
     }
   },
   userForgotpassword: async (_, args, context) => {
-    const { res, next } = context;
-    await emailValidator(args.input, res, next);
-    const otp = CommonFunctionUtil.generateOtp();
-    const hashToken = CommonFunctionUtil.generateHash();
-    const user = await UserService.forgotPasswordByOtp({ ...args.input, otp, hashToken });
-    const templateObject = await TemplateService.fetch('USER_REGISTER');
-    const { email } = user;
-    const username = CommonFunctionUtil.generateUsernameFromEmail(user.email);
-    let { template } = templateObject;
-    const { subject } = templateObject;
-    template = template.replace('{{COMPANY_NAME}}', '');
-    template = template.replace('{{COMPANY_URL}}', '');
-    template = template.replace('{{OTP}}', otp);
-    template = template.replace('{{USERNAME}}', username);
-    template = template.replace('{{COMPANY_TAG_LINE}}', '');
-    const mailOptions = {
-      html: template,
-      subject,
-      to: email
-    };
-    EmailUtil.sendViaSendgrid(mailOptions);
-    return {
-      message: 'An OTP has been sent on your email.',
-      hashToken: user.hashToken
-    };
+    try {
+      const { res, next } = context;
+      await emailValidator(args.input, res, next);
+      const otp = CommonFunctionUtil.generateOtp();
+      const hashToken = CommonFunctionUtil.generateHash();
+      const user = await UserService.forgotPasswordByOtp({ ...args.input, otp, hashToken });
+      const templateObject = await TemplateService.fetch('USER_REGISTER');
+      const { email } = user;
+      const username = CommonFunctionUtil.generateUsernameFromEmail(user.email);
+      let { template } = templateObject;
+      const { subject } = templateObject;
+      template = template.replace('{{COMPANY_NAME}}', '');
+      template = template.replace('{{COMPANY_URL}}', '');
+      template = template.replace('{{OTP}}', otp);
+      template = template.replace('{{USERNAME}}', username);
+      template = template.replace('{{COMPANY_TAG_LINE}}', '');
+      const mailOptions = {
+        html: template,
+        subject,
+        to: email
+      };
+      EmailUtil.sendViaSendgrid(mailOptions);
+      return {
+        message: 'An OTP has been sent on your email.',
+        hashToken: user.hashToken
+      };
+    } catch (err) {
+      throw err;
+    }
   },
   userResetPassword: async (_, args, context) => {
     try {
