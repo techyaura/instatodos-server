@@ -3,24 +3,40 @@ const { ContextMiddleware } = require('../../middlewares');
 const { addTodoProjectValidator, updateTodoProjectValidator } = require('../../validators');
 
 const queries = {
-  todoProjectList: async (root, args, context) => {
-    await ContextMiddleware(context);
-    return ProjectService.todoProjectListCount(context);
+  todoProjectList: async (_, args, context) => {
+    try {
+      await ContextMiddleware(context);
+      return ProjectService.todoProjectListCount(context);
+    } catch (err) {
+      throw err;
+    }
   }
 };
 
 const mutations = {
-  addTodoProject: async (root, args, context) => {
-    await ContextMiddleware(context, addTodoProjectValidator(args.input));
-    return ProjectService.addTodoProject(context, args.input);
+  addTodoProject: async (_, args, context) => {
+    try {
+      await ContextMiddleware(context, addTodoProjectValidator(args.input));
+      return ProjectService.addTodoProject(context, args.input);
+    } catch (err) {
+      throw err;
+    }
   },
-  updateTodoProject: async (root, args, context) => {
-    await ContextMiddleware(context, updateTodoProjectValidator({ ...args.input, id: args.id }));
-    return ProjectService.updateTodoProject(context, args, args.input);
+  updateTodoProject: async (_, args, context) => {
+    try {
+      await ContextMiddleware(context, updateTodoProjectValidator({ ...args.input, id: args.id }));
+      return ProjectService.updateTodoProject(context, args, args.input);
+    } catch (err) {
+      throw err;
+    }
   },
-  deleteTodoProject: async (root, args, context) => {
-    await ContextMiddleware(context);
-    return ProjectService.deleteTodoProject(context, args);
+  deleteTodoProject: async (_, args, context) => {
+    try {
+      await ContextMiddleware(context);
+      return ProjectService.deleteTodoProject(context, args);
+    } catch (err) {
+      throw err;
+    }
   }
 };
 

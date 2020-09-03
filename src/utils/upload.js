@@ -6,7 +6,6 @@ cloudinary.config({
   api_secret: process.env.CLOUD_SECRET
 });
 
-
 module.exports = {
   uploadProfileImage: async (file, publicId = null) => {
     const obj = {

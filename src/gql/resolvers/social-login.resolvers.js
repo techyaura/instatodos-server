@@ -1,7 +1,13 @@
 const { SocialLoginService } = require('../../services');
 
 const mutations = {
-  googleLogin: (root, args) => SocialLoginService.googleLogin(args.input)
+  googleLogin: async (_, args) => {
+    try {
+      await SocialLoginService.googleLogin(args.input);
+    } catch (err) {
+      throw err;
+    }
+  }
 };
 
 module.exports = {
