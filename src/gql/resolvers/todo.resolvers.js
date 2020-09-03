@@ -1,6 +1,6 @@
 const { POST_ADDED, pubSub } = require('../events');
 
-const { TodoService, ProjectService } = require('../../services');
+const { TodoService } = require('../../services');
 const { ContextMiddleware, TodoMiddlewares } = require('../../middlewares');
 const {
   addTodoValidator, updateTodoValidator, addTodoCommentValidator, updateTodoCommentValidator

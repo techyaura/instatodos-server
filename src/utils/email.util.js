@@ -13,7 +13,7 @@ const Nodemailer = require('nodemailer');
 
 class EmailUtil {
   constructor() {
-    this.fromEmail = process.env.SMTP_FROM_EMAIL || 'info@sumanix.com';
+    this.fromEmail = process.env.SMTP_FROM_EMAIL || 'info@techyaura.com';
   }
 
   static smtpConfigOptions() {
@@ -29,7 +29,7 @@ class EmailUtil {
 
   transporter() {
     return Nodemailer.createTransport(
-      this.constructor.smtpConfigOptions(),
+      this.constructor.smtpConfigOptions()
     );
   }
 
@@ -58,7 +58,7 @@ class EmailUtil {
   sendViaSendgrid(mailOptions) {
     return new Promise((resolve, reject) => {
       if (!this.constructor.validateEmailOptions) {
-        return reject(new Error('Invalid Email Options'));
+        throw new Error('Invalid Email Options');
       }
       mailOptions = { ...mailOptions, from: this.fromEmail };
       return this.constructor.smtpConfigOptionsSendgrid()

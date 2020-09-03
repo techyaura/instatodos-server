@@ -1,5 +1,4 @@
 const cloudinary = require('cloudinary');
-const { path } = require('app-root-path');
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -18,15 +17,11 @@ module.exports = {
       obj.overwrite = true;
       obj.secure = true;
     }
-    try {
-      const response = await cloudinary.v2.uploader.upload(file.path, obj);
-      const { secure_url: securedUrl, public_id: publicIdKey } = response;
-      return {
-        url: securedUrl,
-        publicId: publicIdKey
-      };
-    } catch (err) {
-      throw err;
-    }
+    const response = await cloudinary.v2.uploader.upload(file.path, obj);
+    const { secure_url: securedUrl, public_id: publicIdKey } = response;
+    return {
+      url: securedUrl,
+      publicId: publicIdKey
+    };
   }
 };

@@ -1,27 +1,22 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
-const { TodoModel, TodoLabelModel } = require('../../models');
-const { CommonFunctionUtil } = require('../../utils');
+const { TodoModel } = require('../../models');
+const CommentService = require('../todo-comment/todo-comment.service');
 
 const timeZoneValue = 'Asia/Kolkata';
 
 class TodoService {
   constructor() {
     this.TodoModel = TodoModel;
-    this.TodoLabelModel = TodoLabelModel;
   }
 
   async addTodo({ user }, postBody) {
     const todo = this.TodoModel({ ...postBody, user: user._id });
-    try {
-      const response = await todo.save();
-      if (postBody.notes && postBody.notes !== 'undefined') {
-        await this.addTodoComment({ user }, { todoId: response._id }, { description: postBody.notes });
-      }
-      return { message: 'Todo has been succesfully added', ok: true };
-    } catch (err) {
-      throw err;
+    const response = await todo.save();
+    if (postBody.notes && postBody.notes !== 'undefined') {
+      await CommentService.addTodoComment({ user }, { todoId: response._id }, { description: postBody.notes });
     }
+    return { message: 'Todo has been succesfully added', ok: true };
   }
 
   async updateTodo({ user }, { id }, postBody) {
@@ -51,58 +46,29 @@ class TodoService {
         };
       });
     }
-    try {
-      const response = await TodoModel.updateOne({
-        user: user._id, isDeleted: false, status: true, _id: id
-      }, { $set: postBody });
-
-      // const existingSubTasks = await this.TodoModel.find({ parent: id });
-      // if (savedSubTasks.length) {
-      // const toBeDeltedSubTasks = existingSubTasks.filter(existItem => savedSubTasks.filter(item => item._id && item._id !== existItem._id));
-      // await Promise.all(savedSubTasks.map(async item => this.TodoModel.update({ parent: id, _id: item.id }, item, { upsert: true })));
-      // await Promise.all(toBeDeltedSubTasks.map(async item => this.TodoModel.remove({ _id: item._id })));
-      // }
-
-      if (savedSubTasks.length) {
-        // await this.TodoModel.find({ parent: id });
-
-        await this.TodoModel.remove({ parent: id });
-        await this.TodoModel.create(savedSubTasks);
-      } else {
-        await this.TodoModel.remove({ parent: id });
-      }
-      if (response && response.n !== 0) {
-        if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
-          await this.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
-        }
-        return { message: 'Todo has been succesfully updated', ok: true };
-      }
-      return Promise.reject(new Error(403));
-    } catch (err) {
-      return Promise.reject(err);
+    const response = await TodoModel.updateOne({
+      user: user._id, isDeleted: false, status: true, _id: id
+    }, { $set: postBody });
+    if (savedSubTasks.length) {
+      await this.TodoModel.remove({ parent: id });
+      await this.TodoModel.create(savedSubTasks);
+    } else {
+      await this.TodoModel.remove({ parent: id });
     }
-
-    // return this.TodoModel.updateOne({
-    //   user: user._id, isDeleted: false, status: true, _id: id
-    // }, { $set: postBody })
-    //   .then(async (response) => {
-    //     if (response && response.n !== 0) {
-    //       if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
-    //         await this.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
-    //       }
-    //       return { message: 'Todo has been succesfully updated', ok: true };
-    //     }
-    //     return Promise.reject(new Error(403));
-    //   })
-    //   .catch(err => Promise.reject(err));
+    if (response && response.n !== 0) {
+      if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
+        await CommentService.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
+      }
+      return { message: 'Todo has been succesfully updated', ok: true };
+    }
+    throw new Error(403);
   }
 
-  async viewTodo({ user }, params) {
-    try {
-      return await this.TodoModel.findOne({ _id: params.id, user: user._id }).populate({ path: 'user' });
-    } catch (err) {
-      throw err;
-    }
+  viewTodo({ user }, params) {
+    return this.TodoModel
+      .findOne({ _id: params.id, user: user._id })
+      .populate({ path: 'user' })
+      .lean();
   }
 
   static createFilters(user, { filter = null, sort = null }) {
@@ -246,205 +212,197 @@ class TodoService {
     const { conditions: conditionsObJ, sortObject, labelLookUp } = this.constructor.createFilters(user, { filter, sort });
     let conditions = conditionsObJ;
     conditions = { ...conditions, isCompleted: true, $or: [{ parent: { $exists: false } }, { parent: null }] };
-    try {
-      const response = await this.TodoModel
-        .aggregate([
-          {
-            $match: conditions
-          },
-          {
-            $lookup: {
-              from: 'users',
-              localField: 'user',
-              foreignField: '_id',
-              as: 'user'
-            }
-          },
-          {
-            $lookup: labelLookUp
-          },
-          {
-            $lookup: {
-              from: 'projects',
-              localField: 'projectId',
-              foreignField: '_id',
-              as: 'project'
-            }
-          },
-          {
-            $graphLookup: {
-              from: 'todos',
-              startWith: '$_id',
-              connectFromField: 'parent',
-              connectToField: 'parent',
-              as: 'subTasks',
-              maxDepth: 1
-            }
-          },
-          {
-            $project: {
-              project: { $arrayElemAt: ['$project', 0] },
-              title: '$title',
-              labels: '$labels',
-              isCompleted: '$isCompleted',
-              isInProgress: '$isInProgress',
-              createdAt: '$createdAt',
-              updatedAt: '$updatedAt',
-              user: '$user',
-              comments: '$comments',
-              priority: '$priority',
-              subTasks: '$subTasks'
-            }
-          },
-          {
-            $group: {
-              _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: timeZoneValue } },
-              list: { $push: '$$ROOT' },
-              count: { $sum: 1 }
-            }
-          },
-          {
-            $project: {
-              updatedAt: '$_id',
-              list: 1,
-              count: 1
-            }
-          },
-          {
-            $facet: {
-              todos: [
-                {
-                  $sort: sortObject
-                },
-                { $skip: (offset - 1) * first },
-                { $limit: first }
-              ],
-              todosCount: [
-                {
-                  $group: {
-                    _id: null,
-                    count: { $sum: 1 }
-                  }
-                }
-              ]
-            }
+    const response = await this.TodoModel
+      .aggregate([
+        {
+          $match: conditions
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user',
+            foreignField: '_id',
+            as: 'user'
           }
-        ]);
-      const { todos, todosCount } = response[0];
-      const { count } = todosCount[0] || 0;
-      return Promise.resolve({
-        totalCount: count,
-        data: todos
-      });
-    } catch (err) {
-      throw err;
-    }
+        },
+        {
+          $lookup: labelLookUp
+        },
+        {
+          $lookup: {
+            from: 'projects',
+            localField: 'projectId',
+            foreignField: '_id',
+            as: 'project'
+          }
+        },
+        {
+          $graphLookup: {
+            from: 'todos',
+            startWith: '$_id',
+            connectFromField: 'parent',
+            connectToField: 'parent',
+            as: 'subTasks',
+            maxDepth: 1
+          }
+        },
+        {
+          $project: {
+            project: { $arrayElemAt: ['$project', 0] },
+            title: '$title',
+            labels: '$labels',
+            isCompleted: '$isCompleted',
+            isInProgress: '$isInProgress',
+            createdAt: '$createdAt',
+            updatedAt: '$updatedAt',
+            user: '$user',
+            comments: '$comments',
+            priority: '$priority',
+            subTasks: '$subTasks'
+          }
+        },
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: timeZoneValue } },
+            list: { $push: '$$ROOT' },
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $project: {
+            updatedAt: '$_id',
+            list: 1,
+            count: 1
+          }
+        },
+        {
+          $facet: {
+            todos: [
+              {
+                $sort: sortObject
+              },
+              { $skip: (offset - 1) * first },
+              { $limit: first }
+            ],
+            todosCount: [
+              {
+                $group: {
+                  _id: null,
+                  count: { $sum: 1 }
+                }
+              }
+            ]
+          }
+        }
+      ]);
+    const { todos, todosCount } = response[0];
+    const { count } = todosCount[0] || 0;
+    return Promise.resolve({
+      totalCount: count,
+      data: todos
+    });
   }
 
   async upcomingTodo({ user }, {
     first = 10, offset = 1, filter = null, sort = null
   }) {
     const { conditions, sortObject, labelLookUp } = this.constructor.createFilters(user, { filter, sort });
-    try {
-      const response = await this.TodoModel
-        .aggregate([
-          {
-            $match: conditions
-          },
-          {
-            $project: {
-              name: 1,
-              title: '$title',
-              labels: '$labels',
-              isCompleted: '$isCompleted',
-              isInProgress: '$isInProgress',
-              createdAt: '$createdAt',
-              scheduledDate: '$scheduledDate',
-              updatedAt: '$updatedAt',
-              priority: '$priority',
-              user: '$user',
-              comments: '$comments'
-            }
-          },
-          {
-            $lookup: {
-              from: 'users',
-              localField: 'user',
-              foreignField: '_id',
-              as: 'user'
-            }
-          },
-          {
-            $lookup: {
-              from: 'projects',
-              localField: 'projectId',
-              foreignField: '_id',
-              as: 'project'
-            }
-          },
-          {
-            $lookup: labelLookUp
-          },
-          {
-            $project: {
-              title: '$title',
-              project: { $arrayElemAt: ['$project', 0] },
-              projectId: 1,
-              labels: '$labels',
-              isCompleted: '$isCompleted',
-              isInProgress: '$isInProgress',
-              createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-              updatedAt: '$updatedAt',
-              scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate' } },
-              user: '$user',
-              comments: '$comments',
-              priority: '$priority'
-            }
-          },
-
-          {
-            $group: {
-              _id: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate', timezone: 'Asia/Kolkata' } },
-              list: { $push: '$$ROOT' },
-              count: { $sum: 1 }
-            }
-          },
-          {
-            $project: {
-              scheduledDate: '$_id',
-              list: 1,
-              count: 1
-            }
-          },
-          {
-            $facet: {
-              todos: [
-                {
-                  $sort: sortObject
-                },
-                { $skip: (offset - 1) * first },
-                { $limit: first }
-              ],
-              todosCount: [
-                {
-                  $group: {
-                    _id: null,
-                    count: { $sum: 1 }
-                  }
-                }
-              ]
-            }
+    const response = await this.TodoModel
+      .aggregate([
+        {
+          $match: conditions
+        },
+        {
+          $project: {
+            name: 1,
+            title: '$title',
+            labels: '$labels',
+            isCompleted: '$isCompleted',
+            isInProgress: '$isInProgress',
+            createdAt: '$createdAt',
+            scheduledDate: '$scheduledDate',
+            updatedAt: '$updatedAt',
+            priority: '$priority',
+            user: '$user',
+            comments: '$comments'
           }
-        ]);
-      const { todos, todosCount } = response[0];
-      const { count } = todosCount[0] || 0;
-      return Promise.resolve({
-        totalCount: count,
-        data: todos
-      });
-    } catch (err) {
-      throw err;
-    }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user',
+            foreignField: '_id',
+            as: 'user'
+          }
+        },
+        {
+          $lookup: {
+            from: 'projects',
+            localField: 'projectId',
+            foreignField: '_id',
+            as: 'project'
+          }
+        },
+        {
+          $lookup: labelLookUp
+        },
+        {
+          $project: {
+            title: '$title',
+            project: { $arrayElemAt: ['$project', 0] },
+            projectId: 1,
+            labels: '$labels',
+            isCompleted: '$isCompleted',
+            isInProgress: '$isInProgress',
+            createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            updatedAt: '$updatedAt',
+            scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate' } },
+            user: '$user',
+            comments: '$comments',
+            priority: '$priority'
+          }
+        },
+
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate', timezone: 'Asia/Kolkata' } },
+            list: { $push: '$$ROOT' },
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $project: {
+            scheduledDate: '$_id',
+            list: 1,
+            count: 1
+          }
+        },
+        {
+          $facet: {
+            todos: [
+              {
+                $sort: sortObject
+              },
+              { $skip: (offset - 1) * first },
+              { $limit: first }
+            ],
+            todosCount: [
+              {
+                $group: {
+                  _id: null,
+                  count: { $sum: 1 }
+                }
+              }
+            ]
+          }
+        }
+      ]);
+    const { todos, todosCount } = response[0];
+    const { count } = todosCount[0] || 0;
+    return Promise.resolve({
+      totalCount: count,
+      data: todos
+    });
   }
 
   async listTodo({ user }, {
@@ -583,220 +541,15 @@ class TodoService {
   }
 
   async deleteTodo({ user }, params) {
-    try {
-      const response = await this.TodoModel.updateOne({
-        user: user._id, _id: params.id, isDeleted: false, status: true
-      }, {
-        isDeleted: true, status: false
-      });
-      if (response && response.n !== 0) {
-        return { ok: true, message: 'Todo deleted successfully' };
-      }
-      return Promise.reject(new Error(403));
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async addTodoComment({ user }, params, postBody) {
-    try {
-      const { _id: userId } = user;
-      const { todoId } = params;
-      const { description } = postBody;
-      const response = await this.TodoModel.updateOne({
-        user: userId, isDeleted: false, _id: todoId
-      }, { $push: { comments: { description, userId } } });
-      if (response && response.n !== 0) {
-        return { message: 'Todo has been succesfully commented', ok: true };
-      }
-      return Promise.reject(new Error(403));
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async updateTodoComment({ user }, params, postBody) {
-    try {
-      const { _id: userId } = user;
-      const { todoId, id: commentId } = params;
-      const { description } = postBody;
-      const response = await this.TodoModel.updateOne({
-        user: userId, isDeleted: false, _id: todoId, 'comments._id': commentId
-      }, { $set: { 'comments.$.description': description } });
-      if (response && response.n !== 0) {
-        return { message: 'Todo has been succesfully updated', ok: true };
-      }
-      return Promise.reject(new Error(403));
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async todoLabelList({ user }) {
-    const { _id: userId } = user;
-    const query = { user: userId };
-    try {
-      return await this.TodoLabelModel.find(query);
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async addTodoLabel(context, postBody) {
-    try {
-      const { user } = context;
-      const { _id: userId } = user;
-      const { name } = postBody;
-      const isExist = await this.checkUniqueLabel(name, user);
-      if (isExist) {
-        throw new Error('Label Should be unique');
-      }
-      await this.TodoLabelModel({ ...postBody, user: userId, slug: CommonFunctionUtil.slugify(name) }).save();
-      return { message: 'Todo label has been succesfully added', ok: true };
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async updateTodoLabel({ user }, params, postBody) {
-    try {
-      const { id: todoLabelId } = params;
-      const { _id: userId } = user;
-      const { name } = postBody;
-      const isExist = await this.checkUniqueLabel(name, user);
-      if (isExist) {
-        throw new Error('Label Should be unique');
-      }
-      const slug = CommonFunctionUtil.slugify(name);
-      postBody.slug = slug;
-      const response = await this.TodoLabelModel.updateOne({
-        user: userId, _id: todoLabelId
-      }, { $set: postBody });
-      if (response && response.n !== 0) {
-        return { message: 'TodoLabel has been succesfully updated', ok: true };
-      }
-      return Promise.reject(new Error(403));
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async checkUniqueLabel(label, user) {
-    try {
-      return await this.TodoLabelModel.findOne({ name: label, user: user._id }).then(data => (!!(data)));
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async deleteTodoLabel({ user }, params) {
-    try {
-      const { id: todoLabelId } = params;
-      const response = await this.TodoLabelModel.deleteOne({
-        user: user._id, _id: todoLabelId
-      });
-      if (response && response.n !== 0) {
-        return { ok: true, message: 'TodoLabel deleted successfully' };
-      }
-      return Promise.reject(new Error(403));
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async todoLabelListCount({ user }) {
-    try {
-      return await this.TodoLabelModel
-        .aggregate([
-          {
-            $match: { isDeleted: false, user: mongoose.Types.ObjectId(user._id) }
-          },
-          {
-            $lookup: {
-              from: 'todos',
-              let: { labelId: '$_id' },
-              pipeline: [
-                {
-                  $match: {
-                    isDeleted: false,
-                    isCompleted: false,
-                    labelIds: { $ne: null },
-                    $expr: {
-                      $and: [
-                        { $in: ['$$labelId', '$labelIds'] }
-                      ]
-                    }
-                  }
-                }
-              ],
-              as: 'labels'
-            }
-          },
-          {
-            $unwind: {
-              path: '$labels',
-              preserveNullAndEmptyArrays: true
-            }
-          },
-          {
-            $project: {
-              _id: 1,
-              name: { $toLower: '$name' },
-              label: 1,
-              slug: 1,
-              color: 1,
-              description: 1
-            }
-          },
-          {
-            $group: {
-              _id: '$name',
-              labelId: { $first: '$_id' },
-              name: { $first: '$name' },
-              slug: { $first: '$slug' },
-              color: { $first: '$color' },
-              description: { $first: '$description' },
-              todos: { $push: '$labels' }
-            }
-          },
-          {
-            $project: {
-              _id: '$labelId',
-              name: 1,
-              slug: 1,
-              color: 1,
-              description: 1,
-              count: { $sum: { $size: '$todos' } }
-            }
-          },
-          {
-            $sort: { name: 1 }
-          }
-        ]);
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async labelDefaultOnRgister({ user }) {
-    const { _id: userId } = user;
-    const labels = [{
-      name: 'Important',
-      color: '#d73a4a'
-    },
-    {
-      name: 'Priority',
-      color: '#e4e669'
+    const response = await this.TodoModel.updateOne({
+      user: user._id, _id: params.id, isDeleted: false, status: true
     }, {
-      name: 'Help',
-      color: '#008672'
-    }];
-    const mappedArray = labels.map((item) => {
-      item.slug = CommonFunctionUtil.slugify(item.name);
-      item.user = userId;
-      return item;
+      isDeleted: true, status: false
     });
-    await this.TodoLabelModel.create(mappedArray);
+    if (response && response.n !== 0) {
+      return { ok: true, message: 'Todo deleted successfully' };
+    }
+    throw new Error(403);
   }
 }
 
