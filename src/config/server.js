@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 
-require('./env');
 const express = require('express');
 const cluster = require('cluster');
 const bodyParser = require('body-parser');

@@ -1,7 +1,10 @@
-// Config env variables on app bootsrap
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-const env = require('dotenv');
+const fs = require('fs');
 
-env.config({
-  path: `.env.${process.env.NODE_ENV}`
-});
+if (fs.existsSync(`.env.${process.env.NODE_ENV}`)) {
+  // Config env variables on app bootsrap for DEV-SERVER
+  const env = require('dotenv');
+  env.config({
+    path: `.env.${process.env.NODE_ENV}`
+  });
+}
