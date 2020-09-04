@@ -4,7 +4,6 @@ const express = require('express');
 const cluster = require('cluster');
 const bodyParser = require('body-parser');
 const cCPUs = require('os').cpus().length;
-const graphqlHTTP = require('express-graphql');
 const { ApolloServer } = require('apollo-server-express');
 const morgan = require('morgan');
 const cors = require('cors');
@@ -40,21 +39,6 @@ class Boot {
   }
 
   /**
-   * @name graphQlHttpConfig
-   * @description Graphql config
-   */
-  static graphQlHttpConfig() {
-    return graphqlHTTP((request, response, next) => ({
-      schema,
-      pretty: true,
-      graphiql: process.env.NODE_ENV === 'development',
-      context: { ...request, startTime: Date.now() },
-      customFormatErrorFn: (err => errorHandler(err, request, response, next)),
-      extensions: process.env.NODE_ENV === 'development' ? this.useExtensions() : ''
-    }));
-  }
-
-  /**
    * @name useCors
    * @description use CORS policy
    */
@@ -70,13 +54,13 @@ class Boot {
     return this.app.use(morgan('combined', { stream: winston.stream }));
   }
 
-  /**
-   * @name useErrors
-   * @description Express Global Error Handler
-   */
-  useLogger() {
-    return this.app.use((err, req, res, next) => errorHandler(err, req, res, next, true));
-  }
+  // /**
+  //  * @name useErrors
+  //  * @description Express Global Error Handler
+  //  */
+  // useLogger() {
+  //   return this.app.use((err, req, res, next) => errorHandler(err, req, res, next, true));
+  // }
 
   /**
    * @name useListen
@@ -95,21 +79,23 @@ class Boot {
     const server = new ApolloServer({
       schema,
       debug: process.env.NODE_ENV === 'development',
-      context: ({ req }) => ({ ...req, startTime: Date.now() }),
+      context: async ({ req }) => {
+        const user = await AuthMiddleware.jwt(req);
+        return {
+          ...req, user
+        };
+      },
       // engine: {
-      //   rewriteError: ((err, request, response) => errorHandler(err, request, response))
+      //   rewriteError: ((err) => {
+      //     console.log();
+      //     return errorHandler(err);
+      //   })
       // },
       formatError: (err) => {
         const formatError = errorHandler(err);
-        console.log(err);
-        // winston.error(`${response.status || 500} - ${response.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        winston.error(`${err.message} - ${err.name}`);
         return formatError;
       },
-      // engine: {
-      //   rewriteError: (err) => {
-      //     console.log(err);
-      //   }
-      // },
       subscriptions: {
         onConnect: () => {
           console.log('Connected');
@@ -124,8 +110,8 @@ class Boot {
     app.use(cors());
     const httpServer = http.createServer(app);
     server.installSubscriptionHandlers(httpServer);
-    app.use('/graphql', AuthMiddleware.jwt);
-    server.applyMiddleware({ app });
+    const path = '/graphql';
+    server.applyMiddleware({ app, path });
     httpServer.listen(this.port, () => {
       console.log(
         '🚀',
@@ -147,7 +133,7 @@ class Boot {
       await dbConnection();
       this.useMorgan();
       this.useGraphQl();
-      this.useLogger();
+      // this.useLogger();
       if (process.env.NODE_ENV === 'development') {
         /** Clear console for every server restart while development */
         console.clear(); // eslint-disable-line no-console
