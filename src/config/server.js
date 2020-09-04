@@ -25,56 +25,34 @@ class Boot {
     this.host = process.env.HOST || '0.0.0.0';
     this.port = process.env.PORT || 8080;
     this.environment = process.env.environment;
-    if (process.env.IS_CLUSTER_ENABLED) {
-      if (cluster.isMaster) {
-        // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < cCPUs; i++) {
-          cluster.fork();
-        }
+    this.init();
+  }
 
-        cluster.on('online', (worker) => {
-          // eslint-disable-next-line no-console
-          success(`Worker ${worker.process.pid} is online.`);
-        });
-        cluster.on('exit', (worker) => {
-          // eslint-disable-next-line no-console
-          error(`worker ${worker.process.pid} died.`);
-        });
-      } else {
-        this.boostrapExpress();
-      }
-    } else {
-      this.boostrapExpress();
-    }
+  static useExtensions() {
+    return ({
+      document, // eslint-disable-line no-unused-vars
+      variables, // eslint-disable-line no-unused-vars
+      operationName, // eslint-disable-line no-unused-vars
+      result, // eslint-disable-line no-unused-vars
+      context
+    }) => ({
+      runTime: Date.now() - context.startTime
+    });
   }
 
   /**
-   * @name boostrapExpress
-   * @description Starting bootsrap server
+   * @name graphQlHttpConfig
+   * @description Graphql config
    */
-  async boostrapExpress() {
-    try {
-      await dbConnection();
-      return Promise.all([
-        // this.useCors(),
-        this.useMorgan(),
-        this.useGraphQl(),
-        this.useLogger()
-        // this.useListen()
-      ]).then(() => {
-        if (process.env.NODE_ENV === 'development') {
-          /** Clear console for every server restart while development */
-          // console.clear(); // eslint-disable-line no-console
-        }
-        // success(`🚀 Running GraphQL server at http://${this.host}:${this.port} in ${process.env.NODE_ENV} mode`); // eslint-disable-line no-console
-        return this.app;
-      });
-    } catch (err) {
-      console.log(error('Unable to start GraphQL API server')); // eslint-disable-line no-console
-      console.log(warning('---See Below for Error---')); // eslint-disable-line no-console
-      console.log(error(err)); // eslint-disable-line no-console
-      return err;
-    }
+  static graphQlHttpConfig() {
+    return graphqlHTTP((request, response, next) => ({
+      schema,
+      pretty: true,
+      graphiql: process.env.NODE_ENV === 'development',
+      context: { ...request, startTime: Date.now() },
+      customFormatErrorFn: (err => errorHandler(err, request, response, next)),
+      extensions: process.env.NODE_ENV === 'development' ? this.useExtensions() : ''
+    }));
   }
 
   /**
@@ -94,18 +72,19 @@ class Boot {
   }
 
   /**
-   * @name graphQlHttpConfig
-   * @description Graphql config
+   * @name useErrors
+   * @description Express Global Error Handler
    */
-  static graphQlHttpConfig() {
-    return graphqlHTTP((request, response, next) => ({
-      schema,
-      pretty: true,
-      graphiql: process.env.NODE_ENV === 'development',
-      context: { ...request, startTime: Date.now() },
-      customFormatErrorFn: (err => errorHandler(err, request, response, next)),
-      extensions: process.env.NODE_ENV === 'development' ? this.useExtensions() : ''
-    }));
+  useLogger() {
+    return this.app.use((err, req, res, next) => errorHandler(err, req, res, next, true));
+  }
+
+  /**
+   * @name useListen
+   * @description Express expose port for server
+   */
+  useListen() {
+    return this.app.listen(this.port);
   }
 
   /**
@@ -146,42 +125,65 @@ class Boot {
     app.use(cors());
     const httpServer = http.createServer(app);
     server.installSubscriptionHandlers(httpServer);
-    app.use('/graphql',
-      // graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
-      AuthMiddleware.jwt);
+    app.use('/graphql', AuthMiddleware.jwt);
     server.applyMiddleware({ app });
     httpServer.listen(this.port, () => {
-      console.log(success(`🚀 Server ready at http://localhost:${this.port}${server.graphqlPath}`));
-      console.log(success(`🚀 Subscriptions ready at ws://localhost:${this.port}${server.subscriptionsPath}`));
+      console.log(
+        '🚀',
+        success(`Server ready at http://localhost:${this.port}${server.graphqlPath}`)
+      );
+      console.log(
+        '🚀',
+        success(`Subscriptions ready at ws://localhost:${this.port}${server.subscriptionsPath}`)
+      );
     });
   }
 
   /**
-   * @name useErrors
-   * @description Express Global Error Handler
+   * @name boostrapExpress
+   * @description Starting bootsrap server
    */
-  useLogger() {
-    this.app.use((err, req, res, next) => errorHandler(err, req, res, next, true));
+  async boostrapExpress() {
+    try {
+      await dbConnection();
+      this.useMorgan();
+      this.useGraphQl();
+      this.useLogger();
+      if (process.env.NODE_ENV === 'development') {
+        /** Clear console for every server restart while development */
+        console.clear(); // eslint-disable-line no-console
+      }
+      return this.app;
+    } catch (err) {
+      console.log(error('Unable to start GraphQL API server')); // eslint-disable-line no-console
+      console.log(warning('---See Below for Error---')); // eslint-disable-line no-console
+      console.log(error(err)); // eslint-disable-line no-console
+      return err;
+    }
   }
 
-  /**
-   * @name useListen
-   * @description Express expose port for server
-   */
-  useListen() {
-    return this.app.listen(this.port);
-  }
+  init() {
+    /** Check if clustering enabled */
+    if (process.env.IS_CLUSTER_ENABLED) {
+      if (cluster.isMaster) {
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < cCPUs; i++) {
+          cluster.fork();
+        }
 
-  static useExtensions() {
-    return ({
-      document, // eslint-disable-line no-unused-vars
-      variables, // eslint-disable-line no-unused-vars
-      operationName, // eslint-disable-line no-unused-vars
-      result, // eslint-disable-line no-unused-vars
-      context
-    }) => ({
-      runTime: Date.now() - context.startTime
-    });
+        cluster.on('online', (worker) => {
+          // eslint-disable-next-line no-console
+          success(`Worker ${worker.process.pid} is online.`);
+        });
+        cluster.on('exit', (worker) => {
+          // eslint-disable-next-line no-console
+          error(`worker ${worker.process.pid} died.`);
+        });
+      } else {
+        return this.boostrapExpress();
+      }
+    }
+    return this.boostrapExpress();
   }
 }
 
