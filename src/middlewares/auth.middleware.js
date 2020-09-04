@@ -37,7 +37,7 @@ module.exports = {
       }
       throw new AuthenticationError('INVALID_GRANT');
     } catch (err) {
-      throw new ForbiddenError(err);
+      return new Error('Internal server error');
     }
   }
 };
