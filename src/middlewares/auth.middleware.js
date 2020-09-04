@@ -1,5 +1,6 @@
 const {
-  AuthenticationError
+  AuthenticationError,
+  ForbiddenError
 } = require('apollo-server');
 const { UserModel } = require('../models');
 
@@ -17,7 +18,7 @@ module.exports = {
           if (/^Bearer$/i.test(scheme)) {
             token = credentials;
           } else {
-            throw new AuthenticationError('INVALID_GRANT');
+            throw new ForbiddenError('INVALID_GRANT');
           }
         }
       } else {
@@ -36,7 +37,7 @@ module.exports = {
       }
       throw new AuthenticationError('INVALID_GRANT');
     } catch (err) {
-      throw new AuthenticationError(err);
+      throw new ForbiddenError(err);
     }
   }
 };
