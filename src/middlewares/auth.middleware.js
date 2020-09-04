@@ -6,7 +6,7 @@ const { UserModel } = require('../models');
 const { JwtUtil } = require('../utils');
 
 module.exports = {
-  jwt: async (req, next) => {
+  jwt: async (req) => {
     try {
       let token;
       if (req.headers && req.headers.authorization) {

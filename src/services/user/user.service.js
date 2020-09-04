@@ -1,4 +1,3 @@
-const { ApolloError, AuthenticationError, ForbiddenError } = require('apollo-server');
 const { JwtUtil } = require('../../utils');
 const TodoService = require('../todo/todo.service');
 const ProjectService = require('../project/project.service');
@@ -14,7 +13,7 @@ class AuthService {
     return this.UserModel.findOne({ email })
       .then((response) => {
         if (response) {
-          return Promise.reject(new ApolloError('Email address not available'));
+          return Promise.reject(new Error('Email address not available'));
         }
         return Promise.resolve(true);
       })
@@ -47,7 +46,7 @@ class AuthService {
       })
       .then((response) => {
         if (!response) {
-          return Promise.reject(new ApolloError('INVALID_OTP'));
+          return Promise.reject(new Error('INVALID_OTP'));
         }
         return {
           message: 'Email succsessfully verified',
@@ -67,13 +66,13 @@ class AuthService {
       }
     ).lean();
     if (!user) {
-      throw new ForbiddenError('NO_USER_FOUND');
+      throw new Error('NO_USER_FOUND');
     }
     return new Promise((resolve, reject) => new UserModel().comparePassword(postBody.password, user, (isValidPassword) => {
       if (isValidPassword) {
         return resolve(JwtUtil.authenticate(user));
       }
-      return reject(new AuthenticationError('INVALID_CREDENTIALS'));
+      return reject(new Error('INVALID_CREDENTIALS'));
     }));
   }
 
@@ -86,7 +85,7 @@ class AuthService {
     )
       .then((response) => {
         if (!response) {
-          return Promise.reject(new ForbiddenError(`No account exist with ${email}`));
+          return Promise.reject(new Error(`No account exist with ${email}`));
         }
         return {
           email,
@@ -103,7 +102,7 @@ class AuthService {
       .findOne({ hashToken, status: true, isDeleted: false })
       .then((user) => {
         if (!user) {
-          return Promise.reject(new ForbiddenError('No User Found'));
+          return Promise.reject(new Error('No User Found'));
         }
         user.password = password;
         user.hashToken = '';
@@ -127,7 +126,7 @@ class AuthService {
       .findOne({ _id: user._id, status: true, isDeleted: false })
       .then(async (response) => {
         if (!response) {
-          return Promise.reject(new ForbiddenError('No User Found'));
+          return Promise.reject(new Error('No User Found'));
         }
         response.password = password;
         await response.save();
@@ -155,7 +154,7 @@ class AuthService {
     if (existUser) {
       return JwtUtil.authenticate(existUser, 'Token has been generated');
     }
-    throw new ForbiddenError('NO_USER_FOUND');
+    throw new Error('NO_USER_FOUND');
   }
 }
 
