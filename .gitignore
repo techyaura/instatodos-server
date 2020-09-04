@@ -1,8 +1,15 @@
+#node modules
 node_modules
+
+#env files
 .env.test
 .env.local
 .env.development
 .env.production
+
+#logs
 logs
+
+#editor specific
 npm-debug.log
 .vscode
