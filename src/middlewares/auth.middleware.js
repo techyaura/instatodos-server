@@ -6,7 +6,7 @@ const { UserModel } = require('../models');
 const { JwtUtil } = require('../utils');
 
 module.exports = {
-  jwt: async (req) => {
+  jwt: async (req, next) => {
     try {
       let token;
       if (req.headers && req.headers.authorization) {
@@ -20,6 +20,8 @@ module.exports = {
             throw new AuthenticationError('INVALID_GRANT');
           }
         }
+      } else {
+        return {};
       }
       const tokenPayload = await JwtUtil.verify(token);
       if (tokenPayload && tokenPayload.auth) {

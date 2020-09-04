@@ -80,7 +80,8 @@ class Boot {
       schema,
       debug: process.env.NODE_ENV === 'development',
       context: async ({ req }) => {
-        const user = await AuthMiddleware.jwt(req);
+        const { next } = req;
+        const user = await AuthMiddleware.jwt(req, next);
         return {
           ...req, user
         };
