@@ -56,8 +56,10 @@ class TodoService {
       await this.TodoModel.remove({ parent: id });
     }
     if (response && response.n !== 0) {
-      if (postBody.notes && postBody.noteId && postBody.notes !== 'undefined') {
+      if (postBody.noteId) {
         await CommentService.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
+      } else {
+        await CommentService.addTodoComment({ user }, { todoId: id }, { description: postBody.notes });
       }
       return { message: 'Todo has been succesfully updated', ok: true };
     }
@@ -486,7 +488,7 @@ class TodoService {
                   _id: '$_id',
                   project: { $first: '$project' },
                   projectId: { $first: '$projectId' },
-                  notes: { $push: '$comments' },
+                  comments: { $push: '$comments' },
                   user: { $first: '$user' },
                   title: { $first: '$title' },
                   labels: { $first: '$labels' },
@@ -519,8 +521,8 @@ class TodoService {
     const { todos, todosCount } = response[0];
     const mapTodos = todos.map((todo) => {
       const { email } = todo.user[0];
-      if (todo.notes && todo.notes.length) {
-        todo.notes = todo.notes.map(comment => ({
+      if (todo.comments && todo.comments.length) {
+        todo.comments = todo.comments.map(comment => ({
           _id: comment._id,
           description: comment.description,
           userId: (Array.isArray(comment.userId) && comment.userId.length) ? comment.userId[0] : null

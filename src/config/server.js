@@ -114,11 +114,11 @@ class Boot {
     server.applyMiddleware({ app, path });
     httpServer.listen(this.port, () => {
       console.log(
-        '🚀',
+        '🚀🐙',
         success(`Server ready at http://localhost:${this.port}${server.graphqlPath}`)
       );
       console.log(
-        '🚀',
+        '🚀🔥',
         success(`Subscriptions ready at ws://localhost:${this.port}${server.subscriptionsPath}`)
       );
     });

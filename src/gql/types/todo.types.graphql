@@ -88,7 +88,7 @@ type TodoType {
   scheduledDate: Date
   projectId: ID
   project: TodoProjectListType
-  notes: [TodoCommentType]
+  comments: [TodoCommentType]
   labels: [TodoLabelListType]
   subTasks: [TodoType]
   parent: String

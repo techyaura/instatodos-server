@@ -18,13 +18,10 @@ class TodoCommentService {
     throw new Error(403);
   }
 
-  async updateTodoComment({ user }, params, postBody) {
-    const { _id: userId } = user;
+  async updateTodoComment(_, params, postBody) {
     const { todoId, id: commentId } = params;
     const { description } = postBody;
-    const response = await this.TodoModel.updateOne({
-      user: userId, isDeleted: false, _id: todoId, 'comments._id': commentId
-    }, { $set: { 'comments.$.description': description } });
+    const response = await this.TodoModel.updateOne({ isDeleted: false, _id: todoId, 'comments._id': commentId }, { $set: { 'comments.$.description': description } });
     if (response && response.n !== 0) {
       return { message: 'Todo has been succesfully updated', ok: true };
     }

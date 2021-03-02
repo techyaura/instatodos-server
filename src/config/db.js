@@ -11,7 +11,7 @@ module.exports = () => {
 
     // When successfully connected
     mongoose.connection.on('connected', () => {
-    /* eslint no-console: 0 */
+      /* eslint no-console: 0 */
       console.log(success('=> DB Connected'));
       return resolve();
     });
