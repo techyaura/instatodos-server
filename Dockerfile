@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.13
 FROM node:alpine
 RUN apk add --no-cache && npm i -g nodemon
 LABEL maintainer="techyaura <techyaura@gmail.com>"
