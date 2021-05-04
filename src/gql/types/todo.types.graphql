@@ -49,7 +49,7 @@ input TodoInputType {
   priority: TodoPriorityEnumType
   notes: String
   noteId: String
-  # subTasks: [TodoInputType]
+  subTasks: [TodoInputType] #need to remove after client implemntation
 }
 
 input TodoSortInputType {

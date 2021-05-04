@@ -34,8 +34,8 @@ const updateTodoSchema = Joi.object().keys({
   priority: Joi.string().optional(),
   scheduledDate: Joi.date().optional().allow(null),
   notes: Joi.string().optional(),
-  noteId: Joi.string().optional()
-  // subTasks: Joi.array().items(subTask).optional()
+  noteId: Joi.string().optional(),
+  subTasks: Joi.array().items(subTask).optional() // [TODO] need to remove
 });
 const addTodoCommentSchema = Joi.object().keys({
   todoId: Joi.string().required(),
