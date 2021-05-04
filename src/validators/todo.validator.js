@@ -2,6 +2,7 @@ const Joi = require('joi');
 
 const subTask = Joi.object().keys({
   title: Joi.string().required(),
+  todoId: Joi.string().required(),
   isCompleted: Joi.boolean().optional()
 });
 // const subTaskUpdate = Joi.object().keys({
@@ -33,8 +34,8 @@ const updateTodoSchema = Joi.object().keys({
   priority: Joi.string().optional(),
   scheduledDate: Joi.date().optional().allow(null),
   notes: Joi.string().optional(),
-  noteId: Joi.string().optional(),
-  subTasks: Joi.array().items(subTask).optional()
+  noteId: Joi.string().optional()
+  // subTasks: Joi.array().items(subTask).optional()
 });
 const addTodoCommentSchema = Joi.object().keys({
   todoId: Joi.string().required(),
@@ -52,6 +53,10 @@ const updateTodoCommentSchema = Joi.object().keys({
     .required()
 });
 module.exports = {
+  async subTodoValidator(req) {
+    const reqBody = req.body || req;
+    await Joi.validate(reqBody, subTask);
+  },
   async addTodoValidator(req) {
     const reqBody = req.body || req;
     await Joi.validate(reqBody, addTodoSchema);

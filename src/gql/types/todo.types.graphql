@@ -13,6 +13,8 @@ type Mutation {
   addTodo(input: TodoInputType!): SuccessType!
   updateTodo(id: ID!, input: TodoInputType!): SuccessType!
   deleteTodo(id: ID!): SuccessType!
+  addSubTodo(input: SubTaskInputType!): SuccessType!
+  updateSubTodo(id: ID!, input: SubTaskInputType!): SuccessType!
 }
 
 # Subscriptions -------------------------------------------
@@ -47,7 +49,7 @@ input TodoInputType {
   priority: TodoPriorityEnumType
   notes: String
   noteId: String
-  subTasks: [TodoInputType]
+  # subTasks: [TodoInputType]
 }
 
 input TodoSortInputType {
@@ -110,17 +112,8 @@ type TodoListCompletedType {
   data: [TodoCompletedType]
 }
 
-# type SubTask {
-#   _id: String!
-#   projectId: ID
-#   title: String!
-#   user: User
-#   priority: TodoPriorityEnumType
-#   isCompleted: Boolean
-#   isInProgress: Boolean
-#   createdAt: Date!
-#   updatedAt: Date
-#   scheduledDate: Date
-#   notes: [TodoCommentType]
-#   labels: [TodoLabelListType]
-# }
+input SubTaskInputType {
+  title: String!
+  isCompleted: Boolean
+  todoId: String!
+}

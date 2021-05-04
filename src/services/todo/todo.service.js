@@ -10,6 +10,36 @@ class TodoService {
     this.TodoModel = TodoModel;
   }
 
+  async addSubTodo({ user }, postBody) {
+    const item = {};
+    if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
+      item.isCompleted = true;
+    }
+    item.title = postBody.title;
+    item.parent = postBody.todoId;
+    item.user = user._id;
+    const todo = this.TodoModel({ ...item });
+    await todo.save();
+    return { message: 'Sub Task has been succesfully added', ok: true };
+  }
+
+  async updateSubTodo({ user }, { id }, postBody) {
+    const item = {};
+    if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
+      item.isCompleted = true;
+    }
+    item.title = postBody.title;
+    item.parent = postBody.todoId;
+    item.user = user._id;
+    const todo = await this.TodoModel.updateOne({
+      user: user._id, isDeleted: false, status: true, _id: id, parent: postBody.todoId
+    }, { $set: postBody });
+    if (todo.nModified) {
+      return { message: 'Sub Task has been succesfully updated', ok: true };
+    }
+    throw new Error(403);
+  }
+
   async addTodo({ user }, postBody) {
     const todo = this.TodoModel({ ...postBody, user: user._id });
     const response = await todo.save();
@@ -31,30 +61,30 @@ class TodoService {
         ...postBody, isInProgress: false
       };
     }
-    const { subTasks = [] } = postBody;
-    let savedSubTasks = [];
-    if (subTasks.length) {
-      savedSubTasks = subTasks.map((item) => {
-        if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
-          item.isCompleted = true;
-        }
-        return {
-          ...item,
-          parent: id,
-          projectId: postBody.projectId || null,
-          user: user._id
-        };
-      });
-    }
-    const response = await TodoModel.updateOne({
+    // const { subTasks = [] } = postBody;
+    // / let savedSubTasks = [];
+    // if (subTasks.length) {
+    //   savedSubTasks = subTasks.map((item) => {
+    //     if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
+    //       item.isCompleted = true;
+    //     }
+    //     return {
+    //       ...item,
+    //       parent: id,
+    //       projectId: postBody.projectId || null,
+    //       user: user._id
+    //     };
+    //   });
+    // }
+    const response = await this.TodoModel.updateOne({
       user: user._id, isDeleted: false, status: true, _id: id
     }, { $set: postBody });
-    if (savedSubTasks.length) {
-      await this.TodoModel.remove({ parent: id });
-      await this.TodoModel.create(savedSubTasks);
-    } else {
-      await this.TodoModel.remove({ parent: id });
-    }
+    // if (savedSubTasks.length) {
+    //   await this.TodoModel.remove({ parent: id });
+    //   await this.TodoModel.create(savedSubTasks);
+    // } else {
+    //   await this.TodoModel.remove({ parent: id });
+    // }
     if (response && response.n !== 0) {
       if (postBody.noteId) {
         await CommentService.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
