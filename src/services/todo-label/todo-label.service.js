@@ -29,8 +29,8 @@ class TodoLabelService {
     const { id: todoLabelId } = params;
     const { _id: userId } = user;
     const { name } = postBody;
-    const isExist = await this.checkUniqueLabel(name, user);
-    if (isExist) {
+    const isLabelExist = await this.checkLabelByIdAndName(todoLabelId, name, user);
+    if (isLabelExist) {
       throw new Error('Label Should be unique');
     }
     const slug = CommonFunctionUtil.slugify(name);
@@ -47,6 +47,12 @@ class TodoLabelService {
   checkUniqueLabel(label, user) {
     return this.TodoLabelModel
       .findOne({ name: label, user: user._id })
+      .lean();
+  }
+
+  checkLabelByIdAndName(labelId, label, user) {
+    return this.TodoLabelModel
+      .findOne({ _id: { $ne: labelId }, name: label, user: user._id })
       .lean();
   }
 
