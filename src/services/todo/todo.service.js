@@ -478,6 +478,16 @@ class TodoService {
           }
         },
         {
+          $addFields: {
+            subTasks: {
+              $filter: {
+                input: '$subTasks',
+                cond: { $eq: ['$$this.isDeleted', false] }
+              }
+            }
+          }
+        },
+        {
           $match: { $or: [{ parent: null }, { parent: { $exists: false } }] }
         },
         {
