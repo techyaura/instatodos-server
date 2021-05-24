@@ -64,7 +64,7 @@ class ProjectService {
     return this.ProjectModel
       .aggregate([
         {
-          $match: { isDeleted: false, user: mongoose.Types.ObjectId(user._id) }
+          $match: { isDeleted: false, status: true, user: mongoose.Types.ObjectId(user._id) }
         },
         {
           $lookup: {
@@ -75,7 +75,9 @@ class ProjectService {
                 $match: {
                   isDeleted: false,
                   isCompleted: false,
+                  status: true,
                   projectId: { $ne: null },
+                  parent: { $eq: null },
                   $expr: {
                     $and: [
                       { $eq: ['$$nativeProjectId', '$projectId'] }
