@@ -45,11 +45,11 @@ input TodoInputType {
   labelIds: [ID]
   scheduledDate: Date
   isCompleted: Boolean
-  isInProgress: Boolean
+  #isInProgress: Boolean
   priority: TodoPriorityEnumType
   notes: String
   noteId: String
-  subTasks: [TodoInputType] #need to remove after client implemntation
+  #subTasks: [TodoInputType] #need to remove after client implemntation
 }
 
 input TodoSortInputType {

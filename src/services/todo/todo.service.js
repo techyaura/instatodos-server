@@ -61,30 +61,9 @@ class TodoService {
         ...postBody, isInProgress: false
       };
     }
-    // const { subTasks = [] } = postBody;
-    // / let savedSubTasks = [];
-    // if (subTasks.length) {
-    //   savedSubTasks = subTasks.map((item) => {
-    //     if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
-    //       item.isCompleted = true;
-    //     }
-    //     return {
-    //       ...item,
-    //       parent: id,
-    //       projectId: postBody.projectId || null,
-    //       user: user._id
-    //     };
-    //   });
-    // }
     const response = await this.TodoModel.updateOne({
       user: user._id, isDeleted: false, status: true, _id: id
     }, { $set: postBody });
-    // if (savedSubTasks.length) {
-    //   await this.TodoModel.remove({ parent: id });
-    //   await this.TodoModel.create(savedSubTasks);
-    // } else {
-    //   await this.TodoModel.remove({ parent: id });
-    // }
     if (response && response.n !== 0) {
       if (postBody.noteId) {
         await CommentService.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
@@ -196,19 +175,20 @@ class TodoService {
         conditions = {
           ...conditions,
           isCompleted: false,
-          $or: [
-            { scheduledDate: null },
-            // {
-            //   scheduledDate: {
-            //     $gt: new Date(moment().hours(23).minutes(59).seconds(59))
-            //   }
-            // },
-            {
-              scheduledDate: {
-                $lte: new Date(moment().hours(0).minutes(0).seconds(0))
-              }
-            }
-          ]
+          scheduledDate: null
+          // $or: [
+          //   { scheduledDate: null },
+          //   // {
+          //   //   scheduledDate: {
+          //   //     $gt: new Date(moment().hours(23).minutes(59).seconds(59))
+          //   //   }
+          //   // },
+          //   {
+          //     scheduledDate: {
+          //       $lte: new Date(moment().hours(0).minutes(0).seconds(0))
+          //     }
+          //   }
+          // ]
         };
       }
       // check pending tasks
@@ -505,6 +485,16 @@ class TodoService {
             connectToField: 'parent',
             as: 'subTasks',
             maxDepth: 1
+          }
+        },
+        {
+          $addFields: {
+            subTasks: {
+              $filter: {
+                input: '$subTasks',
+                cond: { $eq: ['$$this.isDeleted', false] }
+              }
+            }
           }
         },
         {
