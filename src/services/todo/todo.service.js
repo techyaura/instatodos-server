@@ -166,19 +166,20 @@ class TodoService {
         conditions = {
           ...conditions,
           isCompleted: false,
-          $or: [
-            { scheduledDate: null },
-            // {
-            //   scheduledDate: {
-            //     $gt: new Date(moment().hours(23).minutes(59).seconds(59))
-            //   }
-            // },
-            {
-              scheduledDate: {
-                $lte: new Date(moment().hours(0).minutes(0).seconds(0))
-              }
-            }
-          ]
+          scheduledDate: null
+          // $or: [
+          //   { scheduledDate: null },
+          //   // {
+          //   //   scheduledDate: {
+          //   //     $gt: new Date(moment().hours(23).minutes(59).seconds(59))
+          //   //   }
+          //   // },
+          //   {
+          //     scheduledDate: {
+          //       $lte: new Date(moment().hours(0).minutes(0).seconds(0))
+          //     }
+          //   }
+          // ]
         };
       }
       // check pending tasks
