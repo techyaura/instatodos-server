@@ -14,7 +14,7 @@ type Mutation {
   updateTodo(id: ID!, input: TodoInputType!): SuccessType!
   deleteTodo(id: ID!): SuccessType!
   addSubTodo(input: SubTaskInputType!): SuccessType!
-  updateSubTodo(id: ID!, input: SubTaskInputType!): SuccessType!
+  updateSubTodo(id: ID!, input: SubTaskUpdateInputType!): SuccessType!
 }
 
 # Subscriptions -------------------------------------------
@@ -114,6 +114,12 @@ type TodoListCompletedType {
 
 input SubTaskInputType {
   title: String!
+  isCompleted: Boolean
+  todoId: String!
+}
+
+input SubTaskUpdateInputType {
+  title: String
   isCompleted: Boolean
   todoId: String!
 }

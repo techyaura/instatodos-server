@@ -28,7 +28,9 @@ class TodoService {
     if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
       item.isCompleted = true;
     }
-    item.title = postBody.title;
+    if (postBody.title) {
+      item.title = postBody.title;
+    }
     item.parent = postBody.todoId;
     item.user = user._id;
     const todo = await this.TodoModel.updateOne({
@@ -492,7 +494,7 @@ class TodoService {
             subTasks: {
               $filter: {
                 input: '$subTasks',
-                cond: { $eq: ['$$this.isDeleted', false] }
+                cond: { $and: [{ $eq: ['$$this.isDeleted', false] }, { $eq: ['$$this.isCompleted', false] }] }
               }
             }
           }

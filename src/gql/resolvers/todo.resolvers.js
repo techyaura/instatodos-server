@@ -3,7 +3,7 @@ const { POST_ADDED, pubSub } = require('../events');
 const { TodoService } = require('../../services');
 const { ContextMiddleware, TodoMiddlewares } = require('../../middlewares');
 const {
-  addTodoValidator, updateTodoValidator, addTodoCommentValidator, updateTodoCommentValidator, subTodoValidator
+  addTodoValidator, updateTodoValidator, addTodoCommentValidator, updateTodoCommentValidator, subTodoValidator, subTodoUpdateValidator
 } = require('../../validators');
 
 const queries = {
@@ -52,7 +52,7 @@ const mutations = {
   },
   updateSubTodo: async (_, args, context) => {
     try {
-      await ContextMiddleware(context, subTodoValidator(args.input));
+      await ContextMiddleware(context, subTodoUpdateValidator(args.input));
       return TodoService.updateSubTodo(context, args, args.input);
     } catch (err) {
       throw err;

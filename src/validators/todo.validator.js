@@ -5,10 +5,11 @@ const subTask = Joi.object().keys({
   todoId: Joi.string().required(),
   isCompleted: Joi.boolean().optional()
 });
-// const subTaskUpdate = Joi.object().keys({
-//   title: Joi.string().required(),
-//   isCompleted: Joi.boolean().optional()
-// });
+const subTaskUpdate = Joi.object().keys({
+  title: Joi.string().optional(),
+  isCompleted: Joi.boolean().optional(),
+  todoId: Joi.string().required()
+});
 
 const addTodoSchema = Joi.object().keys({
   projectId: Joi.string().optional(),
@@ -56,6 +57,10 @@ module.exports = {
   async subTodoValidator(req) {
     const reqBody = req.body || req;
     await Joi.validate(reqBody, subTask);
+  },
+  async subTodoUpdateValidator(req) {
+    const reqBody = req.body || req;
+    await Joi.validate(reqBody, subTaskUpdate);
   },
   async addTodoValidator(req) {
     const reqBody = req.body || req;
