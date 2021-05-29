@@ -277,7 +277,7 @@ class TodoService {
         },
         {
           $group: {
-            _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: timeZoneValue } },
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: timeZoneValue } },
             list: { $push: '$$ROOT' },
             count: { $sum: 1 }
           }
@@ -447,12 +447,12 @@ class TodoService {
         {
           $lookup: labelLookUp
         },
-        {
-          $unwind: {
-            path: '$comments',
-            preserveNullAndEmptyArrays: true
-          }
-        },
+        // {
+        //   $unwind: {
+        //     path: '$comments',
+        //     preserveNullAndEmptyArrays: true
+        //   }
+        // },
         {
           $lookup: {
             from: 'users',
