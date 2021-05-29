@@ -48,7 +48,6 @@ input TodoInputType {
   #isInProgress: Boolean
   priority: TodoPriorityEnumType
   notes: String
-  noteId: String
   #subTasks: [TodoInputType] #need to remove after client implemntation
 }
 
@@ -90,7 +89,8 @@ type TodoType {
   scheduledDate: Date
   projectId: ID
   project: TodoProjectListType
-  comments: [TodoCommentType]
+  notes: String
+  #comments: [TodoCommentType]
   labels: [TodoLabelListType]
   subTasks: [TodoType]
   parent: String

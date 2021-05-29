@@ -37,6 +37,10 @@ const schema = new mongoose.Schema({
     type: String,
     required: true
   },
+  notes: {
+    type: String,
+    default: null
+  },
   status: {
     type: Boolean,
     default: true

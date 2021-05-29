@@ -44,10 +44,11 @@ class TodoService {
 
   async addTodo({ user }, postBody) {
     const todo = this.TodoModel({ ...postBody, user: user._id });
-    const response = await todo.save();
-    if (postBody.notes && postBody.notes !== 'undefined') {
-      await CommentService.addTodoComment({ user }, { todoId: response._id }, { description: postBody.notes });
-    }
+    await todo.save();
+    // const response = await todo.save();
+    // if (postBody.notes && postBody.notes !== 'undefined') {
+    //   await CommentService.addTodoComment({ user }, { todoId: response._id }, { description: postBody.notes });
+    // }
     return { message: 'Todo has been succesfully added', ok: true };
   }
 
@@ -67,11 +68,11 @@ class TodoService {
       user: user._id, isDeleted: false, status: true, _id: id
     }, { $set: postBody });
     if (response && response.n !== 0) {
-      if (postBody.noteId) {
-        await CommentService.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
-      } else {
-        await CommentService.addTodoComment({ user }, { todoId: id }, { description: postBody.notes });
-      }
+      // if (postBody.noteId) {
+      //   await CommentService.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
+      // } else {
+      //   await CommentService.addTodoComment({ user }, { todoId: id }, { description: postBody.notes });
+      // }
       return { message: 'Todo has been succesfully updated', ok: true };
     }
     throw new Error(403);
@@ -464,6 +465,7 @@ class TodoService {
         {
           $project: {
             title: '$title',
+            notes: '$notes',
             project: { $arrayElemAt: ['$project', 0] },
             projectId: 1,
             labels: '$labels',
@@ -474,7 +476,7 @@ class TodoService {
             updatedAt: '$updatedAt',
             scheduledDate: { $dateToString: { format: '%Y-%m-%d', date: '$scheduledDate' } },
             user: '$user',
-            comments: '$comments',
+            // comments: '$comments',
             priority: '$priority',
             parent: '$parent'
           }
@@ -510,9 +512,10 @@ class TodoService {
                   _id: '$_id',
                   project: { $first: '$project' },
                   projectId: { $first: '$projectId' },
-                  comments: { $push: '$comments' },
+                  // comments: { $push: '$comments' },
                   user: { $first: '$user' },
                   title: { $first: '$title' },
+                  notes: { $first: '$notes' },
                   labels: { $first: '$labels' },
                   isCompleted: { $first: '$isCompleted' },
                   isInProgress: { $first: '$isInProgress' },
