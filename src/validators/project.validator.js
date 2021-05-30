@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const addTodoProjectSchema = Joi.object().keys({
   name: Joi.string()
-    .regex(/^\S+$/)
+    // .regex(/^\S+$/)
     .min(2)
     .max(60)
     .required()
@@ -10,7 +10,7 @@ const addTodoProjectSchema = Joi.object().keys({
 const updateTodoProjectSchema = Joi.object().keys({
   id: Joi.string().required(),
   name: Joi.string()
-    .regex(/^\S+$/)
+    // .regex(/^\S+$/)
     .min(2)
     .max(30)
     .required()

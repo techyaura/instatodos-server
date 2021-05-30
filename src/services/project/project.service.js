@@ -7,9 +7,14 @@ class ProjectService {
     this.ProjectModel = ProjectModel;
   }
 
-  __checkUniqueProject(label, user) {
+  __checkUniqueProject(label, user, projectId = null) {
+    if (!projectId) {
+      return this.ProjectModel
+        .findOne({ name: label, user: user._id })
+        .lean();
+    }
     return this.ProjectModel
-      .findOne({ name: label, user: user._id })
+      .findOne({ _id: { $ne: projectId }, name: label, user: user._id })
       .lean();
   }
 
@@ -32,16 +37,16 @@ class ProjectService {
   }
 
   async updateTodoProject({ user }, params, postBody) {
-    const { id: todoLabelId } = params;
+    const { id: projectId } = params;
     const { _id: userId } = user;
     const { name } = postBody;
-    const isExist = await this.__checkUniqueProject(name, user);
+    const isExist = await this.__checkUniqueProject(name, user, projectId);
     if (isExist) {
       throw new Error('List Should be unique');
     }
     const slug = CommonFunctionUtil.slugify(name);
     const response = await this.ProjectModel.updateOne({
-      user: userId, _id: todoLabelId
+      user: userId, _id: projectId
     }, { $set: { name, slug } });
     if (response && response.n !== 0) {
       return { message: 'List has been succesfully updated', ok: true };
