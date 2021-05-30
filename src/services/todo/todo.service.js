@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 const { TodoModel } = require('../../models');
-const CommentService = require('../todo-comment/todo-comment.service');
+// const CommentService = require('../todo-comment/todo-comment.service');
 
 const timeZoneValue = 'Asia/Kolkata';
 
@@ -61,12 +61,21 @@ class TodoService {
     };
     if (typeof postBody.isCompleted === 'boolean' && postBody.isCompleted) {
       postBody = {
-        ...postBody, isInProgress: false
+        ...postBody,
+        isCompleted: true
       };
     }
     const response = await this.TodoModel.updateOne({
       user: user._id, isDeleted: false, status: true, _id: id
     }, { $set: postBody });
+    // also update subTasks to completed if parent is completed
+    if (postBody.isCompleted) {
+      const updatePayload = {
+        updatedAt: Date.now(),
+        isCompleted: true
+      };
+      await this.TodoModel.updateMany({ parent: id }, { $set: updatePayload });
+    }
     if (response && response.n !== 0) {
       // if (postBody.noteId) {
       //   await CommentService.updateTodoComment({ user }, { todoId: id, id: postBody.noteId }, { description: postBody.notes });
@@ -573,6 +582,11 @@ class TodoService {
       user: user._id, _id: params.id, isDeleted: false, status: true
     }, {
       isDeleted: true, status: false
+    });
+    await this.TodoModel.updateMany({
+      parent: params.id, isDeleted: false
+    }, {
+      $set: { isDeleted: true, status: false, updatedAt: Date.now() }
     });
     if (response && response.n !== 0) {
       return { ok: true, message: 'Todo deleted successfully' };
