@@ -6,6 +6,7 @@ const ProjectService = require('./project/project.service');
 const SocialLoginService = require('./social-login/social-login.service');
 const TodoLabelService = require('./todo-label/todo-label.service');
 const TodoCommentService = require('./todo-comment/todo-comment.service');
+const SettingService = require('./settings/settings.service');
 
 module.exports = {
   UserService,
@@ -15,5 +16,6 @@ module.exports = {
   ProjectService,
   SocialLoginService,
   TodoLabelService,
-  TodoCommentService
+  TodoCommentService,
+  SettingService
 };

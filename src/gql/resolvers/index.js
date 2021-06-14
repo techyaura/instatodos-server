@@ -7,12 +7,14 @@ const { mutations: ThoughtMutation, queries: ThoughtQuery } = require('./thought
 const { mutations: ProjectMutation, queries: ProjectQuery } = require('./project.resolvers');
 const { mutations: SocialLoginMutation } = require('./social-login.resolvers');
 
+const { queries: SettingQuery, mutations: SettingMutation } = require('./setting.resolvers');
+
 module.exports = {
   Mutation: {
-    ...UserMutation, ...SocialLoginMutation, ...TodoMutation, ...TodoLabelMutation, ...ThoughtMutation, ...ProjectMutation, ...TodoCommentMutation
+    ...UserMutation, ...SocialLoginMutation, ...TodoMutation, ...TodoLabelMutation, ...ThoughtMutation, ...ProjectMutation, ...TodoCommentMutation, ...SettingMutation
   },
   Query: {
-    ...UserQuery, ...TodoQuery, ...TodoLabelQuery, ...ThoughtQuery, ...ProjectQuery
+    ...UserQuery, ...TodoQuery, ...TodoLabelQuery, ...ThoughtQuery, ...ProjectQuery, ...SettingQuery
   },
   Subscription: {
     ...TodoSubscription

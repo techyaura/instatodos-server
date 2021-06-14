@@ -1,0 +1,21 @@
+# Queries -------------------------------------------
+
+type Query {
+  setting : SettingType!
+}
+
+# Mutations -------------------------------------------
+
+type Mutation {
+  setting(input: SettingInputType!): SettingType!
+}
+
+#Types ----------------------------------------------
+
+input SettingInputType {
+  theme: String
+}
+
+type SettingType {
+  theme: String
+}

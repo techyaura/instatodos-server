@@ -8,12 +8,15 @@ const thoughtValidator = require('./thought.validator');
 
 const projectValidator = require('./project.validator');
 
+const configSettingValidator = require('./setting.validator');
+
 const validators = {
   ...authValidator,
   ...todoValidator,
   ...todoLabelValidator,
   ...thoughtValidator,
-  ...projectValidator
+  ...projectValidator,
+  ...configSettingValidator
 };
 
 module.exports = validators;

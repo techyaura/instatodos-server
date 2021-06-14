@@ -1,7 +1,8 @@
 const { JwtUtil } = require('../../utils');
-const TodoService = require('../todo/todo.service');
-const ProjectService = require('../project/project.service');
 const { UserModel } = require('../../models');
+const todoLabelService = require('../todo-label/todo-label.service');
+const projectService = require('../project/project.service');
+const settingsService = require('../settings/settings.service');
 
 class AuthService {
   constructor() {
@@ -24,8 +25,12 @@ class AuthService {
     return this.UserModel(postBody)
       .save()
       .then(user => Promise.all([
-        TodoService.labelDefaultOnRgister({ user }),
-        ProjectService.projectDefaultOnRgister({ user })
+        // configure default labels
+        todoLabelService.labelDefaultOnRgister({ user }),
+        // configure project
+        projectService.projectDefaultOnRgister({ user }),
+        // configure setting
+        settingsService.configureSetting(user)
       ]))
       .then(() => Promise.resolve({ message: 'User succsessfully registered', ...postBody }))
       .catch(err => Promise.reject(err));
@@ -36,14 +41,14 @@ class AuthService {
       otp: postBody.otp,
       hashToken: postBody.hashToken
     },
-      {
-        status: true,
-        otp: ''
-      },
-      {
-        upsert: false,
-        new: true
-      })
+    {
+      status: true,
+      otp: ''
+    },
+    {
+      upsert: false,
+      new: true
+    })
       .then((response) => {
         if (!response) {
           return Promise.reject(new Error('INVALID_OTP'));
