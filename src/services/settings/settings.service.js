@@ -20,7 +20,8 @@ class SettingService {
     }
     // default settings for already existing users
     return {
-      theme: 'rgb(255, 0, 0)'
+      theme: 'rgb(255, 0, 0)',
+      lang: 'en'
     };
   }
 
@@ -29,6 +30,9 @@ class SettingService {
     const update = {};
     if (typeof (postBody.theme) !== 'undefined' && postBody.theme) {
       update.theme = postBody.theme;
+    }
+    if (typeof (postBody.lang) !== 'undefined' && postBody.lang) {
+      update.lang = postBody.lang;
     }
     const response = await configSettingModel.findOneAndUpdate({ userId: user._id }, { $set: update }, { upsert: true, new: true }).lean();
     return response;

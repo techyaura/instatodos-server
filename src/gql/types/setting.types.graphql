@@ -13,9 +13,11 @@ type Mutation {
 #Types ----------------------------------------------
 
 input SettingInputType {
-  theme: String
+  theme: String,
+  lang: String
 }
 
 type SettingType {
-  theme: String
+  theme: String,
+  lang: String
 }

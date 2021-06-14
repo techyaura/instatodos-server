@@ -13,6 +13,11 @@ const schema = new mongoose.Schema({
   theme: {
     type: String,
     default: 'rgb(255, 0, 0)'
+  },
+  lang: {
+    type: String,
+    default: 'en',
+    enum: ['en', 'fr', 'es', 'hi']
   }
 },
 {
