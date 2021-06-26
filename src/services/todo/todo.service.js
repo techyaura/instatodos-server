@@ -287,7 +287,7 @@ class TodoService {
         },
         {
           $group: {
-            _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: timeZoneValue } },
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: timeZoneValue } },
             list: { $push: '$$ROOT' },
             count: { $sum: 1 }
           }
