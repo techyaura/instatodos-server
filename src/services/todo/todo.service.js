@@ -160,11 +160,10 @@ class TodoService {
           $or: [
             {
               isCompleted: false
+            },
+            {
+              isCompleted: true
             }
-            // ,
-            // {
-            //   isCompleted: true
-            // }
           ],
           scheduledDate: {
             $gte: new Date(moment().hours(0).minutes(0).seconds(0)),
